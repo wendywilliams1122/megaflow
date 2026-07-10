@@ -71,16 +71,6 @@ function ThreadPage() {
     enabled: !!thread,
   });
 
-  useEffect(() => {
-    if (thread) {
-      supabase.rpc("increment", {}).then(() => {}).catch(() => {});
-      supabase
-        .from("threads")
-        .update({ view_count: (thread as unknown as { view_count?: number }).view_count ?? 0 })
-        .eq("id", thread.id)
-        .then(() => {});
-    }
-  }, [thread]);
 
   const submitReply = async (e: React.FormEvent) => {
     e.preventDefault();
