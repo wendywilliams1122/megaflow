@@ -287,10 +287,10 @@ export const CategoriesExplorer = () => {
               <nav aria-label="Forum categories">
                 <ul className="space-y-1">
                   {sidebarCategories.map(category => <li key={category.id}>
-                      <a href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827]">
+                      <Link to="/c/$slug" params={{ slug: category.id }} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827]">
                         <span className="text-[#6b7280]">{category.icon}</span>
                         <span className="truncate">{category.label}</span>
-                      </a>
+                      </Link>
                     </li>)}
                 </ul>
               </nav>
