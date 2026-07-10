@@ -1,16 +1,25 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus } from "lucide-react";
 
 export function Header() {
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [query, setQuery] = useState("");
 
   const signOut = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/" });
   };
+
+  const onSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    navigate({ to: "/", search: q ? { q } : { q: undefined } });
+  };
+
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#e5e7eb] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
