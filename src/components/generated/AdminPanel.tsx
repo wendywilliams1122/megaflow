@@ -19,9 +19,13 @@ import {
   ShieldOff,
   ShieldCheck,
   Loader2,
+  Package,
+  Plus,
+  Pencil,
+  X,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads";
+type Tab = "overview" | "users" | "threads" | "products";
 
 type UserRow = {
   id: string;
@@ -46,14 +50,44 @@ type ThreadRow = {
   category: { slug: string; name: string } | null;
 };
 
-type Stats = { members: number; threads: number; posts: number; banned: number };
+type Stats = { members: number; threads: number; posts: number; banned: number; products: number };
+
+type ProductRow = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  price_cents: number;
+  currency: string;
+  image_url: string | null;
+  category: string | null;
+  stock: number;
+  status: "draft" | "active" | "archived";
+  featured: boolean;
+};
+
+const emptyProduct: Omit<ProductRow, "id"> = {
+  title: "",
+  slug: "",
+  description: "",
+  price_cents: 0,
+  currency: "USD",
+  image_url: "",
+  category: "",
+  stock: 0,
+  status: "active",
+  featured: false,
+};
 
 export const AdminPanel = () => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, isModerator, loading } = useAuth();
+  const isStaff = isAdmin || isModerator;
   const [tab, setTab] = useState<Tab>("overview");
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [threads, setThreads] = useState<ThreadRow[]>([]);
+  const [products, setProducts] = useState<ProductRow[]>([]);
+  const [editingProduct, setEditingProduct] = useState<Partial<ProductRow> | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
