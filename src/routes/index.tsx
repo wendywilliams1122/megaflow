@@ -42,24 +42,27 @@ function toneFor(name: string) {
 }
 
 function HomePage() {
+  const { q } = Route.useSearch();
   const [activeTab, setActiveTab] = useState<FilterId>("latest");
 
   const { data: threads, isLoading } = useQuery({
-    queryKey: ["threads", "feed", activeTab],
+    queryKey: ["threads", "feed", activeTab, q ?? ""],
     queryFn: async () => {
-      let q = supabase
+      let qb = supabase
         .from("threads")
         .select(
           "id, slug, title, vote_score, reply_count, created_at, last_activity_at, is_pinned, category:categories(slug, name, color), author:profiles(username)",
         )
         .order("is_pinned", { ascending: false });
 
-      if (activeTab === "latest") q = q.order("last_activity_at", { ascending: false });
-      else if (activeTab === "top") q = q.order("vote_score", { ascending: false });
-      else if (activeTab === "newest") q = q.order("created_at", { ascending: false });
-      else q = q.order("created_at", { ascending: true });
+      if (q && q.trim()) qb = qb.ilike("title", `%${q.trim()}%`);
 
-      const { data } = await q.limit(30);
+      if (activeTab === "latest") qb = qb.order("last_activity_at", { ascending: false });
+      else if (activeTab === "top") qb = qb.order("vote_score", { ascending: false });
+      else if (activeTab === "newest") qb = qb.order("created_at", { ascending: false });
+      else qb = qb.order("created_at", { ascending: true });
+
+      const { data } = await qb.limit(30);
       return (data ?? []) as unknown as ThreadRow[];
     },
   });
