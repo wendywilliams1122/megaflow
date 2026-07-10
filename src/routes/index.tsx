@@ -88,11 +88,16 @@ function HomePage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.18em] text-[#0ea5e9]">
-                  Community forum
+                  {q ? "Search results" : "Community forum"}
                 </p>
                 <h1 className="text-2xl font-extrabold tracking-tight text-[#111827] sm:text-3xl">
-                  Latest discussions
+                  {q ? `Results for “${q}”` : "Latest discussions"}
                 </h1>
+                {q && (
+                  <Link to="/" search={{ q: undefined }} className="mt-2 inline-block text-xs font-bold text-[#0ea5e9] hover:underline">
+                    Clear search
+                  </Link>
+                )}
               </div>
               <Link
                 to="/new"
