@@ -9,21 +9,51 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NewRouteImport } from './routes/new'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RulesRoute = RulesRouteImport.update({
+  id: '/rules',
+  path: '/rules',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -49,16 +79,26 @@ const CSlugRoute = CSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/categories': typeof CategoriesRoute
+  '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
+  '/rules': typeof RulesRoute
+  '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/categories': typeof CategoriesRoute
+  '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
+  '/rules': typeof RulesRoute
+  '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
@@ -66,22 +106,54 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/categories': typeof CategoriesRoute
+  '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
+  '/rules': typeof RulesRoute
+  '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/new' | '/c/$slug' | '/t/$slug' | '/u/$username'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/categories'
+    | '/dashboard'
+    | '/new'
+    | '/rules'
+    | '/support'
+    | '/c/$slug'
+    | '/t/$slug'
+    | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/new' | '/c/$slug' | '/t/$slug' | '/u/$username'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/categories'
+    | '/dashboard'
+    | '/new'
+    | '/rules'
+    | '/support'
+    | '/c/$slug'
+    | '/t/$slug'
+    | '/u/$username'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/auth'
+    | '/categories'
+    | '/dashboard'
     | '/new'
+    | '/rules'
+    | '/support'
     | '/c/$slug'
     | '/t/$slug'
     | '/u/$username'
@@ -89,8 +161,13 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  CategoriesRoute: typeof CategoriesRoute
+  DashboardRoute: typeof DashboardRoute
   NewRoute: typeof NewRoute
+  RulesRoute: typeof RulesRoute
+  SupportRoute: typeof SupportRoute
   CSlugRoute: typeof CSlugRoute
   TSlugRoute: typeof TSlugRoute
   UUsernameRoute: typeof UUsernameRoute
@@ -98,6 +175,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rules': {
+      id: '/rules'
+      path: '/rules'
+      fullPath: '/rules'
+      preLoaderRoute: typeof RulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/new': {
       id: '/new'
       path: '/new'
@@ -105,11 +196,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -145,8 +257,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  CategoriesRoute: CategoriesRoute,
+  DashboardRoute: DashboardRoute,
   NewRoute: NewRoute,
+  RulesRoute: RulesRoute,
+  SupportRoute: SupportRoute,
   CSlugRoute: CSlugRoute,
   TSlugRoute: TSlugRoute,
   UUsernameRoute: UUsernameRoute,
