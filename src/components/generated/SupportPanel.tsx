@@ -366,12 +366,12 @@ export const SupportPanel = () => {
             <button className="flex h-10 w-10 items-center justify-center rounded-lg text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:hidden" aria-label="Open navigation" type="button">
               <Menu size={20} />
             </button>
-            <a href="#" className="flex items-center gap-2.5 rounded-lg" aria-label="Lovable Friendly home">
+            <a href="#" className="flex items-center gap-2.5 rounded-lg" aria-label="MegaFlow home">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0ea5e9] text-white shadow-sm shadow-sky-200" aria-hidden="true">
                 <Heart size={18} fill="currentColor" />
               </div>
               <span className="hidden text-xl font-extrabold tracking-tight text-[#111827] sm:inline">
-                <span>Lovable Friendly</span>
+                <span>MegaFlow</span>
               </span>
             </a>
           </div>

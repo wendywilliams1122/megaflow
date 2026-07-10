@@ -355,18 +355,18 @@ const Sidebar = () => <aside className="hidden min-h-[calc(100vh-4rem)] w-[260px
       </div>
     </div>
   </aside>;
-const Header = () => <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#e5e7eb] bg-[#ffffff]/95 backdrop-blur supports-[backdrop-filter]:bg-[#ffffff]/90">
+const DashHeader = () => <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#e5e7eb] bg-[#ffffff]/95 backdrop-blur supports-[backdrop-filter]:bg-[#ffffff]/90">
     <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         <button className="flex h-10 w-10 items-center justify-center rounded-lg text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:hidden" aria-label="Open navigation">
           <Menu size={20} />
         </button>
-        <a href="#" className="flex items-center gap-2.5 rounded-lg" aria-label="Lovable Friendly home">
+        <a href="#" className="flex items-center gap-2.5 rounded-lg" aria-label="MegaFlow home">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0ea5e9] text-white shadow-sm shadow-sky-200">
             <Heart size={18} fill="currentColor" />
           </div>
           <span className="hidden text-xl font-extrabold tracking-tight text-[#111827] sm:inline">
-            <span>Lovable Friendly</span>
+            <span>MegaFlow</span>
           </span>
         </a>
       </div>
@@ -648,7 +648,7 @@ const MessagesPreview = () => <div className="bg-white rounded-2xl border border
 
 export const UserDashboard = () => {
   return <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827] selection:bg-sky-100 selection:text-sky-600">
-      <Header />
+      <DashHeader />
 
       <div className="mx-auto flex max-w-[1440px] pt-16">
         <Sidebar />
@@ -688,7 +688,7 @@ export const UserDashboard = () => {
           {/* Small Footer for Dashboard */}
           <footer className="pt-8 pb-12 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-slate-400 text-sm">
-              <span className="font-black text-slate-500">Lovable Friendly</span>
+              <span className="font-black text-slate-500">MegaFlow</span>
               <span>&copy; 2024 Dashboard. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-6">
