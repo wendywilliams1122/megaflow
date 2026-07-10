@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { SideRail } from "@/components/SideRail";
+import { Footer } from "@/components/Footer";
 import { timeAgo } from "@/lib/forum";
+import { MessageSquare, Clock } from "lucide-react";
 
 export const Route = createFileRoute("/u/$username")({
   component: UserPage,
@@ -33,44 +36,60 @@ function UserPage() {
     enabled: !!profile,
   });
 
-  if (!profile)
-    return <div className="mx-auto max-w-3xl px-4 py-6 text-sm text-muted-foreground">Loading...</div>;
-
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6">
-      <div className="mb-6 flex items-center gap-4 rounded-lg border border-border bg-card p-5">
-        <div className="brand-gradient flex h-16 w-16 items-center justify-center rounded-full text-xl font-bold text-white">
-          {profile.username.slice(0, 2).toUpperCase()}
-        </div>
-        <div>
-          <h1 className="text-xl font-bold">{profile.display_name ?? profile.username}</h1>
-          <p className="text-sm text-muted-foreground">@{profile.username}</p>
-          <p className="mt-1 text-xs">
-            <span className="font-semibold text-primary">{profile.reputation}</span> reputation
-          </p>
-        </div>
-      </div>
-
-      <h2 className="mb-3 text-sm font-semibold text-muted-foreground">Threads</h2>
-      <ul className="space-y-2">
-        {threads?.map((t: any) => (
-          <li key={t.id}>
-            <Link
-              to="/t/$slug"
-              params={{ slug: t.slug }}
-              className="block rounded-lg border border-border bg-card p-3 hover:border-primary/40"
-            >
-              <div className="font-medium">{t.title}</div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                {t.vote_score} votes · {t.reply_count} replies · {timeAgo(t.created_at)}
+    <div className="mx-auto flex max-w-[1440px] pt-16">
+      <SideRail />
+      <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        {!profile ? (
+          <div className="rounded-xl border border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">Loading…</div>
+        ) : (
+          <>
+            <section className="mb-6 flex items-center gap-4 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0ea5e9] text-xl font-extrabold text-white">
+                {profile.username.slice(0, 2).toUpperCase()}
               </div>
-            </Link>
-          </li>
-        ))}
-        {threads?.length === 0 && (
-          <li className="text-sm text-muted-foreground">No threads yet.</li>
+              <div>
+                <h1 className="text-xl font-extrabold text-[#111827]">
+                  {profile.display_name ?? profile.username}
+                </h1>
+                <p className="text-sm text-[#6b7280]">@{profile.username}</p>
+                <p className="mt-1 text-xs text-[#6b7280]">
+                  <span className="font-bold text-[#0ea5e9]">{profile.reputation}</span> reputation
+                </p>
+              </div>
+            </section>
+
+            <h2 className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#6b7280]">Threads</h2>
+            <div className="space-y-3">
+              {threads?.map((t: any) => (
+                <Link
+                  key={t.id}
+                  to="/t/$slug"
+                  params={{ slug: t.slug }}
+                  className="block rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm hover:border-sky-200 hover:shadow-md"
+                >
+                  <h3 className="font-extrabold text-[#111827]">{t.title}</h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#6b7280]">
+                    <span className="inline-flex items-center gap-1.5">
+                      <MessageSquare size={14} /> {t.reply_count} replies
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock size={14} /> {timeAgo(t.created_at)}
+                    </span>
+                    <span>· {t.vote_score} votes</span>
+                  </div>
+                </Link>
+              ))}
+              {threads?.length === 0 && (
+                <div className="rounded-xl border border-dashed border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">
+                  No threads yet.
+                </div>
+              )}
+            </div>
+          </>
         )}
-      </ul>
+        <Footer />
+      </main>
     </div>
   );
 }
