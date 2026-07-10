@@ -366,11 +366,12 @@ export const AdminPanel = () => {
           </nav>
 
           {tab === "overview" && (
-            <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <section className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
               {[
                 { icon: <Users size={20} />, label: "Members", value: stats?.members ?? 0, bg: "bg-sky-500" },
                 { icon: <MessageSquare size={20} />, label: "Threads", value: stats?.threads ?? 0, bg: "bg-emerald-500" },
                 { icon: <MessageCircle size={20} />, label: "Replies", value: stats?.posts ?? 0, bg: "bg-orange-500" },
+                { icon: <Package size={20} />, label: "Products", value: stats?.products ?? 0, bg: "bg-violet-500" },
                 { icon: <Ban size={20} />, label: "Banned", value: stats?.banned ?? 0, bg: "bg-red-500" },
               ].map((s) => (
                 <article key={s.label} className="rounded-xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
