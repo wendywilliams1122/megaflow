@@ -2,10 +2,10 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus } from "lucide-react";
+import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag } from "lucide-react";
 
 export function Header() {
-  const { user, profile, isAdmin } = useAuth();
+  const { user, profile, isAdmin, isModerator } = useAuth();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
@@ -61,9 +61,12 @@ export function Header() {
           <Link to="/categories" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
             <FileText size={16} /> <span>Categories</span>
           </Link>
-          {isAdmin && (
+          <Link to="/marketplace" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
+            <ShoppingBag size={16} /> <span>Marketplace</span>
+          </Link>
+          {isModerator && (
             <Link to="/admin" className="hidden items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-2 text-sm font-bold text-red-700 hover:bg-red-100 lg:flex">
-              <Shield size={16} /> <span>Admin</span>
+              <Shield size={16} /> <span>{isAdmin ? "Admin" : "Staff"}</span>
             </Link>
           )}
 

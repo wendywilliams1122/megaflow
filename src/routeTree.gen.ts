@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NewRouteImport } from './routes/new'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -34,6 +35,11 @@ const RulesRoute = RulesRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/marketplace': typeof MarketplaceRoute
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/support': typeof SupportRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/marketplace': typeof MarketplaceRoute
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/support': typeof SupportRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/marketplace': typeof MarketplaceRoute
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/support': typeof SupportRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categories'
     | '/dashboard'
+    | '/marketplace'
     | '/new'
     | '/rules'
     | '/support'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categories'
     | '/dashboard'
+    | '/marketplace'
     | '/new'
     | '/rules'
     | '/support'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categories'
     | '/dashboard'
+    | '/marketplace'
     | '/new'
     | '/rules'
     | '/support'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
+  MarketplaceRoute: typeof MarketplaceRoute
   NewRoute: typeof NewRoute
   RulesRoute: typeof RulesRoute
   SupportRoute: typeof SupportRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
+  MarketplaceRoute: MarketplaceRoute,
   NewRoute: NewRoute,
   RulesRoute: RulesRoute,
   SupportRoute: SupportRoute,
