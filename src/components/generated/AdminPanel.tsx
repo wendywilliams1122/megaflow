@@ -606,6 +606,226 @@ export const AdminPanel = () => {
               </div>
             </section>
           )}
+
+          {tab === "products" && (
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-extrabold">Marketplace products</h2>
+                <button
+                  onClick={() => setEditingProduct({ ...emptyProduct })}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#0ea5e9] px-3 py-2 text-sm font-bold text-white hover:bg-sky-600"
+                >
+                  <Plus size={16} /> New product
+                </button>
+              </div>
+
+              {editingProduct && (
+                <div className="rounded-xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-sm font-extrabold">
+                      {editingProduct.id ? "Edit product" : "New product"}
+                    </h3>
+                    <button
+                      onClick={() => setEditingProduct(null)}
+                      className="rounded-md p-1 text-[#6b7280] hover:bg-slate-100"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Title
+                      <input
+                        value={editingProduct.title ?? ""}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, title: e.target.value })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Slug (auto if empty)
+                      <input
+                        value={editingProduct.slug ?? ""}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, slug: e.target.value })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280] md:col-span-2">
+                      Description
+                      <textarea
+                        rows={3}
+                        value={editingProduct.description ?? ""}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Price (cents)
+                      <input
+                        type="number"
+                        value={editingProduct.price_cents ?? 0}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, price_cents: Number(e.target.value) })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Currency
+                      <input
+                        value={editingProduct.currency ?? "USD"}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, currency: e.target.value.toUpperCase() })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Stock
+                      <input
+                        type="number"
+                        value={editingProduct.stock ?? 0}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, stock: Number(e.target.value) })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Category
+                      <input
+                        value={editingProduct.category ?? ""}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280] md:col-span-2">
+                      Image URL
+                      <input
+                        value={editingProduct.image_url ?? ""}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, image_url: e.target.value })}
+                        placeholder="https://…"
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Status
+                      <select
+                        value={editingProduct.status ?? "active"}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, status: e.target.value as ProductRow["status"] })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      >
+                        <option value="active">Active</option>
+                        <option value="draft">Draft</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-[#6b7280]">
+                      <input
+                        type="checkbox"
+                        checked={!!editingProduct.featured}
+                        onChange={(e) => setEditingProduct({ ...editingProduct, featured: e.target.checked })}
+                        className="h-4 w-4 rounded border-[#e5e7eb]"
+                      />
+                      Featured
+                    </label>
+                  </div>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      onClick={() => setEditingProduct(null)}
+                      className="rounded-lg border border-[#e5e7eb] px-4 py-2 text-sm font-bold text-[#6b7280] hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      disabled={busy === "save-product"}
+                      onClick={saveProduct}
+                      className="flex items-center gap-1.5 rounded-lg bg-[#0ea5e9] px-4 py-2 text-sm font-bold text-white hover:bg-sky-600 disabled:opacity-50"
+                    >
+                      {busy === "save-product" && <Loader2 size={14} className="animate-spin" />}
+                      Save
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6b7280]">
+                      <tr>
+                        <th className="px-4 py-3">Product</th>
+                        <th className="px-4 py-3">Category</th>
+                        <th className="px-4 py-3 text-right">Price</th>
+                        <th className="px-4 py-3 text-right">Stock</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#e5e7eb]">
+                      {products.map((p) => (
+                        <tr key={p.id} className="hover:bg-slate-50/70">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-3">
+                              {p.image_url ? (
+                                <img src={p.image_url} alt="" className="h-10 w-10 rounded-md object-cover" />
+                              ) : (
+                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-[#6b7280]">
+                                  <Package size={16} />
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-bold text-[#111827]">
+                                  {p.featured && <span className="mr-1 text-amber-500">★</span>}
+                                  {p.title}
+                                </p>
+                                <p className="text-xs text-[#6b7280]">/{p.slug}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-[#6b7280]">{p.category ?? "—"}</td>
+                          <td className="px-4 py-3 text-right tabular-nums">
+                            {new Intl.NumberFormat("en-US", { style: "currency", currency: p.currency }).format(p.price_cents / 100)}
+                          </td>
+                          <td className="px-4 py-3 text-right tabular-nums">{p.stock}</td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${
+                                p.status === "active"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : p.status === "draft"
+                                    ? "bg-amber-100 text-amber-700"
+                                    : "bg-slate-200 text-slate-700"
+                              }`}
+                            >
+                              {p.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex justify-end gap-1">
+                              <button
+                                onClick={() => setEditingProduct(p)}
+                                className="rounded-md border border-[#e5e7eb] px-2 py-1 text-xs font-bold text-[#6b7280] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                              <button
+                                disabled={busy === p.id}
+                                onClick={() => deleteProduct(p)}
+                                className="rounded-md border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50"
+                              >
+                                {busy === p.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {products.length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-sm text-[#6b7280]">
+                            No products yet. Click "New product" to add one.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          )}
         </main>
       </div>
       <Footer />
