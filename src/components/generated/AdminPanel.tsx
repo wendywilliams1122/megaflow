@@ -306,7 +306,7 @@ export const AdminPanel = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!isStaff) {
     return (
       <div className="min-h-screen bg-[#f6f7f8]">
         <Header />
@@ -314,7 +314,7 @@ export const AdminPanel = () => {
           <ShieldOff size={40} className="mx-auto mb-3 text-red-500" />
           <h1 className="mb-2 text-xl font-extrabold text-[#111827]">Access denied</h1>
           <p className="text-sm text-[#6b7280]">
-            Admin role required. Ask a super admin to grant you access.
+            Admin or moderator role required. Ask a super admin to grant you access.
           </p>
         </div>
       </div>
@@ -338,25 +338,31 @@ export const AdminPanel = () => {
               <Shield size={20} />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold tracking-tight">Admin Panel</h1>
-              <p className="text-sm text-[#6b7280]">Manage members, threads, and moderation.</p>
+              <h1 className="text-2xl font-extrabold tracking-tight">
+                {isAdmin ? "Admin Panel" : "Staff Panel"}
+              </h1>
+              <p className="text-sm text-[#6b7280]">Manage members, threads, products, and moderation.</p>
             </div>
           </header>
 
           <nav className="flex gap-2 border-b border-[#e5e7eb]">
-            {(["overview", "users", "threads"] as Tab[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`border-b-2 px-4 py-2 text-sm font-bold capitalize transition-colors ${
-                  tab === t
-                    ? "border-[#0ea5e9] text-[#0ea5e9]"
-                    : "border-transparent text-[#6b7280] hover:text-[#111827]"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
+            {(["overview", "users", "threads", "products"] as Tab[]).map((t) => {
+              // moderators can't manage users
+              if (t === "users" && !isAdmin) return null;
+              return (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`border-b-2 px-4 py-2 text-sm font-bold capitalize transition-colors ${
+                    tab === t
+                      ? "border-[#0ea5e9] text-[#0ea5e9]"
+                      : "border-transparent text-[#6b7280] hover:text-[#111827]"
+                  }`}
+                >
+                  {t}
+                </button>
+              );
+            })}
           </nav>
 
           {tab === "overview" && (
