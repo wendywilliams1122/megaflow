@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Waves, Plus, LogOut, User as UserIcon } from "lucide-react";
+import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus } from "lucide-react";
 
 export function Header() {
   const { user, profile } = useAuth();
@@ -13,54 +13,93 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-lg">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-          <span className="brand-gradient inline-flex h-8 w-8 items-center justify-center rounded-lg text-white">
-            <Waves className="h-4 w-4" />
-          </span>
-          <span className="brand-text">ShareFlow</span>
-        </Link>
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#e5e7eb] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-3">
+          <button className="flex h-10 w-10 items-center justify-center rounded-lg text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:hidden" aria-label="Open navigation">
+            <Menu size={20} />
+          </button>
+          <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="MegaFlow home">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0ea5e9] text-white shadow-sm shadow-sky-200">
+              <Heart size={18} fill="currentColor" />
+            </div>
+            <span className="hidden text-xl font-extrabold tracking-tight text-[#111827] sm:inline">
+              MegaFlow
+            </span>
+          </Link>
+        </div>
 
-        <div className="flex items-center gap-2">
+        <div className="hidden flex-1 justify-center md:flex">
+          <label className="relative w-full max-w-xl">
+            <span className="sr-only">Search discussions</span>
+            <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#6b7280]">
+              <Search size={18} />
+            </span>
+            <input
+              type="search"
+              className="block w-full rounded-xl border border-[#e5e7eb] bg-[#f6f7f8] py-2.5 pl-10 pr-4 text-sm text-[#111827] placeholder:text-[#6b7280] hover:border-sky-200 focus:border-[#0ea5e9] focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"
+              placeholder="Search discussions, members, tags"
+            />
+          </label>
+        </div>
+
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Link to="/" hash="rules" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
+            <Shield size={16} /> <span>Rules</span>
+          </Link>
+          <Link to="/" hash="policy" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
+            <FileText size={16} /> <span>Policy</span>
+          </Link>
+
           {user ? (
             <>
               <Link
                 to="/new"
-                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="flex items-center gap-1.5 rounded-lg bg-[#0ea5e9] px-3 py-2.5 text-sm font-bold text-white shadow-sm shadow-sky-100 hover:bg-sky-600 sm:px-4"
               >
-                <Plus className="h-4 w-4" /> New thread
+                <Plus size={16} /> <span className="hidden sm:inline">New</span>
               </Link>
               {profile && (
                 <Link
                   to="/u/$username"
                   params={{ username: profile.username }}
-                  className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-sm hover:bg-accent"
+                  className="flex h-10 items-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-2.5 text-sm font-semibold text-[#111827] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
                 >
-                  <div className="brand-gradient flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0ea5e9] text-[10px] font-extrabold text-white">
                     {profile.username.slice(0, 2).toUpperCase()}
-                  </div>
+                  </span>
                   <span className="hidden sm:inline">{profile.username}</span>
                 </Link>
               )}
               <button
                 onClick={signOut}
                 title="Sign out"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border hover:bg-accent"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-[#6b7280] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut size={16} />
               </button>
             </>
           ) : (
-            <Link
-              to="/auth"
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
-            >
-              <UserIcon className="h-4 w-4" /> Sign in
-            </Link>
+            <>
+              <Link
+                to="/auth"
+                search={{ mode: "signin" }}
+                className="flex h-10 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm font-semibold text-[#111827] hover:border-[#0ea5e9] hover:text-[#0ea5e9] sm:px-4"
+              >
+                <LogIn size={16} className="sm:hidden" />
+                <span className="hidden sm:inline">Log In</span>
+              </Link>
+              <Link
+                to="/auth"
+                search={{ mode: "signup" }}
+                className="rounded-lg bg-[#0ea5e9] px-3 py-2.5 text-sm font-bold text-white shadow-sm shadow-sky-100 hover:bg-sky-600 sm:px-4"
+              >
+                Sign Up
+              </Link>
+            </>
           )}
         </div>
       </div>
-    </header>
+    </nav>
   );
 }
