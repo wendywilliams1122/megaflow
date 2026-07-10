@@ -1,16 +1,25 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus } from "lucide-react";
 
 export function Header() {
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [query, setQuery] = useState("");
 
   const signOut = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/" });
   };
+
+  const onSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = query.trim();
+    navigate({ to: "/", search: q ? { q } : { q: undefined } });
+  };
+
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#e5e7eb] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
@@ -29,7 +38,7 @@ export function Header() {
           </Link>
         </div>
 
-        <div className="hidden flex-1 justify-center md:flex">
+        <form onSubmit={onSearch} className="hidden flex-1 justify-center md:flex">
           <label className="relative w-full max-w-xl">
             <span className="sr-only">Search discussions</span>
             <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[#6b7280]">
@@ -37,19 +46,26 @@ export function Header() {
             </span>
             <input
               type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               className="block w-full rounded-xl border border-[#e5e7eb] bg-[#f6f7f8] py-2.5 pl-10 pr-4 text-sm text-[#111827] placeholder:text-[#6b7280] hover:border-sky-200 focus:border-[#0ea5e9] focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"
-              placeholder="Search discussions, members, tags"
+              placeholder="Search discussions…"
             />
           </label>
-        </div>
+        </form>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Link to="/" hash="rules" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
+          <Link to="/rules" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
             <Shield size={16} /> <span>Rules</span>
           </Link>
-          <Link to="/" hash="policy" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
-            <FileText size={16} /> <span>Policy</span>
+          <Link to="/categories" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
+            <FileText size={16} /> <span>Categories</span>
           </Link>
+          {isAdmin && (
+            <Link to="/admin" className="hidden items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-2 text-sm font-bold text-red-700 hover:bg-red-100 lg:flex">
+              <Shield size={16} /> <span>Admin</span>
+            </Link>
+          )}
 
           {user ? (
             <>

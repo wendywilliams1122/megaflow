@@ -8,6 +8,7 @@ import { timeAgo } from "@/lib/forum";
 import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : undefined }),
   component: HomePage,
 });
 
@@ -41,24 +42,27 @@ function toneFor(name: string) {
 }
 
 function HomePage() {
+  const { q } = Route.useSearch();
   const [activeTab, setActiveTab] = useState<FilterId>("latest");
 
   const { data: threads, isLoading } = useQuery({
-    queryKey: ["threads", "feed", activeTab],
+    queryKey: ["threads", "feed", activeTab, q ?? ""],
     queryFn: async () => {
-      let q = supabase
+      let qb = supabase
         .from("threads")
         .select(
           "id, slug, title, vote_score, reply_count, created_at, last_activity_at, is_pinned, category:categories(slug, name, color), author:profiles(username)",
         )
         .order("is_pinned", { ascending: false });
 
-      if (activeTab === "latest") q = q.order("last_activity_at", { ascending: false });
-      else if (activeTab === "top") q = q.order("vote_score", { ascending: false });
-      else if (activeTab === "newest") q = q.order("created_at", { ascending: false });
-      else q = q.order("created_at", { ascending: true });
+      if (q && q.trim()) qb = qb.ilike("title", `%${q.trim()}%`);
 
-      const { data } = await q.limit(30);
+      if (activeTab === "latest") qb = qb.order("last_activity_at", { ascending: false });
+      else if (activeTab === "top") qb = qb.order("vote_score", { ascending: false });
+      else if (activeTab === "newest") qb = qb.order("created_at", { ascending: false });
+      else qb = qb.order("created_at", { ascending: true });
+
+      const { data } = await qb.limit(30);
       return (data ?? []) as unknown as ThreadRow[];
     },
   });
@@ -84,11 +88,16 @@ function HomePage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="mb-1 text-xs font-extrabold uppercase tracking-[0.18em] text-[#0ea5e9]">
-                  Community forum
+                  {q ? "Search results" : "Community forum"}
                 </p>
                 <h1 className="text-2xl font-extrabold tracking-tight text-[#111827] sm:text-3xl">
-                  Latest discussions
+                  {q ? `Results for “${q}”` : "Latest discussions"}
                 </h1>
+                {q && (
+                  <Link to="/" search={{ q: undefined }} className="mt-2 inline-block text-xs font-bold text-[#0ea5e9] hover:underline">
+                    Clear search
+                  </Link>
+                )}
               </div>
               <Link
                 to="/new"
