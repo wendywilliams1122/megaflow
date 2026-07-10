@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag } from "lucide-react";
 
 export function Header() {
-  const { user, profile, isAdmin } = useAuth();
+  const { user, profile, isAdmin, isModerator } = useAuth();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
