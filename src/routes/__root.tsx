@@ -15,12 +15,12 @@ import { Header } from "@/components/Header";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#f6f7f8] px-4">
       <div className="text-center">
-        <h1 className="text-6xl font-bold brand-text">404</h1>
-        <p className="mt-2 text-muted-foreground">Page not found</p>
-        <a href="/" className="mt-4 inline-block text-sm text-primary hover:underline">
-          ← Back to ShareFlow
+        <h1 className="text-6xl font-extrabold text-[#0ea5e9]">404</h1>
+        <p className="mt-2 text-[#6b7280]">Page not found</p>
+        <a href="/" className="mt-4 inline-block text-sm font-bold text-[#0ea5e9] hover:underline">
+          ← Back to MegaFlow
         </a>
       </div>
     </div>
@@ -50,14 +50,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ShareFlow — Community forum for makers, hackers & builders" },
+      { title: "MegaFlow — Community forum for makers, learners & creators" },
       {
         name: "description",
         content:
-          "ShareFlow is an open community forum to discuss programming, cybersecurity, AI, web development and more. Ask, share, and grow together.",
+          "MegaFlow is a community forum for courses, tutorials, tools, freebies, and discussions. Share resources and grow together.",
       },
-      { property: "og:title", content: "ShareFlow" },
-      { property: "og:description", content: "Community forum where ideas flow." },
+      { property: "og:title", content: "MegaFlow" },
+      { property: "og:description", content: "Community forum where knowledge flows." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

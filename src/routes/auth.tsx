@@ -4,7 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
-import { Waves } from "lucide-react";
+import { Heart } from "lucide-react";
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -77,11 +77,11 @@ function AuthPage() {
     <div className="mx-auto flex min-h-[calc(100vh-56px)] max-w-md flex-col justify-center px-4 py-10">
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <div className="mb-6 flex flex-col items-center">
-          <span className="brand-gradient inline-flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg">
-            <Waves className="h-6 w-6" />
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#0ea5e9] text-white shadow-sm shadow-sky-200">
+            <Heart className="h-6 w-6" fill="currentColor" />
           </span>
-          <h1 className="mt-3 text-xl font-bold">
-            {mode === "signin" ? "Welcome back" : "Join ShareFlow"}
+          <h1 className="mt-3 text-xl font-extrabold">
+            {mode === "signin" ? "Welcome back" : "Join MegaFlow"}
           </h1>
           <p className="text-sm text-muted-foreground">
             {mode === "signin" ? "Sign in to continue" : "Create your account"}
