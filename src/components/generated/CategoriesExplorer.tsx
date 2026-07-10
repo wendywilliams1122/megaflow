@@ -357,7 +357,7 @@ export const CategoriesExplorer = () => {
             </div>
 
             <div className="space-y-3 bg-[#f6f7f8] p-3 sm:p-4">
-              {CATEGORIES.map(category => <a key={category.id} href="#" className="group block rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md hover:shadow-sky-100/70">
+              {CATEGORIES.map(category => <Link key={category.id} to="/c/$slug" params={{ slug: category.id }} className="group block rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md hover:shadow-sky-100/70">
                   <span className="flex items-start gap-3 sm:gap-4">
                     <span className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border ${category.iconTone}`} aria-hidden="true">
                       {category.icon}
@@ -381,7 +381,7 @@ export const CategoriesExplorer = () => {
                       </span>
                     </span>
                   </span>
-                </a>)}
+                </Link>)}
             </div>
           </section>
         </main>
