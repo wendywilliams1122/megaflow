@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Link } from '@tanstack/react-router';
 import { Activity, BookOpen, ChevronRight, ClipboardList, Gem, Gift, Globe, GraduationCap, Info, Library, MessageCircle, MessageSquare, Monitor, Newspaper, Package, PenSquare, Phone, Plus, ScrollText, Shield, ShoppingCart, Tag, Ticket, Trophy, Unlock, User, Users, Wrench, XCircle } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
