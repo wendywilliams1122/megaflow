@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Archive, Bell, BookOpen, ClipboardList, Download, Eye, FileText, Flag, Gem, Gift, Globe, GraduationCap, Grid3x3, Info, Library, Lock, LucideIcon, Mail, MessageCircle, MessageSquare, Monitor, MoreVertical, Package, PenSquare, Pencil, Phone, Plus, RefreshCw, ScrollText, Settings, Shield, ShoppingCart, Tag, Ticket, Trash, TrendingUp, Trophy, Unlock, User, UserPlus, Users, UserX, Wrench, XCircle } from 'lucide-react';
-import { TopNavBar } from './TopNavBar';
+import { Header } from '@/components/Header';
 interface StatCardProps {
   icon: ReactNode;
   label: string;
@@ -345,7 +345,7 @@ const QuickActionButton = ({
 };
 export const AdminPanel = () => {
   return <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
-    <TopNavBar />
+    <Header />
 
     <div className="mx-auto flex max-w-[1440px] pt-16">
       <aside className="hidden min-h-[calc(100vh-4rem)] w-[260px] flex-shrink-0 border-r border-[#e5e7eb] bg-white lg:block">

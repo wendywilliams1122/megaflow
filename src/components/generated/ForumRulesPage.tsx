@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, Calendar, CheckCircle2, CircleDot, ExternalLink, FileText, Mail, Shield, Star } from 'lucide-react';
-import { TopNavBar } from './TopNavBar';
-import { SideRail } from './SideRail';
-import { MainFooter } from './MainFooter';
+import { Header } from '@/components/Header';
+import { SideRail } from '@/components/SideRail';
+import { Footer } from '@/components/Footer';
 import { cn } from '../../lib/utils';
 type RuleCopy = {
   id: string;
@@ -151,7 +151,7 @@ const SectionHeading = ({
 };
 export const ForumRulesPage: React.FC = () => {
   return <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
-      <TopNavBar />
+      <Header />
 
       <div className="mx-auto flex max-w-[1440px] pt-16">
         <SideRail />
@@ -312,6 +312,6 @@ export const ForumRulesPage: React.FC = () => {
         </main>
       </div>
 
-      <MainFooter />
+      <Footer />
     </div>;
 };
