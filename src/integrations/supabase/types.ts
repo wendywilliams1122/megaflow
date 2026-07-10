@@ -77,6 +77,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "posts_author_profile_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "posts_thread_id_fkey"
             columns: ["thread_id"]
             isOneToOne: false
@@ -219,6 +226,13 @@ export type Database = {
           vote_score?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "threads_author_profile_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "threads_category_id_fkey"
             columns: ["category_id"]
