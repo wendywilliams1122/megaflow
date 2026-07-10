@@ -20,7 +20,7 @@ function NotFoundComponent() {
         <h1 className="text-6xl font-bold brand-text">404</h1>
         <p className="mt-2 text-muted-foreground">Page not found</p>
         <a href="/" className="mt-4 inline-block text-sm text-primary hover:underline">
-          ← Back to KnowFlow
+          ← Back to ShareFlow
         </a>
       </div>
     </div>
@@ -50,13 +50,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "KnowFlow — Community forum for makers, hackers & builders" },
+      { title: "ShareFlow — Community forum for makers, hackers & builders" },
       {
         name: "description",
         content:
-          "KnowFlow is an open community forum to discuss programming, cybersecurity, AI, web development and more. Ask, share, and grow together.",
+          "ShareFlow is an open community forum to discuss programming, cybersecurity, AI, web development and more. Ask, share, and grow together.",
       },
-      { property: "og:title", content: "KnowFlow" },
+      { property: "og:title", content: "ShareFlow" },
       { property: "og:description", content: "Community forum where ideas flow." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
