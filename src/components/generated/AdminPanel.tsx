@@ -97,17 +97,19 @@ export const AdminPanel = () => {
   };
 
   const loadStats = async () => {
-    const [m, t, p, b] = await Promise.all([
+    const [m, t, p, b, pr] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("threads").select("id", { count: "exact", head: true }),
       supabase.from("posts").select("id", { count: "exact", head: true }),
       supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_banned", true),
+      supabase.from("products").select("id", { count: "exact", head: true }),
     ]);
     setStats({
       members: m.count ?? 0,
       threads: t.count ?? 0,
       posts: p.count ?? 0,
       banned: b.count ?? 0,
+      products: pr.count ?? 0,
     });
   };
 
@@ -147,12 +149,64 @@ export const AdminPanel = () => {
     setThreads((data as unknown as ThreadRow[]) ?? []);
   };
 
+  const loadProducts = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("id, title, slug, description, price_cents, currency, image_url, category, stock, status, featured")
+      .order("created_at", { ascending: false });
+    setProducts((data as ProductRow[]) ?? []);
+  };
+
+  const slugify = (s: string) =>
+    s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const saveProduct = async () => {
+    if (!editingProduct) return;
+    const title = (editingProduct.title ?? "").trim();
+    if (!title) return flash("Title required");
+    const slug = (editingProduct.slug || slugify(title)).trim();
+    const payload = {
+      title,
+      slug,
+      description: editingProduct.description ?? null,
+      price_cents: Number(editingProduct.price_cents ?? 0),
+      currency: editingProduct.currency ?? "USD",
+      image_url: editingProduct.image_url || null,
+      category: editingProduct.category || null,
+      stock: Number(editingProduct.stock ?? 0),
+      status: editingProduct.status ?? "active",
+      featured: !!editingProduct.featured,
+    };
+    setBusy("save-product");
+    const { error } = editingProduct.id
+      ? await supabase.from("products").update(payload).eq("id", editingProduct.id)
+      : await supabase.from("products").insert({ ...payload, created_by: user?.id ?? null });
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash(editingProduct.id ? "Product updated" : "Product created");
+    setEditingProduct(null);
+    loadProducts();
+    loadStats();
+  };
+
+  const deleteProduct = async (p: ProductRow) => {
+    if (!confirm(`Delete "${p.title}"?`)) return;
+    setBusy(p.id);
+    const { error } = await supabase.from("products").delete().eq("id", p.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Product deleted");
+    loadProducts();
+    loadStats();
+  };
+
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isStaff) return;
     loadStats();
     if (tab === "users") loadUsers();
     if (tab === "threads") loadThreads();
-  }, [isAdmin, tab]);
+    if (tab === "products") loadProducts();
+  }, [isStaff, tab]);
 
   const toggleBan = async (u: UserRow) => {
     setBusy(u.id);
