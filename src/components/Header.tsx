@@ -64,9 +64,9 @@ export function Header() {
           <Link to="/marketplace" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
             <ShoppingBag size={16} /> <span>Marketplace</span>
           </Link>
-          {isAdmin && (
+          {isModerator && (
             <Link to="/admin" className="hidden items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-2 text-sm font-bold text-red-700 hover:bg-red-100 lg:flex">
-              <Shield size={16} /> <span>Admin</span>
+              <Shield size={16} /> <span>{isAdmin ? "Admin" : "Staff"}</span>
             </Link>
           )}
 
