@@ -19,7 +19,7 @@ export function Header() {
           <span className="brand-gradient inline-flex h-8 w-8 items-center justify-center rounded-lg text-white">
             <Waves className="h-4 w-4" />
           </span>
-          <span className="brand-text">KnowFlow</span>
+          <span className="brand-text">ShareFlow</span>
         </Link>
 
         <div className="flex items-center gap-2">

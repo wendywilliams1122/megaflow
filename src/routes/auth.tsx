@@ -81,7 +81,7 @@ function AuthPage() {
             <Waves className="h-6 w-6" />
           </span>
           <h1 className="mt-3 text-xl font-bold">
-            {mode === "signin" ? "Welcome back" : "Join KnowFlow"}
+            {mode === "signin" ? "Welcome back" : "Join ShareFlow"}
           </h1>
           <p className="text-sm text-muted-foreground">
             {mode === "signin" ? "Sign in to continue" : "Create your account"}
