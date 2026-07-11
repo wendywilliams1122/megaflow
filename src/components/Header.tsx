@@ -33,9 +33,20 @@ export function Header() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#e5e7eb] bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          <button className="flex h-10 w-10 items-center justify-center rounded-lg text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:hidden" aria-label="Open navigation">
-            <Menu size={20} />
-          </button>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <button className="flex h-10 w-10 items-center justify-center rounded-lg text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:hidden" aria-label="Open navigation">
+                <Menu size={20} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] overflow-y-auto bg-white p-5 sm:w-[340px]">
+              <SheetHeader className="mb-4 text-left">
+                <SheetTitle className="text-base font-extrabold text-[#111827]">Menu</SheetTitle>
+              </SheetHeader>
+              <SideNav onNavigate={() => setMobileOpen(false)} />
+            </SheetContent>
+          </Sheet>
+
           <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="MegaFlow home">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0ea5e9] text-white shadow-sm shadow-sky-200">
               <Heart size={18} fill="currentColor" />
