@@ -56,12 +56,15 @@ function UserPage() {
                 {profile.username.slice(0, 2).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="truncate text-xl font-extrabold text-[#111827]">
-                  {profile.display_name ?? profile.username}
-                </h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="truncate text-xl font-extrabold text-[#111827]">
+                    {profile.display_name ?? profile.username}
+                  </h1>
+                  <UserBadge points={profile.points ?? undefined} staffBadge={(profile as any).staff_badge} isBanned={profile.is_banned ?? undefined} />
+                </div>
                 <p className="text-sm text-[#6b7280]">@{profile.username}</p>
                 <p className="mt-1 text-xs text-[#6b7280]">
-                  <span className="font-bold text-[#0ea5e9]">{profile.reputation}</span> reputation
+                  <span className="font-bold text-[#0ea5e9]">{profile.points ?? profile.reputation}</span> points
                 </p>
                 {profile.bio && <p className="mt-2 text-sm text-[#374151]">{profile.bio}</p>}
               </div>
