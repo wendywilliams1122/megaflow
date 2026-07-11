@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, AlertTriangle, Calendar, CheckCircle2, CircleDot, ExternalLink, FileText, Mail, Shield, Star } from 'lucide-react';
-import { Header } from '@/components/Header';
 import { SideRail } from '@/components/SideRail';
-import { Footer } from '@/components/Footer';
+
 import { cn } from '../../lib/utils';
 type RuleCopy = {
   id: string;
