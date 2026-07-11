@@ -59,7 +59,7 @@ function ThreadPage() {
       if (!thread) return [];
       const { data } = await supabase
         .from("posts")
-        .select("id, body, vote_score, created_at, author_id, author:profiles(username, display_name, reputation)")
+        .select("id, body, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points)")
         .eq("thread_id", thread.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as Post[];
