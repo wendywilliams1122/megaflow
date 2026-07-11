@@ -6,9 +6,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
 import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
+import { RichBody } from "@/components/RichBody";
+import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { toast } from "sonner";
-import { Lock, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine } from "lucide-react";
+import { Lock, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/t/$slug")({
   component: ThreadPage,
