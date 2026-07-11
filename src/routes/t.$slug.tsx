@@ -163,10 +163,14 @@ function ThreadPage() {
                             @{thread.author.username}
                           </Link>
                         )}
+                        {thread.author?.is_banned && (
+                          <span className="mt-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-red-700">User Banned</span>
+                        )}
                         <p className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
-                          {thread.author?.reputation ?? 0} rep
+                          {thread.author?.points ?? thread.author?.reputation ?? 0} pts
                         </p>
                       </div>
+
                     </div>
                   </aside>
                   <div className="min-w-0 flex-1 p-5 sm:p-6">
