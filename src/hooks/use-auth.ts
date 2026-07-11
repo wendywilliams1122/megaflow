@@ -8,8 +8,14 @@ export type Profile = {
   display_name: string | null;
   avatar_url: string | null;
   reputation: number;
+  points?: number;
+  trust_score?: number;
+  warnings?: number;
+  referral_code?: string | null;
+  ban_reason?: string | null;
   is_banned?: boolean;
 };
+
 
 export type AppRole = "admin" | "moderator" | "user";
 
