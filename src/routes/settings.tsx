@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { Save, KeyRound, LogOut, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/settings")({
@@ -147,7 +146,6 @@ function SettingsPage() {
             </button>
           </div>
         </div>
-        <Footer />
       </main>
     </div>
   );

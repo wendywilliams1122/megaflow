@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings } from "@/hooks/use-site-settings";
@@ -299,7 +298,6 @@ function ProductPage() {
           )}
         </main>
       </div>
-      <Footer />
     </div>
   );
 }

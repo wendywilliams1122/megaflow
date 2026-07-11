@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { RichBody } from "@/components/RichBody";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
@@ -289,7 +288,6 @@ function ThreadPage() {
             </>
           )}
         </div>
-        <Footer />
       </main>
     </div>
   );

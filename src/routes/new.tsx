@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { RichEditor } from "@/components/RichEditor";
 import { toast } from "sonner";
 import { makeThreadSlug } from "@/lib/forum";
@@ -230,7 +229,6 @@ function NewThreadPage() {
             </div>
           </form>
         </div>
-        <Footer />
       </main>
     </div>
   );

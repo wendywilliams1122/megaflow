@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { useCart } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings } from "@/hooks/use-site-settings";
@@ -222,7 +221,6 @@ function CartPage() {
           )}
         </main>
       </div>
-      <Footer />
     </div>
   );
 }
