@@ -63,7 +63,7 @@ function CartPage() {
   return (
     <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
       <Header />
-      <div className="mx-auto flex max-w-[1440px] pt-16">
+      <div className="mx-auto flex max-w-[1440px]">
         <SideRail />
         <main className="min-w-0 flex-1 space-y-5 px-4 py-6 sm:px-6 lg:px-8">
           <Link
