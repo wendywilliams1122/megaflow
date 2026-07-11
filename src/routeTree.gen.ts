@@ -115,9 +115,9 @@ const TSlugRoute = TSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
-  id: '/marketplace/$slug',
-  path: '/marketplace/$slug',
-  getParentRoute: () => rootRouteImport,
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => MarketplaceRoute,
 } as any)
 const CSlugRoute = CSlugRouteImport.update({
   id: '/c/$slug',
@@ -271,7 +271,6 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
   CSlugRoute: typeof CSlugRoute
-  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   TSlugRoute: typeof TSlugRoute
   UUsernameRoute: typeof UUsernameRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
@@ -400,10 +399,10 @@ declare module '@tanstack/react-router' {
     }
     '/marketplace/$slug': {
       id: '/marketplace/$slug'
-      path: '/marketplace/$slug'
+      path: '/$slug'
       fullPath: '/marketplace/$slug'
       preLoaderRoute: typeof MarketplaceSlugRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
     '/c/$slug': {
       id: '/c/$slug'
@@ -431,7 +430,6 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
   CSlugRoute: CSlugRoute,
-  MarketplaceSlugRoute: MarketplaceSlugRoute,
   TSlugRoute: TSlugRoute,
   UUsernameRoute: UUsernameRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
@@ -439,3 +437,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
