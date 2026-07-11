@@ -48,11 +48,8 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex items-center gap-2 rounded-lg" aria-label="MegaFlow home">
-            <img src={megaflowIcon} alt="MegaFlow" className="h-9 w-9 object-contain" />
-            <span className="hidden text-xl font-extrabold tracking-tight text-[#111827] sm:inline">
-              MegaFlow
-            </span>
+          <Link to="/" className="flex items-center rounded-lg" aria-label="MegaFlow home">
+            <img src={megaflowLogo} alt="MegaFlow" className="h-11 w-auto object-contain sm:h-12" />
           </Link>
         </div>
 
