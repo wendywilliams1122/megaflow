@@ -201,7 +201,7 @@ function ThreadPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-4">
                         <VoteButtons targetType="thread" targetId={thread.id} initialScore={thread.vote_score} />
-                        <RichBody text={thread.body} className="text-base leading-7 text-[#374151]" />
+                        <RichBody text={threadFullBody ?? thread.body} className="text-base leading-7 text-[#374151]" />
                       </div>
                       {user?.id === thread.author_id && (
                         <button onClick={deleteThread} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
