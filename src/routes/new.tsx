@@ -6,7 +6,7 @@ import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
 import { makeThreadSlug } from "@/lib/forum";
-import { PenLine } from "lucide-react";
+import { PenLine, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
   component: NewThreadPage,
@@ -34,9 +34,6 @@ function NewThreadPage() {
     },
   });
 
-  useEffect(() => {
-    if (categories?.length && !categoryId) setCategoryId(categories[0].id);
-  }, [categories, categoryId]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,16 +89,19 @@ function NewThreadPage() {
 
           <form onSubmit={submit} className="space-y-5 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm sm:p-6">
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-[#111827]">Category</label>
+              <label className="mb-1.5 block text-sm font-bold text-[#111827]">Category <span className="text-red-500">*</span></label>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
+                required
                 className="w-full rounded-xl border border-[#e5e7eb] bg-[#f6f7f8] px-3 py-2.5 text-sm text-[#111827] focus:border-[#0ea5e9] focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"
               >
+                <option value="" disabled>— Select main category —</option>
                 {categories?.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
+              <p className="mt-1 text-xs text-[#6b7280]">Pick the main category your thread belongs to.</p>
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-bold text-[#111827]">Title</label>
@@ -115,11 +115,21 @@ function NewThreadPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-[#111827]">Body</label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="block text-sm font-bold text-[#111827]">Body</label>
+                <button
+                  type="button"
+                  onClick={() => setBody((b) => b + (b ? "\n" : "") + "[spoiler]Paste your hidden resource / link here…[/spoiler]")}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-[#e5e7eb] bg-white px-2.5 py-1 text-xs font-bold text-[#374151] hover:border-amber-300 hover:text-amber-700"
+                  title="Only members with 10+ days and at least one thread can view spoiler content"
+                >
+                  <EyeOff size={12} /> Insert Spoiler
+                </button>
+              </div>
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="Share details, links, code snippets…"
+                placeholder="Share details, links, code snippets… Use [spoiler]…[/spoiler] to hide resources."
                 required
                 rows={12}
                 className="w-full rounded-xl border border-[#e5e7eb] bg-[#f6f7f8] px-3 py-2.5 text-sm leading-7 text-[#111827] placeholder:text-[#6b7280] focus:border-[#0ea5e9] focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"

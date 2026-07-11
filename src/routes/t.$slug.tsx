@@ -6,9 +6,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
 import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
+import { RichBody } from "@/components/RichBody";
+import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { toast } from "sonner";
-import { Lock, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine } from "lucide-react";
+import { Lock, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/t/$slug")({
   component: ThreadPage,
@@ -37,6 +39,7 @@ function ThreadPage() {
   const qc = useQueryClient();
   const [reply, setReply] = useState("");
   const [replying, setReplying] = useState(false);
+  const { data: ads } = useAds("thread");
 
   const { data: thread, isLoading } = useQuery({
     queryKey: ["thread", slug],
@@ -170,7 +173,7 @@ function ThreadPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-4">
                         <VoteButtons targetType="thread" targetId={thread.id} initialScore={thread.vote_score} />
-                        <div className="whitespace-pre-wrap text-base leading-7 text-[#374151]">{thread.body}</div>
+                        <RichBody text={thread.body} className="text-base leading-7 text-[#374151]" />
                       </div>
                       {user?.id === thread.author_id && (
                         <button onClick={deleteThread} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
@@ -187,35 +190,40 @@ function ThreadPage() {
               </h2>
 
               <ul className="space-y-3">
-                {posts?.map((p) => (
-                  <li key={p.id} className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-                    <div className="md:flex">
-                      <aside className="border-b border-[#e5e7eb] p-4 md:w-56 md:border-b-0 md:border-r">
-                        <div className="flex items-center gap-3 md:block">
-                          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(p.author?.username ?? "u")}`}>
-                            {(p.author?.username ?? "?").slice(0, 2).toUpperCase()}
+                {posts?.map((p, idx) => (
+                  <li key={p.id} className="space-y-3">
+                    {ads && ads.length > 0 && idx > 0 && idx % 3 === 0 && (
+                      <AdCard ad={ads[(Math.floor(idx / 3) - 1) % ads.length]} />
+                    )}
+                    <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+                      <div className="md:flex">
+                        <aside className="border-b border-[#e5e7eb] p-4 md:w-56 md:border-b-0 md:border-r">
+                          <div className="flex items-center gap-3 md:block">
+                            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(p.author?.username ?? "u")}`}>
+                              {(p.author?.username ?? "?").slice(0, 2).toUpperCase()}
+                            </div>
+                            <div className="min-w-0 md:mt-2">
+                              {p.author && (
+                                <Link to="/u/$username" params={{ username: p.author.username }} className="block text-sm font-extrabold text-[#111827] hover:text-[#0ea5e9]">
+                                  @{p.author.username}
+                                </Link>
+                              )}
+                              <p className="text-xs text-[#6b7280]">{p.author?.reputation ?? 0} rep · {timeAgo(p.created_at)}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0 md:mt-2">
-                            {p.author && (
-                              <Link to="/u/$username" params={{ username: p.author.username }} className="block text-sm font-extrabold text-[#111827] hover:text-[#0ea5e9]">
-                                @{p.author.username}
-                              </Link>
+                        </aside>
+                        <div className="min-w-0 flex-1 p-4 sm:p-5">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex min-w-0 flex-1 gap-4">
+                              <VoteButtons targetType="post" targetId={p.id} initialScore={p.vote_score} />
+                              <RichBody text={p.body} className="min-w-0 flex-1 text-sm leading-7 text-[#374151]" />
+                            </div>
+                            {user?.id === p.author_id && (
+                              <button onClick={() => deletePost(p.id)} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
+                                <Trash2 size={14} />
+                              </button>
                             )}
-                            <p className="text-xs text-[#6b7280]">{p.author?.reputation ?? 0} rep · {timeAgo(p.created_at)}</p>
                           </div>
-                        </div>
-                      </aside>
-                      <div className="min-w-0 flex-1 p-4 sm:p-5">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex gap-4">
-                            <VoteButtons targetType="post" targetId={p.id} initialScore={p.vote_score} />
-                            <div className="whitespace-pre-wrap text-sm leading-7 text-[#374151]">{p.body}</div>
-                          </div>
-                          {user?.id === p.author_id && (
-                            <button onClick={() => deletePost(p.id)} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
-                              <Trash2 size={14} />
-                            </button>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -238,8 +246,18 @@ function ThreadPage() {
                         className="block w-full resize-y bg-white p-4 text-sm leading-7 text-[#111827] placeholder:text-[#6b7280] focus:outline-none"
                         maxLength={5000}
                       />
-                      <div className="flex items-center justify-between border-t border-[#e5e7eb] bg-[#f6f7f8] px-4 py-3">
-                        <span className="text-xs text-[#6b7280]">{reply.length} / 5,000</span>
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#e5e7eb] bg-[#f6f7f8] px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setReply((r) => r + (r ? "\n" : "") + "[spoiler]Hidden resource here…[/spoiler]")}
+                            className="inline-flex items-center gap-1.5 rounded-md border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-xs font-bold text-[#374151] hover:border-amber-300 hover:text-amber-700"
+                            title="Wrap hidden content that only 10+ day members with a thread can see"
+                          >
+                            <EyeOff size={12} /> Spoiler
+                          </button>
+                          <span className="text-xs text-[#6b7280]">{reply.length} / 5,000</span>
+                        </div>
                         <button
                           type="submit"
                           disabled={replying || !reply.trim()}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
+import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight } from "lucide-react";
 
@@ -66,6 +67,8 @@ function HomePage() {
       return (data ?? []) as unknown as ThreadRow[];
     },
   });
+
+  const { data: ads } = useAds("home");
 
   return (
     <div className="mx-auto flex max-w-[1440px] pt-16">
@@ -132,72 +135,77 @@ function HomePage() {
               </div>
             )}
 
-            {threads?.map((t) => {
+            {threads?.map((t, idx) => {
               const authorName = t.author?.username ?? "unknown";
               const initials = authorName.slice(0, 2).toUpperCase();
               const color = t.category?.color ?? "#0ea5e9";
+              const adIndex = Math.floor(idx / 4);
+              const showAd = ads && ads.length > 0 && idx > 0 && idx % 4 === 0;
+              const ad = showAd ? ads[(adIndex - 1) % ads.length] : null;
               return (
-                <article
-                  key={t.id}
-                  className="group rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md hover:shadow-sky-100/70"
-                >
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div
-                      className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(authorName)}`}
-                    >
-                      {initials}
-                    </div>
+                <div key={t.id} className="space-y-3">
+                  {ad && <AdCard ad={ad} />}
+                  <article
+                    className="group rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md hover:shadow-sky-100/70"
+                  >
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div
+                        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(authorName)}`}
+                      >
+                        {initials}
+                      </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        {t.category && (
-                          <Link
-                            to="/c/$slug"
-                            params={{ slug: t.category.slug }}
-                            className="inline-flex rounded-full border px-2.5 py-1 text-xs font-bold"
-                            style={{
-                              borderColor: color + "33",
-                              backgroundColor: color + "1a",
-                              color,
-                            }}
-                          >
-                            {t.category.name}
-                          </Link>
-                        )}
-                        {t.is_pinned && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
-                            <Pin size={12} /> Pinned
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          {t.category && (
+                            <Link
+                              to="/c/$slug"
+                              params={{ slug: t.category.slug }}
+                              className="inline-flex rounded-full border px-2.5 py-1 text-xs font-bold"
+                              style={{
+                                borderColor: color + "33",
+                                backgroundColor: color + "1a",
+                                color,
+                              }}
+                            >
+                              {t.category.name}
+                            </Link>
+                          )}
+                          {t.is_pinned && (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
+                              <Pin size={12} /> Pinned
+                            </span>
+                          )}
+                        </div>
+
+                        <Link to="/t/$slug" params={{ slug: t.slug }} className="block rounded-md">
+                          <h2 className="truncate text-base font-extrabold leading-snug text-[#111827] transition-colors group-hover:text-[#0ea5e9] sm:text-lg">
+                            {t.title}
+                          </h2>
+                        </Link>
+
+                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#6b7280]">
+                          <span className="font-semibold text-[#374151]">@{authorName}</span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <MessageSquare size={14} /> {t.reply_count} replies
                           </span>
-                        )}
+                          <span className="inline-flex items-center gap-1.5">
+                            <Clock size={14} /> {timeAgo(t.last_activity_at)}
+                          </span>
+                        </div>
                       </div>
 
-                      <Link to="/t/$slug" params={{ slug: t.slug }} className="block rounded-md">
-                        <h2 className="truncate text-base font-extrabold leading-snug text-[#111827] transition-colors group-hover:text-[#0ea5e9] sm:text-lg">
-                          {t.title}
-                        </h2>
+                      <Link
+                        to="/t/$slug"
+                        params={{ slug: t.slug }}
+                        className="hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[#6b7280] hover:bg-sky-50 hover:text-[#0ea5e9] sm:flex"
+                        aria-label={`Open ${t.title}`}
+                      >
+                        <ChevronRight size={19} />
                       </Link>
-
-                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#6b7280]">
-                        <span className="font-semibold text-[#374151]">@{authorName}</span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <MessageSquare size={14} /> {t.reply_count} replies
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <Clock size={14} /> {timeAgo(t.last_activity_at)}
-                        </span>
-                      </div>
                     </div>
-
-                    <Link
-                      to="/t/$slug"
-                      params={{ slug: t.slug }}
-                      className="hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[#6b7280] hover:bg-sky-50 hover:text-[#0ea5e9] sm:flex"
-                      aria-label={`Open ${t.title}`}
-                    >
-                      <ChevronRight size={19} />
-                    </Link>
-                  </div>
-                </article>
+                  </article>
+                </div>
               );
             })}
 

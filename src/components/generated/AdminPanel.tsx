@@ -26,9 +26,12 @@ import {
   ShoppingCart,
   Settings as SettingsIcon,
   Save,
+  Megaphone,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "products" | "orders" | "settings";
+type Tab = "overview" | "users" | "threads" | "products" | "orders" | "ads" | "settings";
 
 type UserRow = {
   id: string;
@@ -103,6 +106,25 @@ const emptyProduct: Omit<ProductRow, "id"> = {
   featured: false,
 };
 
+type AdRow = {
+  id: string;
+  title: string;
+  image_url: string;
+  link_url: string | null;
+  placement: "home" | "thread" | "both";
+  is_active: boolean;
+  sort_order: number;
+};
+
+const emptyAd: Omit<AdRow, "id"> = {
+  title: "",
+  image_url: "",
+  link_url: "",
+  placement: "home",
+  is_active: true,
+  sort_order: 0,
+};
+
 export const AdminPanel = () => {
   const { user, isAdmin, isModerator, loading } = useAuth();
   const isStaff = isAdmin || isModerator;
@@ -112,6 +134,8 @@ export const AdminPanel = () => {
   const [threads, setThreads] = useState<ThreadRow[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [ads, setAds] = useState<AdRow[]>([]);
+  const [editingAd, setEditingAd] = useState<Partial<AdRow> | null>(null);
   const [settings, setSettings] = useState<SettingsRow>({ brand_name: "MegaFlow", whatsapp_number: "", contact_email: "" });
   const [editingProduct, setEditingProduct] = useState<Partial<ProductRow> | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -285,6 +309,56 @@ export const AdminPanel = () => {
     loadStats();
   };
 
+  const loadAds = async () => {
+    const { data } = await (supabase as any)
+      .from("advertisements")
+      .select("id, title, image_url, link_url, placement, is_active, sort_order")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    setAds((data as AdRow[]) ?? []);
+  };
+
+  const saveAd = async () => {
+    if (!editingAd) return;
+    const image_url = (editingAd.image_url ?? "").trim();
+    if (!image_url) return flash("Image URL required");
+    const payload = {
+      title: (editingAd.title ?? "").trim(),
+      image_url,
+      link_url: (editingAd.link_url ?? "").trim() || null,
+      placement: (editingAd.placement ?? "home") as string,
+      is_active: editingAd.is_active !== false,
+      sort_order: Number(editingAd.sort_order ?? 0),
+    };
+    setBusy("save-ad");
+    const { error } = editingAd.id
+      ? await (supabase as any).from("advertisements").update(payload).eq("id", editingAd.id)
+      : await (supabase as any).from("advertisements").insert({ ...payload, created_by: user?.id ?? null });
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash(editingAd.id ? "Ad updated" : "Ad created");
+    setEditingAd(null);
+    loadAds();
+  };
+
+  const deleteAd = async (a: AdRow) => {
+    if (!confirm(`Delete ad "${a.title || a.image_url}"?`)) return;
+    setBusy(a.id);
+    const { error } = await (supabase as any).from("advertisements").delete().eq("id", a.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Ad deleted");
+    loadAds();
+  };
+
+  const toggleAdActive = async (a: AdRow) => {
+    setBusy(a.id);
+    const { error } = await (supabase as any).from("advertisements").update({ is_active: !a.is_active }).eq("id", a.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    loadAds();
+  };
+
   useEffect(() => {
     if (!isStaff) return;
     loadStats();
@@ -292,6 +366,7 @@ export const AdminPanel = () => {
     if (tab === "threads") loadThreads();
     if (tab === "products") loadProducts();
     if (tab === "orders") loadOrders();
+    if (tab === "ads") loadAds();
     if (tab === "settings") loadSettings();
   }, [isStaff, tab]);
 
@@ -433,7 +508,7 @@ export const AdminPanel = () => {
           </header>
 
           <nav className="flex gap-2 border-b border-[#e5e7eb]">
-            {(["overview", "users", "threads", "products", "orders", "settings"] as Tab[]).map((t) => {
+            {(["overview", "users", "threads", "products", "orders", "ads", "settings"] as Tab[]).map((t) => {
               // moderators can't manage users
               if (t === "users" && !isAdmin) return null;
               return (
@@ -1003,6 +1078,163 @@ export const AdminPanel = () => {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </section>
+          )}
+
+          {tab === "ads" && (
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500 text-white">
+                    <Megaphone size={18} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-extrabold">Advertisements</h2>
+                    <p className="text-xs text-[#6b7280]">Show image posters between posts on the home feed and thread pages.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setEditingAd({ ...emptyAd })}
+                  className="flex items-center gap-1.5 rounded-lg bg-[#0ea5e9] px-3 py-2 text-sm font-bold text-white hover:bg-sky-600"
+                >
+                  <Plus size={16} /> New ad
+                </button>
+              </div>
+
+              {editingAd && (
+                <div className="rounded-xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
+                  <div className="mb-3 flex items-center justify-between">
+                    <h3 className="text-sm font-extrabold">{editingAd.id ? "Edit ad" : "New ad"}</h3>
+                    <button onClick={() => setEditingAd(null)} className="rounded-md p-1 text-[#6b7280] hover:bg-slate-100">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <label className="text-xs font-bold text-[#6b7280] md:col-span-2">
+                      Title (optional)
+                      <input
+                        value={editingAd.title ?? ""}
+                        onChange={(e) => setEditingAd({ ...editingAd, title: e.target.value })}
+                        placeholder="Promo of the week"
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280] md:col-span-2">
+                      Image URL <span className="text-red-500">*</span>
+                      <input
+                        value={editingAd.image_url ?? ""}
+                        onChange={(e) => setEditingAd({ ...editingAd, image_url: e.target.value })}
+                        placeholder="https://…/banner.jpg"
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280] md:col-span-2">
+                      Link URL (optional)
+                      <input
+                        value={editingAd.link_url ?? ""}
+                        onChange={(e) => setEditingAd({ ...editingAd, link_url: e.target.value })}
+                        placeholder="https://your-landing-page.com"
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Placement
+                      <select
+                        value={editingAd.placement ?? "home"}
+                        onChange={(e) => setEditingAd({ ...editingAd, placement: e.target.value as AdRow["placement"] })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      >
+                        <option value="home">Home feed</option>
+                        <option value="thread">Thread pages</option>
+                        <option value="both">Both</option>
+                      </select>
+                    </label>
+                    <label className="text-xs font-bold text-[#6b7280]">
+                      Sort order
+                      <input
+                        type="number"
+                        value={editingAd.sort_order ?? 0}
+                        onChange={(e) => setEditingAd({ ...editingAd, sort_order: Number(e.target.value) })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                      />
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-[#6b7280] md:col-span-2">
+                      <input
+                        type="checkbox"
+                        checked={editingAd.is_active !== false}
+                        onChange={(e) => setEditingAd({ ...editingAd, is_active: e.target.checked })}
+                        className="h-4 w-4 rounded border-[#e5e7eb]"
+                      />
+                      Active (visible to visitors)
+                    </label>
+                    {editingAd.image_url && (
+                      <div className="md:col-span-2">
+                        <p className="mb-1 text-xs font-bold text-[#6b7280]">Preview</p>
+                        <img src={editingAd.image_url} alt="" className="max-h-48 rounded-lg border border-[#e5e7eb] object-cover" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button onClick={() => setEditingAd(null)} className="rounded-lg border border-[#e5e7eb] px-4 py-2 text-sm font-bold text-[#6b7280] hover:bg-slate-50">Cancel</button>
+                    <button
+                      disabled={busy === "save-ad"}
+                      onClick={saveAd}
+                      className="flex items-center gap-1.5 rounded-lg bg-[#0ea5e9] px-4 py-2 text-sm font-bold text-white hover:bg-sky-600 disabled:opacity-50"
+                    >
+                      {busy === "save-ad" && <Loader2 size={14} className="animate-spin" />}
+                      Save
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {ads.map((a) => (
+                  <article key={a.id} className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+                    <div className="aspect-[16/9] w-full overflow-hidden bg-slate-100">
+                      <img src={a.image_url} alt={a.title} className="h-full w-full object-cover" />
+                    </div>
+                    <div className="space-y-2 p-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="truncate text-sm font-extrabold text-[#111827]">{a.title || "(no title)"}</p>
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${a.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>
+                          {a.is_active ? "Active" : "Off"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#6b7280]">Placement: <span className="font-bold text-[#374151]">{a.placement}</span> · Order: {a.sort_order}</p>
+                      {a.link_url && <p className="truncate text-xs text-sky-600">{a.link_url}</p>}
+                      <div className="flex flex-wrap justify-end gap-1 pt-1">
+                        <button
+                          disabled={busy === a.id}
+                          onClick={() => toggleAdActive(a)}
+                          className="rounded-md border border-[#e5e7eb] px-2 py-1 text-xs font-bold text-[#6b7280] hover:border-emerald-300 hover:text-emerald-700"
+                          title={a.is_active ? "Turn off" : "Turn on"}
+                        >
+                          {a.is_active ? <EyeOff size={13} /> : <Eye size={13} />}
+                        </button>
+                        <button
+                          onClick={() => setEditingAd(a)}
+                          className="rounded-md border border-[#e5e7eb] px-2 py-1 text-xs font-bold text-[#6b7280] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
+                        >
+                          <Pencil size={13} />
+                        </button>
+                        <button
+                          disabled={busy === a.id}
+                          onClick={() => deleteAd(a)}
+                          className="rounded-md border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50"
+                        >
+                          {busy === a.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+                {ads.length === 0 && (
+                  <div className="col-span-full rounded-xl border border-dashed border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">
+                    No ads yet. Click "New ad" to add a banner poster.
+                  </div>
+                )}
               </div>
             </section>
           )}
