@@ -5,6 +5,7 @@ import { SideRail } from "@/components/SideRail";
 import { useAuth } from "@/hooks/use-auth";
 import { timeAgo } from "@/lib/forum";
 import { MessageSquare, Clock, Settings } from "lucide-react";
+import { UserBadge } from "@/components/UserBadge";
 
 export const Route = createFileRoute("/u/$username")({
   component: UserPage,
