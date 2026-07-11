@@ -1368,6 +1368,14 @@ export const AdminPanel = () => {
               </div>
             </section>
           )}
+
+          {tab === "settings" && (
+            <>
+              <BlockedDomainsCard flash={flash} />
+              <MultiAccountIPCard />
+            </>
+          )}
+
         </main>
       </div>
       
