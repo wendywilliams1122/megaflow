@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useSiteSettings } from "@/hooks/use-site-settings";
-import { Heart, Mail, MessageCircle, Send, ShieldCheck, Sparkles } from "lucide-react";
+import { Mail, MessageCircle, Send, ShieldCheck, Sparkles } from "lucide-react";
+import megaflowIcon from "@/assets/megaflow-icon.png";
 
 type Col = { title: string; links: { label: string; to: string }[] };
 
