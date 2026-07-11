@@ -228,12 +228,71 @@ export const AdminPanel = () => {
     loadStats();
   };
 
+  const loadOrders = async () => {
+    const { data } = await (supabase as any)
+      .from("orders")
+      .select("id, product_title, product_slug, unit_price_cents, currency, quantity, buyer_name, buyer_contact, method, status, note, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    setOrders((data as OrderRow[]) ?? []);
+  };
+
+  const loadSettings = async () => {
+    const { data } = await (supabase as any)
+      .from("site_settings")
+      .select("brand_name, whatsapp_number, contact_email")
+      .eq("id", true)
+      .maybeSingle();
+    if (data) setSettings({
+      brand_name: data.brand_name ?? "MegaFlow",
+      whatsapp_number: data.whatsapp_number ?? "",
+      contact_email: data.contact_email ?? "",
+    });
+  };
+
+  const saveSettings = async () => {
+    setBusy("save-settings");
+    const { error } = await (supabase as any)
+      .from("site_settings")
+      .update({
+        brand_name: settings.brand_name.trim() || "MegaFlow",
+        whatsapp_number: settings.whatsapp_number?.trim() || null,
+        contact_email: settings.contact_email?.trim() || null,
+      })
+      .eq("id", true);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Settings saved");
+  };
+
+  const updateOrderStatus = async (o: OrderRow, status: OrderRow["status"]) => {
+    setBusy(o.id);
+    const { error } = await (supabase as any).from("orders").update({ status }).eq("id", o.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Order updated");
+    loadOrders();
+  };
+
+  const deleteOrder = async (o: OrderRow) => {
+    if (!confirm("Delete this order?")) return;
+    setBusy(o.id);
+    const { error } = await (supabase as any).from("orders").delete().eq("id", o.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Order deleted");
+    loadOrders();
+    loadStats();
+  };
+
   useEffect(() => {
     if (!isStaff) return;
     loadStats();
     if (tab === "users") loadUsers();
     if (tab === "threads") loadThreads();
     if (tab === "products") loadProducts();
+    if (tab === "orders") loadOrders();
+    if (tab === "settings") loadSettings();
   }, [isStaff, tab]);
 
   const toggleBan = async (u: UserRow) => {
