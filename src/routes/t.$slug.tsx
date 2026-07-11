@@ -22,12 +22,12 @@ type Thread = {
   is_pinned: boolean; is_locked: boolean;
   created_at: string; author_id: string;
   category: { slug: string; name: string; color: string | null } | null;
-  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
+  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
 };
 
 type Post = {
   id: string; body: string; vote_score: number; created_at: string; author_id: string;
-  author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
+  author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
 };
 
 
