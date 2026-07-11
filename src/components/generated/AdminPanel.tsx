@@ -433,7 +433,7 @@ export const AdminPanel = () => {
           </header>
 
           <nav className="flex gap-2 border-b border-[#e5e7eb]">
-            {(["overview", "users", "threads", "products"] as Tab[]).map((t) => {
+            {(["overview", "users", "threads", "products", "orders", "settings"] as Tab[]).map((t) => {
               // moderators can't manage users
               if (t === "users" && !isAdmin) return null;
               return (
@@ -459,6 +459,7 @@ export const AdminPanel = () => {
                 { icon: <MessageSquare size={20} />, label: "Threads", value: stats?.threads ?? 0, bg: "bg-emerald-500" },
                 { icon: <MessageCircle size={20} />, label: "Replies", value: stats?.posts ?? 0, bg: "bg-orange-500" },
                 { icon: <Package size={20} />, label: "Products", value: stats?.products ?? 0, bg: "bg-violet-500" },
+                { icon: <ShoppingCart size={20} />, label: "Orders", value: stats?.orders ?? 0, bg: "bg-amber-500" },
                 { icon: <Ban size={20} />, label: "Banned", value: stats?.banned ?? 0, bg: "bg-red-500" },
               ].map((s) => (
                 <article key={s.label} className="rounded-xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
