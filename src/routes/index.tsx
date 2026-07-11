@@ -68,6 +68,8 @@ function HomePage() {
     },
   });
 
+  const { data: ads } = useAds("home");
+
   return (
     <div className="mx-auto flex max-w-[1440px] pt-16">
       <SideRail />
