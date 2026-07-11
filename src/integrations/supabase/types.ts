@@ -53,6 +53,24 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_email_domains: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string | null
@@ -154,6 +172,7 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          ip_address: string | null
           thread_id: string
           updated_at: string
           vote_score: number
@@ -163,6 +182,7 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          ip_address?: string | null
           thread_id: string
           updated_at?: string
           vote_score?: number
@@ -172,6 +192,7 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          ip_address?: string | null
           thread_id?: string
           updated_at?: string
           vote_score?: number
@@ -247,59 +268,115 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          ban_reason: string | null
           bio: string | null
           created_at: string
           display_name: string | null
           id: string
           is_banned: boolean
+          last_ip: string | null
+          points: number
+          referral_code: string
+          referred_by: string | null
           reputation: number
+          signup_ip: string | null
+          trust_score: number
           updated_at: string
           username: string
+          warnings: number
         }
         Insert: {
           avatar_url?: string | null
+          ban_reason?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id: string
           is_banned?: boolean
+          last_ip?: string | null
+          points?: number
+          referral_code: string
+          referred_by?: string | null
           reputation?: number
+          signup_ip?: string | null
+          trust_score?: number
           updated_at?: string
           username: string
+          warnings?: number
         }
         Update: {
           avatar_url?: string | null
+          ban_reason?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           is_banned?: boolean
+          last_ip?: string | null
+          points?: number
+          referral_code?: string
+          referred_by?: string | null
           reputation?: number
+          signup_ip?: string | null
+          trust_score?: number
           updated_at?: string
           username?: string
+          warnings?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
           brand_name: string
           contact_email: string | null
+          downloads_min_points: number
           id: boolean
+          max_comments_per_day: number
+          max_threads_per_day: number
+          points_comment: number
+          points_referral: number
+          points_thread: number
+          points_upvote: number
           updated_at: string
+          warnings_before_ban: number
           whatsapp_number: string | null
         }
         Insert: {
           brand_name?: string
           contact_email?: string | null
+          downloads_min_points?: number
           id?: boolean
+          max_comments_per_day?: number
+          max_threads_per_day?: number
+          points_comment?: number
+          points_referral?: number
+          points_thread?: number
+          points_upvote?: number
           updated_at?: string
+          warnings_before_ban?: number
           whatsapp_number?: string | null
         }
         Update: {
           brand_name?: string
           contact_email?: string | null
+          downloads_min_points?: number
           id?: boolean
+          max_comments_per_day?: number
+          max_threads_per_day?: number
+          points_comment?: number
+          points_referral?: number
+          points_thread?: number
+          points_upvote?: number
           updated_at?: string
+          warnings_before_ban?: number
           whatsapp_number?: string | null
         }
         Relationships: []
@@ -362,6 +439,7 @@ export type Database = {
           category_id: string
           created_at: string
           id: string
+          ip_address: string | null
           is_locked: boolean
           is_pinned: boolean
           last_activity_at: string
@@ -378,6 +456,7 @@ export type Database = {
           category_id: string
           created_at?: string
           id?: string
+          ip_address?: string | null
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
@@ -394,6 +473,7 @@ export type Database = {
           category_id?: string
           created_at?: string
           id?: string
+          ip_address?: string | null
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
@@ -474,6 +554,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
       can_view_spoiler: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
