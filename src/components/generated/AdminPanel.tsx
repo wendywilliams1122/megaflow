@@ -23,9 +23,12 @@ import {
   Plus,
   Pencil,
   X,
+  ShoppingCart,
+  Settings as SettingsIcon,
+  Save,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "products";
+type Tab = "overview" | "users" | "threads" | "products" | "orders" | "settings";
 
 type UserRow = {
   id: string;
@@ -50,7 +53,28 @@ type ThreadRow = {
   category: { slug: string; name: string } | null;
 };
 
-type Stats = { members: number; threads: number; posts: number; banned: number; products: number };
+type Stats = { members: number; threads: number; posts: number; banned: number; products: number; orders: number };
+
+type OrderRow = {
+  id: string;
+  product_title: string;
+  product_slug: string | null;
+  unit_price_cents: number;
+  currency: string;
+  quantity: number;
+  buyer_name: string;
+  buyer_contact: string;
+  method: "buy" | "cart" | "whatsapp" | "email";
+  status: "new" | "contacted" | "completed" | "cancelled";
+  note: string | null;
+  created_at: string;
+};
+
+type SettingsRow = {
+  brand_name: string;
+  whatsapp_number: string | null;
+  contact_email: string | null;
+};
 
 type ProductRow = {
   id: string;
@@ -87,6 +111,8 @@ export const AdminPanel = () => {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [threads, setThreads] = useState<ThreadRow[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
+  const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [settings, setSettings] = useState<SettingsRow>({ brand_name: "MegaFlow", whatsapp_number: "", contact_email: "" });
   const [editingProduct, setEditingProduct] = useState<Partial<ProductRow> | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -97,12 +123,13 @@ export const AdminPanel = () => {
   };
 
   const loadStats = async () => {
-    const [m, t, p, b, pr] = await Promise.all([
+    const [m, t, p, b, pr, o] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("threads").select("id", { count: "exact", head: true }),
       supabase.from("posts").select("id", { count: "exact", head: true }),
       supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_banned", true),
       supabase.from("products").select("id", { count: "exact", head: true }),
+      (supabase as any).from("orders").select("id", { count: "exact", head: true }),
     ]);
     setStats({
       members: m.count ?? 0,
@@ -110,6 +137,7 @@ export const AdminPanel = () => {
       posts: p.count ?? 0,
       banned: b.count ?? 0,
       products: pr.count ?? 0,
+      orders: o.count ?? 0,
     });
   };
 
@@ -200,12 +228,71 @@ export const AdminPanel = () => {
     loadStats();
   };
 
+  const loadOrders = async () => {
+    const { data } = await (supabase as any)
+      .from("orders")
+      .select("id, product_title, product_slug, unit_price_cents, currency, quantity, buyer_name, buyer_contact, method, status, note, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    setOrders((data as OrderRow[]) ?? []);
+  };
+
+  const loadSettings = async () => {
+    const { data } = await (supabase as any)
+      .from("site_settings")
+      .select("brand_name, whatsapp_number, contact_email")
+      .eq("id", true)
+      .maybeSingle();
+    if (data) setSettings({
+      brand_name: data.brand_name ?? "MegaFlow",
+      whatsapp_number: data.whatsapp_number ?? "",
+      contact_email: data.contact_email ?? "",
+    });
+  };
+
+  const saveSettings = async () => {
+    setBusy("save-settings");
+    const { error } = await (supabase as any)
+      .from("site_settings")
+      .update({
+        brand_name: settings.brand_name.trim() || "MegaFlow",
+        whatsapp_number: settings.whatsapp_number?.trim() || null,
+        contact_email: settings.contact_email?.trim() || null,
+      })
+      .eq("id", true);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Settings saved");
+  };
+
+  const updateOrderStatus = async (o: OrderRow, status: OrderRow["status"]) => {
+    setBusy(o.id);
+    const { error } = await (supabase as any).from("orders").update({ status }).eq("id", o.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Order updated");
+    loadOrders();
+  };
+
+  const deleteOrder = async (o: OrderRow) => {
+    if (!confirm("Delete this order?")) return;
+    setBusy(o.id);
+    const { error } = await (supabase as any).from("orders").delete().eq("id", o.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Order deleted");
+    loadOrders();
+    loadStats();
+  };
+
   useEffect(() => {
     if (!isStaff) return;
     loadStats();
     if (tab === "users") loadUsers();
     if (tab === "threads") loadThreads();
     if (tab === "products") loadProducts();
+    if (tab === "orders") loadOrders();
+    if (tab === "settings") loadSettings();
   }, [isStaff, tab]);
 
   const toggleBan = async (u: UserRow) => {
@@ -346,7 +433,7 @@ export const AdminPanel = () => {
           </header>
 
           <nav className="flex gap-2 border-b border-[#e5e7eb]">
-            {(["overview", "users", "threads", "products"] as Tab[]).map((t) => {
+            {(["overview", "users", "threads", "products", "orders", "settings"] as Tab[]).map((t) => {
               // moderators can't manage users
               if (t === "users" && !isAdmin) return null;
               return (
@@ -372,6 +459,7 @@ export const AdminPanel = () => {
                 { icon: <MessageSquare size={20} />, label: "Threads", value: stats?.threads ?? 0, bg: "bg-emerald-500" },
                 { icon: <MessageCircle size={20} />, label: "Replies", value: stats?.posts ?? 0, bg: "bg-orange-500" },
                 { icon: <Package size={20} />, label: "Products", value: stats?.products ?? 0, bg: "bg-violet-500" },
+                { icon: <ShoppingCart size={20} />, label: "Orders", value: stats?.orders ?? 0, bg: "bg-amber-500" },
                 { icon: <Ban size={20} />, label: "Banned", value: stats?.banned ?? 0, bg: "bg-red-500" },
               ].map((s) => (
                 <article key={s.label} className="rounded-xl border border-[#e5e7eb] bg-white p-5 shadow-sm">
@@ -823,6 +911,161 @@ export const AdminPanel = () => {
                     </tbody>
                   </table>
                 </div>
+              </div>
+          </section>
+          )}
+
+          {tab === "orders" && (
+            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6b7280]">
+                    <tr>
+                      <th className="px-4 py-3">Product</th>
+                      <th className="px-4 py-3">Buyer</th>
+                      <th className="px-4 py-3">Method</th>
+                      <th className="px-4 py-3 text-right">Qty</th>
+                      <th className="px-4 py-3 text-right">Total</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">When</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e5e7eb]">
+                    {orders.map((o) => (
+                      <tr key={o.id} className="hover:bg-slate-50/70">
+                        <td className="px-4 py-3">
+                          {o.product_slug ? (
+                            <Link to="/marketplace/$slug" params={{ slug: o.product_slug }} className="font-bold text-[#111827] hover:text-[#0ea5e9]">
+                              {o.product_title}
+                            </Link>
+                          ) : (
+                            <span className="font-bold text-[#111827]">{o.product_title}</span>
+                          )}
+                          {o.note && <p className="mt-0.5 line-clamp-1 text-xs text-[#6b7280]">“{o.note}”</p>}
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="font-bold text-[#111827]">{o.buyer_name}</p>
+                          <p className="text-xs text-[#6b7280]">{o.buyer_contact}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${
+                            o.method === "whatsapp" ? "bg-emerald-100 text-emerald-700"
+                            : o.method === "email" ? "bg-slate-200 text-slate-700"
+                            : o.method === "cart" ? "bg-violet-100 text-violet-700"
+                            : "bg-sky-100 text-sky-700"
+                          }`}>{o.method}</span>
+                        </td>
+                        <td className="px-4 py-3 text-right tabular-nums">{o.quantity}</td>
+                        <td className="px-4 py-3 text-right font-extrabold tabular-nums">
+                          {new Intl.NumberFormat("en-US", { style: "currency", currency: o.currency }).format((o.unit_price_cents * o.quantity) / 100)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <select
+                            disabled={busy === o.id}
+                            value={o.status}
+                            onChange={(e) => updateOrderStatus(o, e.target.value as OrderRow["status"])}
+                            className={`rounded-md border px-2 py-1 text-xs font-bold ${
+                              o.status === "new" ? "border-amber-300 bg-amber-50 text-amber-700"
+                              : o.status === "contacted" ? "border-sky-300 bg-sky-50 text-sky-700"
+                              : o.status === "completed" ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                              : "border-red-300 bg-red-50 text-red-700"
+                            }`}
+                          >
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-[#6b7280]">
+                          {new Date(o.created_at).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end">
+                            <button
+                              disabled={busy === o.id}
+                              onClick={() => deleteOrder(o)}
+                              className="rounded-md border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50"
+                            >
+                              {busy === o.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {orders.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="px-4 py-8 text-center text-sm text-[#6b7280]">
+                          No orders yet. Buyer requests from the Marketplace will appear here.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {tab === "settings" && (
+            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-white">
+                  <SettingsIcon size={18} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-extrabold">Site & contact settings</h2>
+                  <p className="text-xs text-[#6b7280]">
+                    Configure the WhatsApp number and email buyers can use to reach you.
+                  </p>
+                </div>
+              </div>
+
+              <label className="block text-xs font-bold text-[#6b7280]">
+                Brand name
+                <input
+                  value={settings.brand_name}
+                  onChange={(e) => setSettings({ ...settings, brand_name: e.target.value })}
+                  className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                />
+              </label>
+
+              <label className="block text-xs font-bold text-[#6b7280]">
+                WhatsApp number (with country code, e.g. +92300…)
+                <input
+                  value={settings.whatsapp_number ?? ""}
+                  onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
+                  placeholder="+923001234567"
+                  className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                />
+                <span className="mt-1 block text-[11px] font-normal text-[#6b7280]">
+                  Used for the “Buy on WhatsApp” button. Digits only will be kept when opening WhatsApp.
+                </span>
+              </label>
+
+              <label className="block text-xs font-bold text-[#6b7280]">
+                Contact email
+                <input
+                  type="email"
+                  value={settings.contact_email ?? ""}
+                  onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
+                  placeholder="sales@yourbrand.com"
+                  className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                />
+                <span className="mt-1 block text-[11px] font-normal text-[#6b7280]">
+                  Used for the “Buy on Email” button (opens the buyer's email app).
+                </span>
+              </label>
+
+              <div className="flex justify-end">
+                <button
+                  disabled={busy === "save-settings"}
+                  onClick={saveSettings}
+                  className="flex items-center gap-2 rounded-lg bg-[#0ea5e9] px-5 py-2.5 text-sm font-bold text-white hover:bg-sky-600 disabled:opacity-50"
+                >
+                  {busy === "save-settings" ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  Save settings
+                </button>
               </div>
             </section>
           )}

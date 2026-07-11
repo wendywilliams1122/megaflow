@@ -15,11 +15,13 @@ import { Route as NewRouteImport } from './routes/new'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 
 const SupportRoute = SupportRouteImport.update({
@@ -52,6 +54,11 @@ const CategoriesRoute = CategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -77,6 +84,11 @@ const TSlugRoute = TSlugRouteImport.update({
   path: '/t/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const CSlugRoute = CSlugRouteImport.update({
   id: '/c/$slug',
   path: '/c/$slug',
@@ -87,13 +99,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
 }
@@ -101,13 +115,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
 }
@@ -116,13 +132,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
 }
@@ -132,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/cart'
     | '/categories'
     | '/dashboard'
     | '/marketplace'
@@ -139,6 +158,7 @@ export interface FileRouteTypes {
     | '/rules'
     | '/support'
     | '/c/$slug'
+    | '/marketplace/$slug'
     | '/t/$slug'
     | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
@@ -146,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/cart'
     | '/categories'
     | '/dashboard'
     | '/marketplace'
@@ -153,6 +174,7 @@ export interface FileRouteTypes {
     | '/rules'
     | '/support'
     | '/c/$slug'
+    | '/marketplace/$slug'
     | '/t/$slug'
     | '/u/$username'
   id:
@@ -160,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/cart'
     | '/categories'
     | '/dashboard'
     | '/marketplace'
@@ -167,6 +190,7 @@ export interface FileRouteTypes {
     | '/rules'
     | '/support'
     | '/c/$slug'
+    | '/marketplace/$slug'
     | '/t/$slug'
     | '/u/$username'
   fileRoutesById: FileRoutesById
@@ -175,9 +199,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
-  MarketplaceRoute: typeof MarketplaceRoute
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   NewRoute: typeof NewRoute
   RulesRoute: typeof RulesRoute
   SupportRoute: typeof SupportRoute
@@ -230,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -265,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/$slug': {
+      id: '/marketplace/$slug'
+      path: '/$slug'
+      fullPath: '/marketplace/$slug'
+      preLoaderRoute: typeof MarketplaceSlugRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/c/$slug': {
       id: '/c/$slug'
       path: '/c/$slug'
@@ -275,13 +314,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MarketplaceRouteChildren {
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
-  MarketplaceRoute: MarketplaceRoute,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
   NewRoute: NewRoute,
   RulesRoute: RulesRoute,
   SupportRoute: SupportRoute,
