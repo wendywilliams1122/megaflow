@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
+import { useAuth } from "@/hooks/use-auth";
 import { timeAgo } from "@/lib/forum";
-import { MessageSquare, Clock } from "lucide-react";
+import { MessageSquare, Clock, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/u/$username")({
   component: UserPage,
@@ -12,6 +13,8 @@ export const Route = createFileRoute("/u/$username")({
 
 function UserPage() {
   const { username } = Route.useParams();
+  const { user } = useAuth();
+
 
   const { data: profile } = useQuery({
     queryKey: ["profile", username],
@@ -44,20 +47,27 @@ function UserPage() {
           <div className="rounded-xl border border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">Loading…</div>
         ) : (
           <>
-            <section className="mb-6 flex items-center gap-4 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0ea5e9] text-xl font-extrabold text-white">
+            <section className="mb-6 flex flex-wrap items-center gap-4 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm sm:p-6">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#0ea5e9] text-xl font-extrabold text-white">
                 {profile.username.slice(0, 2).toUpperCase()}
               </div>
-              <div>
-                <h1 className="text-xl font-extrabold text-[#111827]">
+              <div className="min-w-0 flex-1">
+                <h1 className="truncate text-xl font-extrabold text-[#111827]">
                   {profile.display_name ?? profile.username}
                 </h1>
                 <p className="text-sm text-[#6b7280]">@{profile.username}</p>
                 <p className="mt-1 text-xs text-[#6b7280]">
                   <span className="font-bold text-[#0ea5e9]">{profile.reputation}</span> reputation
                 </p>
+                {profile.bio && <p className="mt-2 text-sm text-[#374151]">{profile.bio}</p>}
               </div>
+              {user?.id === profile.id && (
+                <Link to="/settings" className="inline-flex items-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-4 py-2 text-sm font-bold text-[#111827] hover:border-[#0ea5e9] hover:text-[#0ea5e9]">
+                  <Settings size={16} /> Edit Profile
+                </Link>
+              )}
             </section>
+
 
             <h2 className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#6b7280]">Threads</h2>
             <div className="space-y-3">

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
@@ -31,6 +32,11 @@ import { Route as CSlugRouteImport } from './routes/c.$slug'
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RulesRoute = RulesRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
+  '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
+  '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
+  '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/new'
     | '/rules'
+    | '/settings'
     | '/support'
     | '/c/$slug'
     | '/marketplace/$slug'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/new'
     | '/rules'
+    | '/settings'
     | '/support'
     | '/c/$slug'
     | '/marketplace/$slug'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/new'
     | '/rules'
+    | '/settings'
     | '/support'
     | '/c/$slug'
     | '/marketplace/$slug'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   NewRoute: typeof NewRoute
   RulesRoute: typeof RulesRoute
+  SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
   CSlugRoute: typeof CSlugRoute
   TSlugRoute: typeof TSlugRoute
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rules': {
@@ -420,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRouteWithChildren,
   NewRoute: NewRoute,
   RulesRoute: RulesRoute,
+  SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
   CSlugRoute: CSlugRoute,
   TSlugRoute: TSlugRoute,
