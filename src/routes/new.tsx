@@ -115,11 +115,21 @@ function NewThreadPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-[#111827]">Body</label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="block text-sm font-bold text-[#111827]">Body</label>
+                <button
+                  type="button"
+                  onClick={() => setBody((b) => b + (b ? "\n" : "") + "[spoiler]Paste your hidden resource / link here…[/spoiler]")}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-[#e5e7eb] bg-white px-2.5 py-1 text-xs font-bold text-[#374151] hover:border-amber-300 hover:text-amber-700"
+                  title="Only members with 10+ days and at least one thread can view spoiler content"
+                >
+                  <EyeOff size={12} /> Insert Spoiler
+                </button>
+              </div>
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="Share details, links, code snippets…"
+                placeholder="Share details, links, code snippets… Use [spoiler]…[/spoiler] to hide resources."
                 required
                 rows={12}
                 className="w-full rounded-xl border border-[#e5e7eb] bg-[#f6f7f8] px-3 py-2.5 text-sm leading-7 text-[#111827] placeholder:text-[#6b7280] focus:border-[#0ea5e9] focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"
