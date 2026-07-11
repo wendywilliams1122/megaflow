@@ -121,6 +121,7 @@ function RootComponent() {
         </div>
         <Footer />
       </div>
+      <DisclaimerModal />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
