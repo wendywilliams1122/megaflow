@@ -189,7 +189,6 @@ function ThreadPage() {
                           </Link>
                         )}
                         <UserBadge className="mt-1" points={thread.author?.points} staffBadge={thread.author?.staff_badge} isBanned={thread.author?.is_banned} />
-                        )}
                         <p className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
                           {thread.author?.points ?? thread.author?.reputation ?? 0} pts
                         </p>
