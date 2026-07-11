@@ -6,7 +6,7 @@ import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
 import { toast } from "sonner";
 import { makeThreadSlug } from "@/lib/forum";
-import { PenLine } from "lucide-react";
+import { PenLine, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
   component: NewThreadPage,
