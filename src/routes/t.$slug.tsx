@@ -21,13 +21,14 @@ type Thread = {
   is_pinned: boolean; is_locked: boolean;
   created_at: string; author_id: string;
   category: { slug: string; name: string; color: string | null } | null;
-  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number } | null;
+  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
 };
 
 type Post = {
   id: string; body: string; vote_score: number; created_at: string; author_id: string;
-  author: { username: string; display_name: string | null; reputation: number } | null;
+  author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
 };
+
 
 const TONES = ["bg-sky-500","bg-indigo-500","bg-emerald-500","bg-amber-500","bg-cyan-500","bg-purple-500","bg-rose-500","bg-slate-500"];
 function toneFor(name: string){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return TONES[h%TONES.length];}
