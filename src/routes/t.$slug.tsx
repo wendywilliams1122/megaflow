@@ -235,8 +235,7 @@ function ThreadPage() {
                                   @{p.author.username}
                                 </Link>
                               )}
-                              {p.author?.is_banned && (
-                                <span className="mt-0.5 inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-red-700">Banned</span>
+                              <UserBadge className="mt-0.5" points={p.author?.points} staffBadge={p.author?.staff_badge} isBanned={p.author?.is_banned} />
                               )}
                               <p className="text-xs text-[#6b7280]">{p.author?.points ?? p.author?.reputation ?? 0} pts · {timeAgo(p.created_at)}</p>
                             </div>
