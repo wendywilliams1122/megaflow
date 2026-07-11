@@ -44,6 +44,13 @@ function AuthPage() {
           setLoading(false);
           return;
         }
+        const { data: blocked } = await supabase.rpc("is_email_domain_blocked", { _email: email });
+        if (blocked) {
+          const domain = email.split("@")[1] ?? "this provider";
+          toast.error(`Signup blocked: "${domain}" is a disposable/temporary email provider. Please use a real email address (Gmail, Outlook, your work email, etc.).`);
+          setLoading(false);
+          return;
+        }
         let signup_ip: string | undefined;
         try {
           const res = await fetch("https://api.ipify.org?format=json");
@@ -73,7 +80,11 @@ function AuthPage() {
         navigate({ to: search.redirect ?? "/" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      const raw = err instanceof Error ? err.message : "Something went wrong";
+      const friendly = /disposable|blocked_email|Signup blocked/i.test(raw)
+        ? `Signup blocked: "${email.split("@")[1] ?? "this provider"}" is a disposable/temporary email. Please use a real email address.`
+        : raw;
+      toast.error(friendly);
     } finally {
       setLoading(false);
     }
