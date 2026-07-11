@@ -44,6 +44,13 @@ function AuthPage() {
           setLoading(false);
           return;
         }
+        const { data: blocked } = await supabase.rpc("is_email_domain_blocked", { _email: email });
+        if (blocked) {
+          const domain = email.split("@")[1] ?? "this provider";
+          toast.error(`Signup blocked: "${domain}" is a disposable/temporary email provider. Please use a real email address (Gmail, Outlook, your work email, etc.).`);
+          setLoading(false);
+          return;
+        }
         let signup_ip: string | undefined;
         try {
           const res = await fetch("https://api.ipify.org?format=json");
