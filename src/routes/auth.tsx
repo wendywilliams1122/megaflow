@@ -80,7 +80,11 @@ function AuthPage() {
         navigate({ to: search.redirect ?? "/" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      const raw = err instanceof Error ? err.message : "Something went wrong";
+      const friendly = /disposable|blocked_email|Signup blocked/i.test(raw)
+        ? `Signup blocked: "${email.split("@")[1] ?? "this provider"}" is a disposable/temporary email. Please use a real email address.`
+        : raw;
+      toast.error(friendly);
     } finally {
       setLoading(false);
     }
