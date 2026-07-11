@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Header } from "@/components/Header";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
+
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import {
