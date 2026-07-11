@@ -34,9 +34,6 @@ function NewThreadPage() {
     },
   });
 
-  useEffect(() => {
-    if (categories?.length && !categoryId) setCategoryId(categories[0].id);
-  }, [categories, categoryId]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
