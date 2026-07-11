@@ -4,7 +4,7 @@ import { useSpoilerAccess } from "@/hooks/use-forum-access";
 export type DownloadItem = { url: string; label: string };
 
 export function DownloadList({ items }: { items: DownloadItem[] }) {
-  const { hasAccess, loading } = useSpoilerAccess();
+  const { canView: hasAccess, loading } = useSpoilerAccess();
   if (!items?.length) return null;
 
   return (
