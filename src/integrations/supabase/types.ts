@@ -311,50 +311,71 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          cover_url: string | null
           created_at: string
           display_name: string | null
+          headline: string | null
           id: string
           is_banned: boolean
+          location: string | null
           points: number
           referral_code: string
           referred_by: string | null
           reputation: number
+          social_github: string | null
+          social_linkedin: string | null
+          social_twitter: string | null
           staff_badge: string | null
           trust_score: number
           updated_at: string
           username: string
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          cover_url?: string | null
           created_at?: string
           display_name?: string | null
+          headline?: string | null
           id: string
           is_banned?: boolean
+          location?: string | null
           points?: number
           referral_code: string
           referred_by?: string | null
           reputation?: number
+          social_github?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
           staff_badge?: string | null
           trust_score?: number
           updated_at?: string
           username: string
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          cover_url?: string | null
           created_at?: string
           display_name?: string | null
+          headline?: string | null
           id?: string
           is_banned?: boolean
+          location?: string | null
           points?: number
           referral_code?: string
           referred_by?: string | null
           reputation?: number
+          social_github?: string | null
+          social_linkedin?: string | null
+          social_twitter?: string | null
           staff_badge?: string | null
           trust_score?: number
           updated_at?: string
           username?: string
+          website?: string | null
         }
         Relationships: [
           {
