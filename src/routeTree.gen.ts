@@ -13,7 +13,6 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NewRouteImport } from './routes/new'
-import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
@@ -24,6 +23,7 @@ import { Route as AdvertisementRouteImport } from './routes/advertisement'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
@@ -47,11 +47,6 @@ const RulesRoute = RulesRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketplaceRoute = MarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -104,6 +99,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UUsernameRoute = UUsernameRouteImport.update({
   id: '/u/$username',
   path: '/u/$username',
@@ -115,9 +115,9 @@ const TSlugRoute = TSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/$slug',
+  path: '/marketplace/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CSlugRoute = CSlugRouteImport.update({
   id: '/c/$slug',
@@ -136,7 +136,6 @@ export interface FileRoutesByFullPath {
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/settings': typeof SettingsRoute
@@ -145,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -157,7 +157,6 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/settings': typeof SettingsRoute
@@ -166,6 +165,7 @@ export interface FileRoutesByTo {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
+  '/marketplace': typeof MarketplaceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -179,7 +179,6 @@ export interface FileRoutesById {
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
   '/rules': typeof RulesRoute
   '/settings': typeof SettingsRoute
@@ -188,6 +187,7 @@ export interface FileRoutesById {
   '/marketplace/$slug': typeof MarketplaceSlugRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -202,7 +202,6 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/dashboard'
-    | '/marketplace'
     | '/new'
     | '/rules'
     | '/settings'
@@ -211,6 +210,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/t/$slug'
     | '/u/$username'
+    | '/marketplace/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -223,7 +223,6 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/dashboard'
-    | '/marketplace'
     | '/new'
     | '/rules'
     | '/settings'
@@ -232,6 +231,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/t/$slug'
     | '/u/$username'
+    | '/marketplace'
   id:
     | '__root__'
     | '/'
@@ -244,7 +244,6 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/dashboard'
-    | '/marketplace'
     | '/new'
     | '/rules'
     | '/settings'
@@ -253,6 +252,7 @@ export interface FileRouteTypes {
     | '/marketplace/$slug'
     | '/t/$slug'
     | '/u/$username'
+    | '/marketplace/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -266,14 +266,15 @@ export interface RootRouteChildren {
   CategoriesRoute: typeof CategoriesRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
-  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   NewRoute: typeof NewRoute
   RulesRoute: typeof RulesRoute
   SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
   CSlugRoute: typeof CSlugRoute
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
   TSlugRoute: typeof TSlugRoute
   UUsernameRoute: typeof UUsernameRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -304,13 +305,6 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace': {
-      id: '/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -383,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/u/$username': {
       id: '/u/$username'
       path: '/u/$username'
@@ -399,10 +400,10 @@ declare module '@tanstack/react-router' {
     }
     '/marketplace/$slug': {
       id: '/marketplace/$slug'
-      path: '/$slug'
+      path: '/marketplace/$slug'
       fullPath: '/marketplace/$slug'
       preLoaderRoute: typeof MarketplaceSlugRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/c/$slug': {
       id: '/c/$slug'
@@ -413,18 +414,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface MarketplaceRouteChildren {
-  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
-}
-
-const MarketplaceRouteChildren: MarketplaceRouteChildren = {
-  MarketplaceSlugRoute: MarketplaceSlugRoute,
-}
-
-const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
-  MarketplaceRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -437,15 +426,26 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesRoute: CategoriesRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
-  MarketplaceRoute: MarketplaceRouteWithChildren,
   NewRoute: NewRoute,
   RulesRoute: RulesRoute,
   SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
   CSlugRoute: CSlugRoute,
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
   TSlugRoute: TSlugRoute,
   UUsernameRoute: UUsernameRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
