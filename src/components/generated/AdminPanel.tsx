@@ -508,7 +508,7 @@ export const AdminPanel = () => {
           </header>
 
           <nav className="flex gap-2 border-b border-[#e5e7eb]">
-            {(["overview", "users", "threads", "products", "orders", "settings"] as Tab[]).map((t) => {
+            {(["overview", "users", "threads", "products", "orders", "ads", "settings"] as Tab[]).map((t) => {
               // moderators can't manage users
               if (t === "users" && !isAdmin) return null;
               return (
