@@ -190,35 +190,40 @@ function ThreadPage() {
               </h2>
 
               <ul className="space-y-3">
-                {posts?.map((p) => (
-                  <li key={p.id} className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
-                    <div className="md:flex">
-                      <aside className="border-b border-[#e5e7eb] p-4 md:w-56 md:border-b-0 md:border-r">
-                        <div className="flex items-center gap-3 md:block">
-                          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(p.author?.username ?? "u")}`}>
-                            {(p.author?.username ?? "?").slice(0, 2).toUpperCase()}
+                {posts?.map((p, idx) => (
+                  <li key={p.id} className="space-y-3">
+                    {ads && ads.length > 0 && idx > 0 && idx % 3 === 0 && (
+                      <AdCard ad={ads[(Math.floor(idx / 3) - 1) % ads.length]} />
+                    )}
+                    <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+                      <div className="md:flex">
+                        <aside className="border-b border-[#e5e7eb] p-4 md:w-56 md:border-b-0 md:border-r">
+                          <div className="flex items-center gap-3 md:block">
+                            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(p.author?.username ?? "u")}`}>
+                              {(p.author?.username ?? "?").slice(0, 2).toUpperCase()}
+                            </div>
+                            <div className="min-w-0 md:mt-2">
+                              {p.author && (
+                                <Link to="/u/$username" params={{ username: p.author.username }} className="block text-sm font-extrabold text-[#111827] hover:text-[#0ea5e9]">
+                                  @{p.author.username}
+                                </Link>
+                              )}
+                              <p className="text-xs text-[#6b7280]">{p.author?.reputation ?? 0} rep · {timeAgo(p.created_at)}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0 md:mt-2">
-                            {p.author && (
-                              <Link to="/u/$username" params={{ username: p.author.username }} className="block text-sm font-extrabold text-[#111827] hover:text-[#0ea5e9]">
-                                @{p.author.username}
-                              </Link>
+                        </aside>
+                        <div className="min-w-0 flex-1 p-4 sm:p-5">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex min-w-0 flex-1 gap-4">
+                              <VoteButtons targetType="post" targetId={p.id} initialScore={p.vote_score} />
+                              <RichBody text={p.body} className="min-w-0 flex-1 text-sm leading-7 text-[#374151]" />
+                            </div>
+                            {user?.id === p.author_id && (
+                              <button onClick={() => deletePost(p.id)} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
+                                <Trash2 size={14} />
+                              </button>
                             )}
-                            <p className="text-xs text-[#6b7280]">{p.author?.reputation ?? 0} rep · {timeAgo(p.created_at)}</p>
                           </div>
-                        </div>
-                      </aside>
-                      <div className="min-w-0 flex-1 p-4 sm:p-5">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex gap-4">
-                            <VoteButtons targetType="post" targetId={p.id} initialScore={p.vote_score} />
-                            <div className="whitespace-pre-wrap text-sm leading-7 text-[#374151]">{p.body}</div>
-                          </div>
-                          {user?.id === p.author_id && (
-                            <button onClick={() => deletePost(p.id)} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
-                              <Trash2 size={14} />
-                            </button>
-                          )}
                         </div>
                       </div>
                     </div>
