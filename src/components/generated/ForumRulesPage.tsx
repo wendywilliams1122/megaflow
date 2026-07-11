@@ -311,6 +311,5 @@ export const ForumRulesPage: React.FC = () => {
         </main>
       </div>
 
-      <Footer />
     </div>;
 };
