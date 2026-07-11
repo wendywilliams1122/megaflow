@@ -309,6 +309,56 @@ export const AdminPanel = () => {
     loadStats();
   };
 
+  const loadAds = async () => {
+    const { data } = await (supabase as any)
+      .from("advertisements")
+      .select("id, title, image_url, link_url, placement, is_active, sort_order")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    setAds((data as AdRow[]) ?? []);
+  };
+
+  const saveAd = async () => {
+    if (!editingAd) return;
+    const image_url = (editingAd.image_url ?? "").trim();
+    if (!image_url) return flash("Image URL required");
+    const payload = {
+      title: (editingAd.title ?? "").trim(),
+      image_url,
+      link_url: (editingAd.link_url ?? "").trim() || null,
+      placement: (editingAd.placement ?? "home") as string,
+      is_active: editingAd.is_active !== false,
+      sort_order: Number(editingAd.sort_order ?? 0),
+    };
+    setBusy("save-ad");
+    const { error } = editingAd.id
+      ? await (supabase as any).from("advertisements").update(payload).eq("id", editingAd.id)
+      : await (supabase as any).from("advertisements").insert({ ...payload, created_by: user?.id ?? null });
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash(editingAd.id ? "Ad updated" : "Ad created");
+    setEditingAd(null);
+    loadAds();
+  };
+
+  const deleteAd = async (a: AdRow) => {
+    if (!confirm(`Delete ad "${a.title || a.image_url}"?`)) return;
+    setBusy(a.id);
+    const { error } = await (supabase as any).from("advertisements").delete().eq("id", a.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash("Ad deleted");
+    loadAds();
+  };
+
+  const toggleAdActive = async (a: AdRow) => {
+    setBusy(a.id);
+    const { error } = await (supabase as any).from("advertisements").update({ is_active: !a.is_active }).eq("id", a.id);
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    loadAds();
+  };
+
   useEffect(() => {
     if (!isStaff) return;
     loadStats();
@@ -316,6 +366,7 @@ export const AdminPanel = () => {
     if (tab === "threads") loadThreads();
     if (tab === "products") loadProducts();
     if (tab === "orders") loadOrders();
+    if (tab === "ads") loadAds();
     if (tab === "settings") loadSettings();
   }, [isStaff, tab]);
 
