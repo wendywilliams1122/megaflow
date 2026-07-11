@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
 import { SideRail } from "@/components/SideRail";
 import { RichBody } from "@/components/RichBody";
+import { UserBadge } from "@/components/UserBadge";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { toast } from "sonner";
@@ -21,12 +22,12 @@ type Thread = {
   is_pinned: boolean; is_locked: boolean;
   created_at: string; author_id: string;
   category: { slug: string; name: string; color: string | null } | null;
-  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
+  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
 };
 
 type Post = {
   id: string; body: string; vote_score: number; created_at: string; author_id: string;
-  author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
+  author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
 };
 
 
@@ -46,7 +47,7 @@ function ThreadPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("threads")
-        .select("id, slug, title, body:body_public, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points)")
+        .select("id, slug, title, body:body_public, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points, staff_badge)")
         .eq("slug", slug)
         .maybeSingle();
       return data as unknown as Thread | null;
@@ -68,7 +69,7 @@ function ThreadPage() {
       if (!thread) return [];
       const { data } = await supabase
         .from("posts")
-        .select("id, body:body_public, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points)")
+        .select("id, body:body_public, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points, staff_badge)")
         .eq("thread_id", thread.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as Post[];
@@ -187,9 +188,7 @@ function ThreadPage() {
                             @{thread.author.username}
                           </Link>
                         )}
-                        {thread.author?.is_banned && (
-                          <span className="mt-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-red-700">User Banned</span>
-                        )}
+                        <UserBadge className="mt-1" points={thread.author?.points} staffBadge={thread.author?.staff_badge} isBanned={thread.author?.is_banned} />
                         <p className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
                           {thread.author?.points ?? thread.author?.reputation ?? 0} pts
                         </p>
@@ -236,9 +235,7 @@ function ThreadPage() {
                                   @{p.author.username}
                                 </Link>
                               )}
-                              {p.author?.is_banned && (
-                                <span className="mt-0.5 inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-red-700">Banned</span>
-                              )}
+                              <UserBadge className="mt-0.5" points={p.author?.points} staffBadge={p.author?.staff_badge} isBanned={p.author?.is_banned} />
                               <p className="text-xs text-[#6b7280]">{p.author?.points ?? p.author?.reputation ?? 0} pts · {timeAgo(p.created_at)}</p>
                             </div>
 
