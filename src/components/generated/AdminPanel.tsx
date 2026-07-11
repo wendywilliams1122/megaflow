@@ -144,7 +144,7 @@ export const AdminPanel = () => {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [ads, setAds] = useState<AdRow[]>([]);
   const [editingAd, setEditingAd] = useState<Partial<AdRow> | null>(null);
-  const [settings, setSettings] = useState<SettingsRow>({ brand_name: "MegaFlow", whatsapp_number: "", contact_email: "" });
+  const [settings, setSettings] = useState<SettingsRow>({ brand_name: "MegaFlow", whatsapp_number: "", contact_email: "", points_thread: 10, points_comment: 2, points_upvote: 1, points_referral: 25, max_threads_per_day: 5, max_comments_per_day: 30, warnings_before_ban: 3, downloads_min_points: 0 });
   const [editingProduct, setEditingProduct] = useState<Partial<ProductRow> | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
