@@ -23,9 +23,12 @@ import {
   Plus,
   Pencil,
   X,
+  ShoppingCart,
+  Settings as SettingsIcon,
+  Save,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "products";
+type Tab = "overview" | "users" | "threads" | "products" | "orders" | "settings";
 
 type UserRow = {
   id: string;
@@ -50,7 +53,28 @@ type ThreadRow = {
   category: { slug: string; name: string } | null;
 };
 
-type Stats = { members: number; threads: number; posts: number; banned: number; products: number };
+type Stats = { members: number; threads: number; posts: number; banned: number; products: number; orders: number };
+
+type OrderRow = {
+  id: string;
+  product_title: string;
+  product_slug: string | null;
+  unit_price_cents: number;
+  currency: string;
+  quantity: number;
+  buyer_name: string;
+  buyer_contact: string;
+  method: "buy" | "cart" | "whatsapp" | "email";
+  status: "new" | "contacted" | "completed" | "cancelled";
+  note: string | null;
+  created_at: string;
+};
+
+type SettingsRow = {
+  brand_name: string;
+  whatsapp_number: string | null;
+  contact_email: string | null;
+};
 
 type ProductRow = {
   id: string;
@@ -87,6 +111,8 @@ export const AdminPanel = () => {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [threads, setThreads] = useState<ThreadRow[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
+  const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [settings, setSettings] = useState<SettingsRow>({ brand_name: "MegaFlow", whatsapp_number: "", contact_email: "" });
   const [editingProduct, setEditingProduct] = useState<Partial<ProductRow> | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -97,12 +123,13 @@ export const AdminPanel = () => {
   };
 
   const loadStats = async () => {
-    const [m, t, p, b, pr] = await Promise.all([
+    const [m, t, p, b, pr, o] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("threads").select("id", { count: "exact", head: true }),
       supabase.from("posts").select("id", { count: "exact", head: true }),
       supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_banned", true),
       supabase.from("products").select("id", { count: "exact", head: true }),
+      (supabase as any).from("orders").select("id", { count: "exact", head: true }),
     ]);
     setStats({
       members: m.count ?? 0,
@@ -110,6 +137,7 @@ export const AdminPanel = () => {
       posts: p.count ?? 0,
       banned: b.count ?? 0,
       products: pr.count ?? 0,
+      orders: o.count ?? 0,
     });
   };
 
