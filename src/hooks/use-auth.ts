@@ -27,12 +27,25 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   const loadUserData = (userId: string) => {
-    supabase
-      .from("profiles")
-      .select("id, username, display_name, avatar_url, reputation, points, trust_score, warnings, referral_code, ban_reason, is_banned")
-      .eq("id", userId)
-      .maybeSingle()
-      .then(({ data }) => setProfile(data as Profile | null));
+    (async () => {
+      const [{ data: p }, { data: mod }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, username, display_name, avatar_url, reputation, points, trust_score, referral_code, is_banned")
+          .eq("id", userId)
+          .maybeSingle(),
+        supabase
+          .from("profile_moderation")
+          .select("ban_reason, warnings")
+          .eq("user_id", userId)
+          .maybeSingle(),
+      ]);
+      if (p) {
+        setProfile({ ...(p as Profile), ban_reason: mod?.ban_reason ?? null, warnings: mod?.warnings ?? 0 });
+      } else {
+        setProfile(null);
+      }
+    })();
     supabase
       .from("user_roles")
       .select("role")
