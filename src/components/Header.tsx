@@ -3,9 +3,10 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag, ShoppingCart } from "lucide-react";
+import { Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag, ShoppingCart } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { SideNav } from "@/components/SideNav";
+import megaflowIcon from "@/assets/megaflow-icon.png";
 
 
 
@@ -47,10 +48,8 @@ export function Header() {
             </SheetContent>
           </Sheet>
 
-          <Link to="/" className="flex items-center gap-2.5 rounded-lg" aria-label="MegaFlow home">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0ea5e9] text-white shadow-sm shadow-sky-200">
-              <Heart size={18} fill="currentColor" />
-            </div>
+          <Link to="/" className="flex items-center gap-2 rounded-lg" aria-label="MegaFlow home">
+            <img src={megaflowIcon} alt="MegaFlow" className="h-9 w-9 object-contain" />
             <span className="hidden text-xl font-extrabold tracking-tight text-[#111827] sm:inline">
               MegaFlow
             </span>
