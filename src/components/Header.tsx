@@ -14,6 +14,8 @@ export function Header() {
   const { count: cartCount, hydrated: cartHydrated } = useCart();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [mobileOpen, setMobileOpen] = useState(false);
+
 
   const signOut = async () => {
     await supabase.auth.signOut();
