@@ -597,6 +597,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_email_domain_blocked: { Args: { _email: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
