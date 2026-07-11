@@ -11,14 +11,20 @@ export function MultiAccountIPCard() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await (supabase as any)
-        .from("profiles")
-        .select("id, username, is_banned, signup_ip, last_ip")
-        .not("signup_ip", "is", null);
+      const { data: ips } = await (supabase as any)
+        .from("profile_ips")
+        .select("user_id, signup_ip, last_ip");
+      const userIds = (ips ?? []).map((r: any) => r.user_id);
+      const { data: profs } = userIds.length
+        ? await supabase.from("profiles").select("id, username, is_banned").in("id", userIds)
+        : { data: [] as any[] };
+      const profMap = new Map((profs ?? []).map((p: any) => [p.id, p]));
       const map = new Map<string, { id: string; username: string; is_banned: boolean }[]>();
-      (data ?? []).forEach((p: any) => {
-        const ips = [p.signup_ip, p.last_ip].filter(Boolean);
-        ips.forEach((ip: string) => {
+      (ips ?? []).forEach((r: any) => {
+        const p = profMap.get(r.user_id);
+        if (!p) return;
+        const list = [r.signup_ip, r.last_ip].filter(Boolean);
+        list.forEach((ip: string) => {
           if (!map.has(ip)) map.set(ip, []);
           const arr = map.get(ip)!;
           if (!arr.find((u) => u.id === p.id)) {
