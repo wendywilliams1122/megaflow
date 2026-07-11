@@ -288,7 +288,7 @@ function MarketplacePage() {
   );
 }
 
-export const Route = createFileRoute("/marketplace")({
+export const Route = createFileRoute("/marketplace/")({
   component: MarketplacePage,
   head: () => ({
     meta: [
