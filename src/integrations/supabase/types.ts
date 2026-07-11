@@ -319,6 +319,7 @@ export type Database = {
           referral_code: string
           referred_by: string | null
           reputation: number
+          staff_badge: string | null
           trust_score: number
           updated_at: string
           username: string
@@ -334,6 +335,7 @@ export type Database = {
           referral_code: string
           referred_by?: string | null
           reputation?: number
+          staff_badge?: string | null
           trust_score?: number
           updated_at?: string
           username: string
@@ -349,6 +351,7 @@ export type Database = {
           referral_code?: string
           referred_by?: string | null
           reputation?: number
+          staff_badge?: string | null
           trust_score?: number
           updated_at?: string
           username?: string
