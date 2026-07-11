@@ -46,7 +46,7 @@ function ThreadPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("threads")
-        .select("id, slug, title, body, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation)")
+        .select("id, slug, title, body, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points)")
         .eq("slug", slug)
         .maybeSingle();
       return data as unknown as Thread | null;
