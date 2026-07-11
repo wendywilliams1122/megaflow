@@ -11,7 +11,7 @@ export type SpoilerAccess = {
 };
 
 export function useSpoilerAccess(): SpoilerAccess {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const { data, isLoading } = useQuery({
     queryKey: ["spoiler-access", user?.id],
@@ -29,7 +29,7 @@ export function useSpoilerAccess(): SpoilerAccess {
     return { canView: false, loading: authLoading, reason: "signed-out", daysOld: 0, hasThread: false };
   }
 
-  const createdAt = profile?.created_at ? new Date(profile.created_at).getTime() : Date.now();
+  const createdAt = user.created_at ? new Date(user.created_at).getTime() : Date.now();
   const daysOld = Math.floor((Date.now() - createdAt) / 86400000);
   const hasThread = (data?.threadCount ?? 0) > 0;
 
