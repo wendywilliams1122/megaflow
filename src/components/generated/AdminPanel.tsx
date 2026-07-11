@@ -76,7 +76,16 @@ type SettingsRow = {
   brand_name: string;
   whatsapp_number: string | null;
   contact_email: string | null;
+  points_thread: number;
+  points_comment: number;
+  points_upvote: number;
+  points_referral: number;
+  max_threads_per_day: number;
+  max_comments_per_day: number;
+  warnings_before_ban: number;
+  downloads_min_points: number;
 };
+
 
 type ProductRow = {
   id: string;
