@@ -52,8 +52,12 @@ export function RichEditor({ value, onChange, placeholder = "Write your post…"
       contentType: file.type, upsert: false,
     });
     if (error) return toast.error(error.message);
-    const { data } = supabase.storage.from("forum-uploads").getPublicUrl(path);
-    ed.chain().focus().setImage({ src: data.publicUrl }).run();
+    // Public buckets are disabled workspace-wide, so mint a long-lived signed URL.
+    const { data, error: signErr } = await supabase.storage
+      .from("forum-uploads")
+      .createSignedUrl(path, 60 * 60 * 24 * 365 * 10); // ~10 years
+    if (signErr || !data?.signedUrl) return toast.error(signErr?.message ?? "Failed to sign image");
+    ed.chain().focus().setImage({ src: data.signedUrl }).run();
   }, []);
 
   if (!editor) return null;
