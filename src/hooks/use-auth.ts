@@ -29,7 +29,7 @@ export function useAuth() {
   const loadUserData = (userId: string) => {
     supabase
       .from("profiles")
-      .select("id, username, display_name, avatar_url, reputation, is_banned")
+      .select("id, username, display_name, avatar_url, reputation, points, trust_score, warnings, referral_code, ban_reason, is_banned")
       .eq("id", userId)
       .maybeSingle()
       .then(({ data }) => setProfile(data as Profile | null));
