@@ -44,10 +44,8 @@ export function Footer() {
       <div className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0ea5e9] text-white shadow-sm shadow-sky-200">
-                <Heart size={17} fill="currentColor" />
-              </div>
+            <div className="flex items-center gap-2">
+              <img src={megaflowIcon} alt="MegaFlow" className="h-10 w-10 object-contain" />
               <span className="text-lg font-extrabold tracking-tight text-[#111827]">MegaFlow</span>
             </div>
             <p className="mt-4 max-w-sm text-sm leading-6 text-[#6b7280]">
