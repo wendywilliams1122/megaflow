@@ -21,7 +21,7 @@ function UserPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, username, display_name, avatar_url, bio, reputation, points, is_banned, created_at")
+        .select("id, username, display_name, avatar_url, bio, reputation, points, is_banned, staff_badge, created_at")
         .eq("username", username)
         .maybeSingle();
       return data;
