@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { SideRail } from "@/components/SideRail";
+import { BlockedDomainsCard } from "@/components/admin/BlockedDomainsCard";
+import { MultiAccountIPCard } from "@/components/admin/MultiAccountIPCard";
+
 
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +79,16 @@ type SettingsRow = {
   brand_name: string;
   whatsapp_number: string | null;
   contact_email: string | null;
+  points_thread: number;
+  points_comment: number;
+  points_upvote: number;
+  points_referral: number;
+  max_threads_per_day: number;
+  max_comments_per_day: number;
+  warnings_before_ban: number;
+  downloads_min_points: number;
 };
+
 
 type ProductRow = {
   id: string;
@@ -135,7 +147,7 @@ export const AdminPanel = () => {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [ads, setAds] = useState<AdRow[]>([]);
   const [editingAd, setEditingAd] = useState<Partial<AdRow> | null>(null);
-  const [settings, setSettings] = useState<SettingsRow>({ brand_name: "MegaFlow", whatsapp_number: "", contact_email: "" });
+  const [settings, setSettings] = useState<SettingsRow>({ brand_name: "MegaFlow", whatsapp_number: "", contact_email: "", points_thread: 10, points_comment: 2, points_upvote: 1, points_referral: 25, max_threads_per_day: 5, max_comments_per_day: 30, warnings_before_ban: 3, downloads_min_points: 0 });
   const [editingProduct, setEditingProduct] = useState<Partial<ProductRow> | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -263,13 +275,21 @@ export const AdminPanel = () => {
   const loadSettings = async () => {
     const { data } = await (supabase as any)
       .from("site_settings")
-      .select("brand_name, whatsapp_number, contact_email")
+      .select("*")
       .eq("id", true)
       .maybeSingle();
     if (data) setSettings({
       brand_name: data.brand_name ?? "MegaFlow",
       whatsapp_number: data.whatsapp_number ?? "",
       contact_email: data.contact_email ?? "",
+      points_thread: data.points_thread ?? 10,
+      points_comment: data.points_comment ?? 2,
+      points_upvote: data.points_upvote ?? 1,
+      points_referral: data.points_referral ?? 25,
+      max_threads_per_day: data.max_threads_per_day ?? 5,
+      max_comments_per_day: data.max_comments_per_day ?? 30,
+      warnings_before_ban: data.warnings_before_ban ?? 3,
+      downloads_min_points: data.downloads_min_points ?? 0,
     });
   };
 
@@ -281,12 +301,21 @@ export const AdminPanel = () => {
         brand_name: settings.brand_name.trim() || "MegaFlow",
         whatsapp_number: settings.whatsapp_number?.trim() || null,
         contact_email: settings.contact_email?.trim() || null,
+        points_thread: settings.points_thread,
+        points_comment: settings.points_comment,
+        points_upvote: settings.points_upvote,
+        points_referral: settings.points_referral,
+        max_threads_per_day: settings.max_threads_per_day,
+        max_comments_per_day: settings.max_comments_per_day,
+        warnings_before_ban: settings.warnings_before_ban,
+        downloads_min_points: settings.downloads_min_points,
       })
       .eq("id", true);
     setBusy(null);
     if (error) return flash("Failed: " + error.message);
     flash("Settings saved");
   };
+
 
   const updateOrderStatus = async (o: OrderRow, status: OrderRow["status"]) => {
     setBusy(o.id);
@@ -1288,7 +1317,49 @@ export const AdminPanel = () => {
                 </span>
               </label>
 
+              <div className="mt-2 border-t border-[#e5e7eb] pt-4">
+                <h3 className="mb-3 text-sm font-extrabold text-[#111827]">Points & rewards</h3>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {([
+                    ["points_thread","Per thread"],
+                    ["points_comment","Per comment"],
+                    ["points_upvote","Per upvote"],
+                    ["points_referral","Per referral"],
+                  ] as const).map(([k,label]) => (
+                    <label key={k} className="block text-xs font-bold text-[#6b7280]">
+                      {label}
+                      <input type="number" min={0} value={settings[k]}
+                        onChange={(e) => setSettings({ ...settings, [k]: Number(e.target.value) || 0 })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827]" />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-2 border-t border-[#e5e7eb] pt-4">
+                <h3 className="mb-3 text-sm font-extrabold text-[#111827]">Anti-spam & access</h3>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {([
+                    ["max_threads_per_day","Threads / day"],
+                    ["max_comments_per_day","Comments / day"],
+                    ["warnings_before_ban","Warnings → ban"],
+                    ["downloads_min_points","Min points for downloads"],
+                  ] as const).map(([k,label]) => (
+                    <label key={k} className="block text-xs font-bold text-[#6b7280]">
+                      {label}
+                      <input type="number" min={0} value={settings[k]}
+                        onChange={(e) => setSettings({ ...settings, [k]: Number(e.target.value) || 0 })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827]" />
+                    </label>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] text-[#6b7280]">
+                  Admins & moderators bypass all download conditions. Regular users still need the 10-day + own-thread rule; set min points to 0 to disable the extra points gate.
+                </p>
+              </div>
+
               <div className="flex justify-end">
+
                 <button
                   disabled={busy === "save-settings"}
                   onClick={saveSettings}
@@ -1300,6 +1371,14 @@ export const AdminPanel = () => {
               </div>
             </section>
           )}
+
+          {tab === "settings" && (
+            <>
+              <BlockedDomainsCard flash={flash} />
+              <MultiAccountIPCard />
+            </>
+          )}
+
         </main>
       </div>
       

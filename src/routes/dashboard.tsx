@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { UserDashboard } from "@/components/generated/UserDashboard";
+import { ReferralPointsCard } from "@/components/ReferralPointsCard";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -9,5 +10,10 @@ export const Route = createFileRoute("/dashboard")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: UserDashboard,
+  component: () => (
+    <>
+      <ReferralPointsCard />
+      <UserDashboard />
+    </>
+  ),
 });

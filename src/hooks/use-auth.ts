@@ -8,8 +8,14 @@ export type Profile = {
   display_name: string | null;
   avatar_url: string | null;
   reputation: number;
+  points?: number;
+  trust_score?: number;
+  warnings?: number;
+  referral_code?: string | null;
+  ban_reason?: string | null;
   is_banned?: boolean;
 };
+
 
 export type AppRole = "admin" | "moderator" | "user";
 
@@ -23,7 +29,7 @@ export function useAuth() {
   const loadUserData = (userId: string) => {
     supabase
       .from("profiles")
-      .select("id, username, display_name, avatar_url, reputation, is_banned")
+      .select("id, username, display_name, avatar_url, reputation, points, trust_score, warnings, referral_code, ban_reason, is_banned")
       .eq("id", userId)
       .maybeSingle()
       .then(({ data }) => setProfile(data as Profile | null));

@@ -21,13 +21,14 @@ type Thread = {
   is_pinned: boolean; is_locked: boolean;
   created_at: string; author_id: string;
   category: { slug: string; name: string; color: string | null } | null;
-  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number } | null;
+  author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
 };
 
 type Post = {
   id: string; body: string; vote_score: number; created_at: string; author_id: string;
-  author: { username: string; display_name: string | null; reputation: number } | null;
+  author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number } | null;
 };
+
 
 const TONES = ["bg-sky-500","bg-indigo-500","bg-emerald-500","bg-amber-500","bg-cyan-500","bg-purple-500","bg-rose-500","bg-slate-500"];
 function toneFor(name: string){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return TONES[h%TONES.length];}
@@ -45,7 +46,7 @@ function ThreadPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("threads")
-        .select("id, slug, title, body, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation)")
+        .select("id, slug, title, body, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points)")
         .eq("slug", slug)
         .maybeSingle();
       return data as unknown as Thread | null;
@@ -58,7 +59,7 @@ function ThreadPage() {
       if (!thread) return [];
       const { data } = await supabase
         .from("posts")
-        .select("id, body, vote_score, created_at, author_id, author:profiles(username, display_name, reputation)")
+        .select("id, body, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points)")
         .eq("thread_id", thread.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as Post[];
@@ -162,10 +163,14 @@ function ThreadPage() {
                             @{thread.author.username}
                           </Link>
                         )}
+                        {thread.author?.is_banned && (
+                          <span className="mt-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-red-700">User Banned</span>
+                        )}
                         <p className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
-                          {thread.author?.reputation ?? 0} rep
+                          {thread.author?.points ?? thread.author?.reputation ?? 0} pts
                         </p>
                       </div>
+
                     </div>
                   </aside>
                   <div className="min-w-0 flex-1 p-5 sm:p-6">
@@ -207,8 +212,12 @@ function ThreadPage() {
                                   @{p.author.username}
                                 </Link>
                               )}
-                              <p className="text-xs text-[#6b7280]">{p.author?.reputation ?? 0} rep · {timeAgo(p.created_at)}</p>
+                              {p.author?.is_banned && (
+                                <span className="mt-0.5 inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-red-700">Banned</span>
+                              )}
+                              <p className="text-xs text-[#6b7280]">{p.author?.points ?? p.author?.reputation ?? 0} pts · {timeAgo(p.created_at)}</p>
                             </div>
+
                           </div>
                         </aside>
                         <div className="min-w-0 flex-1 p-4 sm:p-5">
