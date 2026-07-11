@@ -1,11 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useCart } from "@/hooks/use-cart";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag } from "lucide-react";
+import { Heart, Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag, ShoppingCart } from "lucide-react";
+
 
 export function Header() {
   const { user, profile, isAdmin, isModerator } = useAuth();
+  const { count: cartCount, hydrated: cartHydrated } = useCart();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
@@ -63,6 +66,18 @@ export function Header() {
           </Link>
           <Link to="/marketplace" className="hidden items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#f6f7f8] hover:text-[#111827] lg:flex">
             <ShoppingBag size={16} /> <span>Marketplace</span>
+          </Link>
+          <Link
+            to="/cart"
+            className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-[#e5e7eb] bg-white text-[#111827] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
+            aria-label="Cart"
+          >
+            <ShoppingCart size={16} />
+            {cartHydrated && cartCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#0ea5e9] px-1 text-[10px] font-extrabold text-white">
+                {cartCount}
+              </span>
+            )}
           </Link>
           {isModerator && (
             <Link to="/admin" className="hidden items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-2 text-sm font-bold text-red-700 hover:bg-red-100 lg:flex">
