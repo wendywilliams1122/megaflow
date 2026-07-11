@@ -47,7 +47,7 @@ function ThreadPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("threads")
-        .select("id, slug, title, body:body_public, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points)")
+        .select("id, slug, title, body:body_public, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points, staff_badge)")
         .eq("slug", slug)
         .maybeSingle();
       return data as unknown as Thread | null;
@@ -69,7 +69,7 @@ function ThreadPage() {
       if (!thread) return [];
       const { data } = await supabase
         .from("posts")
-        .select("id, body:body_public, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points)")
+        .select("id, body:body_public, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points, staff_badge)")
         .eq("thread_id", thread.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as Post[];
