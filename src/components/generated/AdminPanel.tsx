@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Header } from "@/components/Header";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
+
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -442,8 +441,8 @@ export const AdminPanel = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f6f7f8]">
-        <Header />
-        <div className="pt-32 text-center text-[#6b7280]">Loading...</div>
+        
+        <div className="pt-8 text-center text-[#6b7280]">Loading...</div>
       </div>
     );
   }
@@ -451,8 +450,8 @@ export const AdminPanel = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-[#f6f7f8]">
-        <Header />
-        <div className="mx-auto max-w-md pt-32 text-center">
+        
+        <div className="mx-auto max-w-md pt-8 text-center">
           <Shield size={40} className="mx-auto mb-3 text-[#6b7280]" />
           <h1 className="mb-2 text-xl font-extrabold text-[#111827]">Sign in required</h1>
           <p className="mb-4 text-sm text-[#6b7280]">You need to sign in to access the admin panel.</p>
@@ -471,8 +470,8 @@ export const AdminPanel = () => {
   if (!isStaff) {
     return (
       <div className="min-h-screen bg-[#f6f7f8]">
-        <Header />
-        <div className="mx-auto max-w-md pt-32 text-center">
+        
+        <div className="mx-auto max-w-md pt-8 text-center">
           <ShieldOff size={40} className="mx-auto mb-3 text-red-500" />
           <h1 className="mb-2 text-xl font-extrabold text-[#111827]">Access denied</h1>
           <p className="text-sm text-[#6b7280]">
@@ -485,8 +484,8 @@ export const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
-      <Header />
-      <div className="mx-auto flex max-w-[1440px] pt-16">
+      
+      <div className="mx-auto flex max-w-[1440px] pt-4">
         <SideRail />
         <main className="min-w-0 flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           {msg && (
@@ -1303,7 +1302,7 @@ export const AdminPanel = () => {
           )}
         </main>
       </div>
-      <Footer />
+      
     </div>
   );
 };

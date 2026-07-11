@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Activity, BookOpen, ChevronRight, ClipboardList, Gem, Gift, Globe, GraduationCap, Info, Library, MessageCircle, MessageSquare, Monitor, Newspaper, Package, PenSquare, Phone, Plus, ScrollText, Shield, ShoppingCart, Tag, Ticket, Trophy, Unlock, User, Users, Wrench, XCircle } from 'lucide-react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+
+
 interface Category {
   id: string;
   name: string;
@@ -248,9 +248,8 @@ const sidebarCategories: SidebarItem[] = [{
 }];
 export const CategoriesExplorer = () => {
   return <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
-      <Header />
+      <div className="mx-auto flex max-w-[1440px]">
 
-      <div className="mx-auto flex max-w-[1440px] pt-16">
         <aside className="hidden min-h-[calc(100vh-4rem)] w-[260px] flex-shrink-0 border-r border-[#e5e7eb] bg-white lg:block">
           <div className="sticky top-16 space-y-5 px-5 py-6">
             <section className="rounded-2xl border border-[#e5e7eb] bg-white p-5 text-center shadow-sm" aria-labelledby="guest-title">
@@ -387,7 +386,7 @@ export const CategoriesExplorer = () => {
         </main>
       </div>
 
-      <Footer />
+
 
       <button className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0ea5e9] text-white shadow-lg shadow-sky-100 transition hover:bg-sky-600 active:scale-95 lg:hidden" aria-label="Start a discussion">
         <Plus size={27} />
