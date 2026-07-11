@@ -92,16 +92,19 @@ function NewThreadPage() {
 
           <form onSubmit={submit} className="space-y-5 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-sm sm:p-6">
             <div>
-              <label className="mb-1.5 block text-sm font-bold text-[#111827]">Category</label>
+              <label className="mb-1.5 block text-sm font-bold text-[#111827]">Category <span className="text-red-500">*</span></label>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
+                required
                 className="w-full rounded-xl border border-[#e5e7eb] bg-[#f6f7f8] px-3 py-2.5 text-sm text-[#111827] focus:border-[#0ea5e9] focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"
               >
+                <option value="" disabled>— Select main category —</option>
                 {categories?.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
+              <p className="mt-1 text-xs text-[#6b7280]">Pick the main category your thread belongs to.</p>
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-bold text-[#111827]">Title</label>
