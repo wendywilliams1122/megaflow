@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
+import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight } from "lucide-react";
 
