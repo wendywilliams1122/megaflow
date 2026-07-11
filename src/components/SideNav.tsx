@@ -21,11 +21,14 @@ type NavItem = {
   id: string;
   label: string;
   icon: ComponentType<{ size?: number }>;
-  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/categories";
+  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/categories" | "/dashboard" | "/settings";
+  authOnly?: boolean;
 };
 
 const sidebarNavItems: NavItem[] = [
   { id: "all", label: "All Discussions", icon: MessageSquare, to: "/" },
+  { id: "dashboard", label: "My Dashboard", icon: LayoutDashboard, to: "/dashboard", authOnly: true },
+  { id: "settings", label: "Account Settings", icon: SettingsIcon, to: "/settings", authOnly: true },
   { id: "marketplace", label: "Marketplace", icon: ShoppingBag, to: "/marketplace" },
   { id: "categories", label: "Categories", icon: Package, to: "/categories" },
   { id: "rules", label: "Forum Rules", icon: ShieldCheck, to: "/rules" },
@@ -35,6 +38,7 @@ const sidebarNavItems: NavItem[] = [
   { id: "about", label: "About Us", icon: Info, to: "/about" },
   { id: "best", label: "Best Members", icon: Trophy, to: "/best-members" },
 ];
+
 
 export function SideNav({ onNavigate }: { onNavigate?: () => void }) {
   const { user, profile } = useAuth();
