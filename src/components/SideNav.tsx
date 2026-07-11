@@ -6,9 +6,10 @@ import {
   MessageSquare, Phone, Globe, Info, Trophy, PenSquare, User,
   Gift, BookOpen, GraduationCap, Package, Gem, Wrench, Monitor, Unlock,
   Ticket, Library, Newspaper, MessageCircle, ClipboardList, ScrollText,
-  ShoppingCart, XCircle, ShoppingBag, ShieldCheck, LifeBuoy,
+  ShoppingCart, XCircle, ShoppingBag, ShieldCheck, LifeBuoy, LayoutDashboard, Settings as SettingsIcon,
 } from "lucide-react";
 import type { ComponentType } from "react";
+
 
 const iconMap: Record<string, ComponentType<{ size?: number }>> = {
   Gift, BookOpen, GraduationCap, Package, Gem, Wrench, Monitor, Unlock,
