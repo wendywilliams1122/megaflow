@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag, ShoppingCart } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { SideNav } from "@/components/SideNav";
-import megaflowIcon from "@/assets/megaflow-icon.png";
+import megaflowLogo from "@/assets/megaflow-logo.png";
 
 
 
