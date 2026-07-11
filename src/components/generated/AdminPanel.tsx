@@ -725,7 +725,7 @@ export const AdminPanel = () => {
                               {t.author.username}
                             </Link>
                           ) : (
-                            "—"
+                            "-"
                           )}
                         </td>
                         <td className="px-4 py-3 text-[#6b7280]">
@@ -738,7 +738,7 @@ export const AdminPanel = () => {
                               {t.category.name}
                             </Link>
                           ) : (
-                            "—"
+                            "-"
                           )}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">{t.vote_score}</td>
@@ -967,7 +967,7 @@ export const AdminPanel = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-[#6b7280]">{p.category ?? "—"}</td>
+                          <td className="px-4 py-3 text-[#6b7280]">{p.category ?? "-"}</td>
                           <td className="px-4 py-3 text-right tabular-nums">
                             {new Intl.NumberFormat("en-US", { style: "currency", currency: p.currency }).format(p.price_cents / 100)}
                           </td>

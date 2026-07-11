@@ -96,7 +96,7 @@ function ProductPage() {
     if (method === "whatsapp" && settings?.whatsapp_number) {
       const number = settings.whatsapp_number.replace(/[^0-9]/g, "");
       const text = encodeURIComponent(
-        `Hi! I'd like to buy: ${product.title} (x${qty}) — ${formatPrice(product.price_cents * qty, product.currency)}.\nName: ${displayName}\nContact: ${displayContact}${note ? "\nNote: " + note : ""}`,
+        `Hi! I'd like to buy: ${product.title} (x${qty}) - ${formatPrice(product.price_cents * qty, product.currency)}.\nName: ${displayName}\nContact: ${displayContact}${note ? "\nNote: " + note : ""}`,
       );
       window.open(`https://wa.me/${number}?text=${text}`, "_blank");
     }
@@ -240,7 +240,7 @@ function ProductPage() {
                     <CheckCircle2 size={16} />
                     {done === "cart"
                       ? "Added to cart!"
-                      : "Request sent — the team will contact you shortly."}
+                      : "Request sent - the team will contact you shortly."}
                   </div>
                 )}
 
@@ -306,7 +306,7 @@ export const Route = createFileRoute("/marketplace/$slug")({
   component: ProductPage,
   head: () => ({
     meta: [
-      { title: "Product — MegaFlow Marketplace" },
+      { title: "Product - MegaFlow Marketplace" },
       { name: "description", content: "Buy from the MegaFlow marketplace." },
     ],
   }),

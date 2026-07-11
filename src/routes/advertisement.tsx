@@ -5,7 +5,7 @@ import { Megaphone, Target, BarChart3, CheckCircle2 } from "lucide-react";
 export const Route = createFileRoute("/advertisement")({
   head: () => ({
     meta: [
-      { title: "Advertise on MegaFlow — Reach Our Community" },
+      { title: "Advertise on MegaFlow - Reach Our Community" },
       { name: "description", content: "Promote your product to a highly engaged forum audience. Sponsorships, banner slots, and featured marketplace listings available." },
       { property: "og:title", content: "Advertise on MegaFlow" },
       { property: "og:description", content: "Reach engaged forum members with our ad options." },

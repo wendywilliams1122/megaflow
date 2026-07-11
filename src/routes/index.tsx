@@ -80,7 +80,7 @@ function HomePage() {
               <Megaphone size={19} />
             </div>
             <p className="text-sm font-medium leading-6 text-[#0f172a]">
-              Welcome to MegaFlow — join the community, share resources, and grow together.
+              Welcome to MegaFlow - join the community, share resources, and grow together.
             </p>
           </div>
         </section>

@@ -12,8 +12,8 @@ import {
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Edit Profile — MegaFlow" },
-      { name: "description", content: "Update your MegaFlow profile — avatar, cover, headline, bio, location and social links." },
+      { title: "Edit Profile - MegaFlow" },
+      { name: "description", content: "Update your MegaFlow profile - avatar, cover, headline, bio, location and social links." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -259,7 +259,7 @@ function SettingsPage() {
                     </div>
                   </div>
 
-                  {/* Image URL inputs — inline */}
+                  {/* Image URL inputs - inline */}
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     <Field
                       label="Avatar URL"
@@ -364,7 +364,7 @@ function SettingsPage() {
               </Card>
 
               {/* Social */}
-              <Card title="Social Links" description="Optional — help members connect with you elsewhere.">
+              <Card title="Social Links" description="Optional - help members connect with you elsewhere.">
                 <div className="grid gap-4 sm:grid-cols-3">
                   <Field
                     label="Twitter / X"

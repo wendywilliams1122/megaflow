@@ -49,7 +49,7 @@ export function Footer() {
               <span className="text-lg font-extrabold tracking-tight text-[#111827]">MegaFlow</span>
             </div>
             <p className="mt-4 max-w-sm text-sm leading-6 text-[#6b7280]">
-              A community forum for makers, learners, and creators — share courses, tools, freebies
+              A community forum for makers, learners, and creators - share courses, tools, freebies
               and grow together.
             </p>
 
@@ -108,7 +108,7 @@ export function Footer() {
             </div>
             <div>
               <p className="text-sm font-extrabold text-[#111827]">Stay in the flow</p>
-              <p className="text-xs text-[#6b7280]">Get weekly picks — top threads, resources & new drops.</p>
+              <p className="text-xs text-[#6b7280]">Get weekly picks - top threads, resources & new drops.</p>
             </div>
           </div>
           <form

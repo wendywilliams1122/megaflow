@@ -7,9 +7,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Us — MegaFlow" },
+      { title: "Contact Us - MegaFlow" },
       { name: "description", content: "Get in touch with the MegaFlow team via email, WhatsApp, or our contact form." },
-      { property: "og:title", content: "Contact Us — MegaFlow" },
+      { property: "og:title", content: "Contact Us - MegaFlow" },
       { property: "og:description", content: "Reach the MegaFlow team." },
     ],
   }),

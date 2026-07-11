@@ -117,7 +117,7 @@ function NewThreadPage() {
                 required
                 className="w-full rounded-xl border border-[#e5e7eb] bg-[#f6f7f8] px-3 py-2.5 text-sm text-[#111827] focus:border-[#0ea5e9] focus:bg-white focus:outline-none focus:ring-4 focus:ring-sky-100"
               >
-                <option value="" disabled>— Select main category —</option>
+                <option value="" disabled>- Select main category -</option>
                 {categories?.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -142,7 +142,7 @@ function NewThreadPage() {
               <RichEditor
                 value={body}
                 onChange={setBody}
-                placeholder="Write your post — format text, upload images, embed videos by URL…"
+                placeholder="Write your post - format text, upload images, embed videos by URL…"
                 minHeight={300}
               />
               <p className="mt-1 text-xs text-[#6b7280]">
@@ -154,7 +154,7 @@ function NewThreadPage() {
               <div className="mb-3 flex items-center gap-2">
                 <Download size={16} className="text-[#0ea5e9]" />
                 <h3 className="text-sm font-extrabold text-[#111827]">Download Links</h3>
-                <span className="text-xs text-[#6b7280]">(shown as animated buttons at the end — only for 10+ day members with a thread)</span>
+                <span className="text-xs text-[#6b7280]">(shown as animated buttons at the end - only for 10+ day members with a thread)</span>
               </div>
 
               {downloads.length > 0 && (
