@@ -1314,7 +1314,49 @@ export const AdminPanel = () => {
                 </span>
               </label>
 
+              <div className="mt-2 border-t border-[#e5e7eb] pt-4">
+                <h3 className="mb-3 text-sm font-extrabold text-[#111827]">Points & rewards</h3>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {([
+                    ["points_thread","Per thread"],
+                    ["points_comment","Per comment"],
+                    ["points_upvote","Per upvote"],
+                    ["points_referral","Per referral"],
+                  ] as const).map(([k,label]) => (
+                    <label key={k} className="block text-xs font-bold text-[#6b7280]">
+                      {label}
+                      <input type="number" min={0} value={settings[k]}
+                        onChange={(e) => setSettings({ ...settings, [k]: Number(e.target.value) || 0 })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827]" />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-2 border-t border-[#e5e7eb] pt-4">
+                <h3 className="mb-3 text-sm font-extrabold text-[#111827]">Anti-spam & access</h3>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {([
+                    ["max_threads_per_day","Threads / day"],
+                    ["max_comments_per_day","Comments / day"],
+                    ["warnings_before_ban","Warnings → ban"],
+                    ["downloads_min_points","Min points for downloads"],
+                  ] as const).map(([k,label]) => (
+                    <label key={k} className="block text-xs font-bold text-[#6b7280]">
+                      {label}
+                      <input type="number" min={0} value={settings[k]}
+                        onChange={(e) => setSettings({ ...settings, [k]: Number(e.target.value) || 0 })}
+                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827]" />
+                    </label>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] text-[#6b7280]">
+                  Admins & moderators bypass all download conditions. Regular users still need the 10-day + own-thread rule; set min points to 0 to disable the extra points gate.
+                </p>
+              </div>
+
               <div className="flex justify-end">
+
                 <button
                   disabled={busy === "save-settings"}
                   onClick={saveSettings}
