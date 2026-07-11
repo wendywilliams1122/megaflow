@@ -172,7 +172,6 @@ export type Database = {
           body: string
           created_at: string
           id: string
-          ip_address: string | null
           thread_id: string
           updated_at: string
           vote_score: number
@@ -182,7 +181,6 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
-          ip_address?: string | null
           thread_id: string
           updated_at?: string
           vote_score?: number
@@ -192,7 +190,6 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
-          ip_address?: string | null
           thread_id?: string
           updated_at?: string
           vote_score?: number
@@ -265,63 +262,93 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_ips: {
+        Row: {
+          last_ip: string | null
+          signup_ip: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          last_ip?: string | null
+          signup_ip?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          last_ip?: string | null
+          signup_ip?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profile_moderation: {
+        Row: {
+          ban_reason: string | null
+          updated_at: string
+          user_id: string
+          warnings: number
+        }
+        Insert: {
+          ban_reason?: string | null
+          updated_at?: string
+          user_id: string
+          warnings?: number
+        }
+        Update: {
+          ban_reason?: string | null
+          updated_at?: string
+          user_id?: string
+          warnings?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
-          ban_reason: string | null
           bio: string | null
           created_at: string
           display_name: string | null
           id: string
           is_banned: boolean
-          last_ip: string | null
           points: number
           referral_code: string
           referred_by: string | null
           reputation: number
-          signup_ip: string | null
           trust_score: number
           updated_at: string
           username: string
-          warnings: number
         }
         Insert: {
           avatar_url?: string | null
-          ban_reason?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id: string
           is_banned?: boolean
-          last_ip?: string | null
           points?: number
           referral_code: string
           referred_by?: string | null
           reputation?: number
-          signup_ip?: string | null
           trust_score?: number
           updated_at?: string
           username: string
-          warnings?: number
         }
         Update: {
           avatar_url?: string | null
-          ban_reason?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
           is_banned?: boolean
-          last_ip?: string | null
           points?: number
           referral_code?: string
           referred_by?: string | null
           reputation?: number
-          signup_ip?: string | null
           trust_score?: number
           updated_at?: string
           username?: string
-          warnings?: number
         }
         Relationships: [
           {
@@ -439,7 +466,6 @@ export type Database = {
           category_id: string
           created_at: string
           id: string
-          ip_address: string | null
           is_locked: boolean
           is_pinned: boolean
           last_activity_at: string
@@ -456,7 +482,6 @@ export type Database = {
           category_id: string
           created_at?: string
           id?: string
-          ip_address?: string | null
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
@@ -473,7 +498,6 @@ export type Database = {
           category_id?: string
           created_at?: string
           id?: string
-          ip_address?: string | null
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
