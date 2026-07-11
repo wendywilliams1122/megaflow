@@ -912,6 +912,161 @@ export const AdminPanel = () => {
                   </table>
                 </div>
               </div>
+          </section>
+          )}
+
+          {tab === "orders" && (
+            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6b7280]">
+                    <tr>
+                      <th className="px-4 py-3">Product</th>
+                      <th className="px-4 py-3">Buyer</th>
+                      <th className="px-4 py-3">Method</th>
+                      <th className="px-4 py-3 text-right">Qty</th>
+                      <th className="px-4 py-3 text-right">Total</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">When</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e5e7eb]">
+                    {orders.map((o) => (
+                      <tr key={o.id} className="hover:bg-slate-50/70">
+                        <td className="px-4 py-3">
+                          {o.product_slug ? (
+                            <Link to="/marketplace/$slug" params={{ slug: o.product_slug }} className="font-bold text-[#111827] hover:text-[#0ea5e9]">
+                              {o.product_title}
+                            </Link>
+                          ) : (
+                            <span className="font-bold text-[#111827]">{o.product_title}</span>
+                          )}
+                          {o.note && <p className="mt-0.5 line-clamp-1 text-xs text-[#6b7280]">“{o.note}”</p>}
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="font-bold text-[#111827]">{o.buyer_name}</p>
+                          <p className="text-xs text-[#6b7280]">{o.buyer_contact}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${
+                            o.method === "whatsapp" ? "bg-emerald-100 text-emerald-700"
+                            : o.method === "email" ? "bg-slate-200 text-slate-700"
+                            : o.method === "cart" ? "bg-violet-100 text-violet-700"
+                            : "bg-sky-100 text-sky-700"
+                          }`}>{o.method}</span>
+                        </td>
+                        <td className="px-4 py-3 text-right tabular-nums">{o.quantity}</td>
+                        <td className="px-4 py-3 text-right font-extrabold tabular-nums">
+                          {new Intl.NumberFormat("en-US", { style: "currency", currency: o.currency }).format((o.unit_price_cents * o.quantity) / 100)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <select
+                            disabled={busy === o.id}
+                            value={o.status}
+                            onChange={(e) => updateOrderStatus(o, e.target.value as OrderRow["status"])}
+                            className={`rounded-md border px-2 py-1 text-xs font-bold ${
+                              o.status === "new" ? "border-amber-300 bg-amber-50 text-amber-700"
+                              : o.status === "contacted" ? "border-sky-300 bg-sky-50 text-sky-700"
+                              : o.status === "completed" ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+                              : "border-red-300 bg-red-50 text-red-700"
+                            }`}
+                          >
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-[#6b7280]">
+                          {new Date(o.created_at).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end">
+                            <button
+                              disabled={busy === o.id}
+                              onClick={() => deleteOrder(o)}
+                              className="rounded-md border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50"
+                            >
+                              {busy === o.id ? <Loader2 size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {orders.length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="px-4 py-8 text-center text-sm text-[#6b7280]">
+                          No orders yet. Buyer requests from the Marketplace will appear here.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {tab === "settings" && (
+            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-white">
+                  <SettingsIcon size={18} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-extrabold">Site & contact settings</h2>
+                  <p className="text-xs text-[#6b7280]">
+                    Configure the WhatsApp number and email buyers can use to reach you.
+                  </p>
+                </div>
+              </div>
+
+              <label className="block text-xs font-bold text-[#6b7280]">
+                Brand name
+                <input
+                  value={settings.brand_name}
+                  onChange={(e) => setSettings({ ...settings, brand_name: e.target.value })}
+                  className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                />
+              </label>
+
+              <label className="block text-xs font-bold text-[#6b7280]">
+                WhatsApp number (with country code, e.g. +92300…)
+                <input
+                  value={settings.whatsapp_number ?? ""}
+                  onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })}
+                  placeholder="+923001234567"
+                  className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                />
+                <span className="mt-1 block text-[11px] font-normal text-[#6b7280]">
+                  Used for the “Buy on WhatsApp” button. Digits only will be kept when opening WhatsApp.
+                </span>
+              </label>
+
+              <label className="block text-xs font-bold text-[#6b7280]">
+                Contact email
+                <input
+                  type="email"
+                  value={settings.contact_email ?? ""}
+                  onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
+                  placeholder="sales@yourbrand.com"
+                  className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
+                />
+                <span className="mt-1 block text-[11px] font-normal text-[#6b7280]">
+                  Used for the “Buy on Email” button (opens the buyer's email app).
+                </span>
+              </label>
+
+              <div className="flex justify-end">
+                <button
+                  disabled={busy === "save-settings"}
+                  onClick={saveSettings}
+                  className="flex items-center gap-2 rounded-lg bg-[#0ea5e9] px-5 py-2.5 text-sm font-bold text-white hover:bg-sky-600 disabled:opacity-50"
+                >
+                  {busy === "save-settings" ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  Save settings
+                </button>
+              </div>
             </section>
           )}
         </main>
