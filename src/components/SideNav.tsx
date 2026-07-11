@@ -104,7 +104,7 @@ export function SideNav({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
 
       <nav className="space-y-1" aria-label="Forum navigation">
-        {sidebarNavItems.map((item) => {
+        {sidebarNavItems.filter((i) => !i.authOnly || !!user).map((item) => {
           const Icon = item.icon;
           return (
             <Link
