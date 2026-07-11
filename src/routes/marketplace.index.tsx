@@ -151,7 +151,7 @@ function MarketplacePage() {
                 <option value="newest">Newest</option>
                 <option value="price-asc">Price: Low → High</option>
                 <option value="price-desc">Price: High → Low</option>
-                <option value="name">Name (A–Z)</option>
+                <option value="name">Name (A-Z)</option>
               </select>
 
               <label className="flex items-center gap-2 text-xs font-bold text-[#6b7280]">
@@ -290,7 +290,7 @@ export const Route = createFileRoute("/marketplace/")({
   component: MarketplacePage,
   head: () => ({
     meta: [
-      { title: "Marketplace — MegaFlow" },
+      { title: "Marketplace - MegaFlow" },
       { name: "description", content: "Curated products from the MegaFlow team." },
     ],
   }),

@@ -229,7 +229,7 @@ export const Route = createFileRoute("/cart")({
   component: CartPage,
   head: () => ({
     meta: [
-      { title: "Cart — MegaFlow Marketplace" },
+      { title: "Cart - MegaFlow Marketplace" },
       { name: "description", content: "Review your marketplace order." },
     ],
   }),

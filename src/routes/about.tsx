@@ -4,9 +4,9 @@ import { Heart, Users, Sparkles, Shield } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — MegaFlow" },
-      { name: "description", content: "Learn about MegaFlow — our mission, community values, and the team behind the forum." },
-      { property: "og:title", content: "About Us — MegaFlow" },
+      { title: "About Us - MegaFlow" },
+      { name: "description", content: "Learn about MegaFlow - our mission, community values, and the team behind the forum." },
+      { property: "og:title", content: "About Us - MegaFlow" },
       { property: "og:description", content: "About the MegaFlow community." },
     ],
   }),
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   const values = [
     { icon: Users, title: "Community First", text: "Every feature we build is chosen by and for our members." },
-    { icon: Sparkles, title: "Quality Discussions", text: "Focused, respectful, and useful — always." },
+    { icon: Sparkles, title: "Quality Discussions", text: "Focused, respectful, and useful - always." },
     { icon: Shield, title: "Safe & Moderated", text: "Clear rules, active staff, and zero tolerance for spam." },
     { icon: Heart, title: "Made With Love", text: "A small team obsessed with member experience." },
   ];

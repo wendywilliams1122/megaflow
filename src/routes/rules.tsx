@@ -4,9 +4,9 @@ import { ForumRulesPage } from "@/components/generated/ForumRulesPage";
 export const Route = createFileRoute("/rules")({
   head: () => ({
     meta: [
-      { title: "Forum Rules — MegaFlow" },
+      { title: "Forum Rules - MegaFlow" },
       { name: "description", content: "Community guidelines and posting rules for MegaFlow." },
-      { property: "og:title", content: "Forum Rules — MegaFlow" },
+      { property: "og:title", content: "Forum Rules - MegaFlow" },
       { property: "og:description", content: "Community guidelines and posting rules for MegaFlow." },
     ],
   }),

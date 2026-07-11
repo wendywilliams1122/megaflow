@@ -6,9 +6,9 @@ import { Trophy, Medal } from "lucide-react";
 export const Route = createFileRoute("/best-members")({
   head: () => ({
     meta: [
-      { title: "Best Members — MegaFlow" },
+      { title: "Best Members - MegaFlow" },
       { name: "description", content: "Top contributors to the MegaFlow community by reputation." },
-      { property: "og:title", content: "Best Members — MegaFlow" },
+      { property: "og:title", content: "Best Members - MegaFlow" },
       { property: "og:description", content: "Community leaderboard." },
     ],
   }),

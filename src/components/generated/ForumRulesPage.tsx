@@ -120,7 +120,7 @@ const CONSEQUENCES: ConsequenceRow[] = [{
   id: 'major',
   level: 'Major',
   action: 'Temp-ban',
-  duration: '7–30 days',
+  duration: '7-30 days',
   tone: 'major'
 }, {
   id: 'critical',

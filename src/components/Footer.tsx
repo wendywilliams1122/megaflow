@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useSiteSettings } from "@/hooks/use-site-settings";
 import { Mail, MessageCircle, Send, ShieldCheck, Sparkles } from "lucide-react";
-import megaflowIcon from "@/assets/megaflow-icon.png";
+import megaflowLogo from "@/assets/megaflow-logo.png";
 
 type Col = { title: string; links: { label: string; to: string }[] };
 
@@ -44,12 +44,11 @@ export function Footer() {
       <div className="mx-auto max-w-[1440px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2">
-              <img src={megaflowIcon} alt="MegaFlow" className="h-10 w-10 object-contain" />
-              <span className="text-lg font-extrabold tracking-tight text-[#111827]">MegaFlow</span>
+            <div className="flex items-center">
+              <img src={megaflowLogo} alt="MegaFlow" className="h-12 w-auto object-contain" />
             </div>
             <p className="mt-4 max-w-sm text-sm leading-6 text-[#6b7280]">
-              A community forum for makers, learners, and creators — share courses, tools, freebies
+              A community forum for makers, learners, and creators - share courses, tools, freebies
               and grow together.
             </p>
 
@@ -108,7 +107,7 @@ export function Footer() {
             </div>
             <div>
               <p className="text-sm font-extrabold text-[#111827]">Stay in the flow</p>
-              <p className="text-xs text-[#6b7280]">Get weekly picks — top threads, resources & new drops.</p>
+              <p className="text-xs text-[#6b7280]">Get weekly picks - top threads, resources & new drops.</p>
             </div>
           </div>
           <form

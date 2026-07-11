@@ -54,7 +54,7 @@ export function DisclaimerModal() {
         <div className="max-h-[60vh] space-y-3 overflow-y-auto px-5 py-4 text-sm leading-6 text-[#374151]">
           <p>
             <strong className="text-[#111827]">MegaFlow</strong> is a community-driven discussion
-            forum. All content — including courses, tutorials, tools, links, and resources — is
+            forum. All content - including courses, tutorials, tools, links, and resources - is
             shared by our members and is <strong>already publicly available</strong> on the
             internet.
           </p>

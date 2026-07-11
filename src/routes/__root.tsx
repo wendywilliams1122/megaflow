@@ -52,17 +52,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MegaFlow — Community forum for makers, learners & creators" },
+      { title: "MegaFlow - Community forum for makers, learners & creators" },
       {
         name: "description",
         content:
           "MegaFlow is a community forum for courses, tutorials, tools, freebies, and discussions. Share resources and grow together.",
       },
-      { property: "og:title", content: "MegaFlow — Community forum for makers, learners & creators" },
+      { property: "og:title", content: "MegaFlow - Community forum for makers, learners & creators" },
       { property: "og:description", content: "MegaFlow is a community forum for courses, tutorials, tools, freebies, and discussions. Share resources and grow together." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "MegaFlow — Community forum for makers, learners & creators" },
+      { name: "twitter:title", content: "MegaFlow - Community forum for makers, learners & creators" },
       { name: "twitter:description", content: "MegaFlow is a community forum for courses, tutorials, tools, freebies, and discussions. Share resources and grow together." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8ef97cbb-94b7-43c3-8122-6cf1f2b1d204/id-preview-2c5aab30--d9c2d13b-cef5-4339-a608-e6211bd7f592.lovable.app-1783772064020.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8ef97cbb-94b7-43c3-8122-6cf1f2b1d204/id-preview-2c5aab30--d9c2d13b-cef5-4339-a608-e6211bd7f592.lovable.app-1783772064020.png" },

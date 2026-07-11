@@ -33,7 +33,7 @@ export function ReferralPointsCard() {
           </div>
           {profile.is_banned && (
             <p className="mt-2 rounded bg-red-100 px-2 py-1 text-[11px] font-extrabold text-red-700">
-              User Banned{profile.ban_reason ? ` — ${profile.ban_reason}` : ""}
+              User Banned{profile.ban_reason ? ` - ${profile.ban_reason}` : ""}
             </p>
           )}
         </div>
