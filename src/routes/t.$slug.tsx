@@ -236,7 +236,6 @@ function ThreadPage() {
                                 </Link>
                               )}
                               <UserBadge className="mt-0.5" points={p.author?.points} staffBadge={p.author?.staff_badge} isBanned={p.author?.is_banned} />
-                              )}
                               <p className="text-xs text-[#6b7280]">{p.author?.points ?? p.author?.reputation ?? 0} pts · {timeAgo(p.created_at)}</p>
                             </div>
 
