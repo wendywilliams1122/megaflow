@@ -246,8 +246,18 @@ function ThreadPage() {
                         className="block w-full resize-y bg-white p-4 text-sm leading-7 text-[#111827] placeholder:text-[#6b7280] focus:outline-none"
                         maxLength={5000}
                       />
-                      <div className="flex items-center justify-between border-t border-[#e5e7eb] bg-[#f6f7f8] px-4 py-3">
-                        <span className="text-xs text-[#6b7280]">{reply.length} / 5,000</span>
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#e5e7eb] bg-[#f6f7f8] px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setReply((r) => r + (r ? "\n" : "") + "[spoiler]Hidden resource here…[/spoiler]")}
+                            className="inline-flex items-center gap-1.5 rounded-md border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-xs font-bold text-[#374151] hover:border-amber-300 hover:text-amber-700"
+                            title="Wrap hidden content that only 10+ day members with a thread can see"
+                          >
+                            <EyeOff size={12} /> Spoiler
+                          </button>
+                          <span className="text-xs text-[#6b7280]">{reply.length} / 5,000</span>
+                        </div>
                         <button
                           type="submit"
                           disabled={replying || !reply.trim()}
