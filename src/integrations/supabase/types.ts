@@ -47,6 +47,68 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          buyer_contact: string
+          buyer_id: string | null
+          buyer_name: string
+          created_at: string
+          currency: string
+          id: string
+          method: string
+          note: string | null
+          product_id: string | null
+          product_slug: string | null
+          product_title: string
+          quantity: number
+          status: string
+          unit_price_cents: number
+          updated_at: string
+        }
+        Insert: {
+          buyer_contact: string
+          buyer_id?: string | null
+          buyer_name: string
+          created_at?: string
+          currency?: string
+          id?: string
+          method?: string
+          note?: string | null
+          product_id?: string | null
+          product_slug?: string | null
+          product_title: string
+          quantity?: number
+          status?: string
+          unit_price_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          buyer_contact?: string
+          buyer_id?: string | null
+          buyer_name?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          method?: string
+          note?: string | null
+          product_id?: string | null
+          product_slug?: string | null
+          product_title?: string
+          quantity?: number
+          status?: string
+          unit_price_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author_id: string
@@ -176,6 +238,30 @@ export type Database = {
           reputation?: number
           updated_at?: string
           username?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          brand_name: string
+          contact_email: string | null
+          id: boolean
+          updated_at: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          brand_name?: string
+          contact_email?: string | null
+          id?: boolean
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          brand_name?: string
+          contact_email?: string | null
+          id?: boolean
+          updated_at?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
