@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { SideRail } from "@/components/SideRail";
+import { BlockedDomainsCard } from "@/components/admin/BlockedDomainsCard";
+import { MultiAccountIPCard } from "@/components/admin/MultiAccountIPCard";
+
 
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
