@@ -106,6 +106,25 @@ const emptyProduct: Omit<ProductRow, "id"> = {
   featured: false,
 };
 
+type AdRow = {
+  id: string;
+  title: string;
+  image_url: string;
+  link_url: string | null;
+  placement: "home" | "thread" | "both";
+  is_active: boolean;
+  sort_order: number;
+};
+
+const emptyAd: Omit<AdRow, "id"> = {
+  title: "",
+  image_url: "",
+  link_url: "",
+  placement: "home",
+  is_active: true,
+  sort_order: 0,
+};
+
 export const AdminPanel = () => {
   const { user, isAdmin, isModerator, loading } = useAuth();
   const isStaff = isAdmin || isModerator;
