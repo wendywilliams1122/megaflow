@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
 import { Footer } from "@/components/Footer";
+import { useAuth } from "@/hooks/use-auth";
 import { timeAgo } from "@/lib/forum";
-import { MessageSquare, Clock } from "lucide-react";
+import { MessageSquare, Clock, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/u/$username")({
   component: UserPage,
@@ -12,6 +13,8 @@ export const Route = createFileRoute("/u/$username")({
 
 function UserPage() {
   const { username } = Route.useParams();
+  const { user } = useAuth();
+
 
   const { data: profile } = useQuery({
     queryKey: ["profile", username],
