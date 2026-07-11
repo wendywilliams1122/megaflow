@@ -272,13 +272,21 @@ export const AdminPanel = () => {
   const loadSettings = async () => {
     const { data } = await (supabase as any)
       .from("site_settings")
-      .select("brand_name, whatsapp_number, contact_email")
+      .select("*")
       .eq("id", true)
       .maybeSingle();
     if (data) setSettings({
       brand_name: data.brand_name ?? "MegaFlow",
       whatsapp_number: data.whatsapp_number ?? "",
       contact_email: data.contact_email ?? "",
+      points_thread: data.points_thread ?? 10,
+      points_comment: data.points_comment ?? 2,
+      points_upvote: data.points_upvote ?? 1,
+      points_referral: data.points_referral ?? 25,
+      max_threads_per_day: data.max_threads_per_day ?? 5,
+      max_comments_per_day: data.max_comments_per_day ?? 30,
+      warnings_before_ban: data.warnings_before_ban ?? 3,
+      downloads_min_points: data.downloads_min_points ?? 0,
     });
   };
 
@@ -290,12 +298,21 @@ export const AdminPanel = () => {
         brand_name: settings.brand_name.trim() || "MegaFlow",
         whatsapp_number: settings.whatsapp_number?.trim() || null,
         contact_email: settings.contact_email?.trim() || null,
+        points_thread: settings.points_thread,
+        points_comment: settings.points_comment,
+        points_upvote: settings.points_upvote,
+        points_referral: settings.points_referral,
+        max_threads_per_day: settings.max_threads_per_day,
+        max_comments_per_day: settings.max_comments_per_day,
+        warnings_before_ban: settings.warnings_before_ban,
+        downloads_min_points: settings.downloads_min_points,
       })
       .eq("id", true);
     setBusy(null);
     if (error) return flash("Failed: " + error.message);
     flash("Settings saved");
   };
+
 
   const updateOrderStatus = async (o: OrderRow, status: OrderRow["status"]) => {
     setBusy(o.id);
