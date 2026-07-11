@@ -14,10 +14,14 @@ import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as BestMembersRouteImport } from './routes/best-members'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdvertisementRouteImport } from './routes/advertisement'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
@@ -49,6 +53,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -59,14 +68,29 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BestMembersRoute = BestMembersRouteImport.update({
+  id: '/best-members',
+  path: '/best-members',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdvertisementRoute = AdvertisementRouteImport.update({
+  id: '/advertisement',
+  path: '/advertisement',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -97,10 +121,14 @@ const CSlugRoute = CSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
+  '/best-members': typeof BestMembersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
@@ -113,10 +141,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
+  '/best-members': typeof BestMembersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
@@ -130,10 +162,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
+  '/best-members': typeof BestMembersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/new': typeof NewRoute
@@ -148,10 +184,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/admin'
+    | '/advertisement'
     | '/auth'
+    | '/best-members'
     | '/cart'
     | '/categories'
+    | '/contact'
     | '/dashboard'
     | '/marketplace'
     | '/new'
@@ -164,10 +204,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/admin'
+    | '/advertisement'
     | '/auth'
+    | '/best-members'
     | '/cart'
     | '/categories'
+    | '/contact'
     | '/dashboard'
     | '/marketplace'
     | '/new'
@@ -180,10 +224,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/admin'
+    | '/advertisement'
     | '/auth'
+    | '/best-members'
     | '/cart'
     | '/categories'
+    | '/contact'
     | '/dashboard'
     | '/marketplace'
     | '/new'
@@ -197,10 +245,14 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  AdvertisementRoute: typeof AdvertisementRoute
   AuthRoute: typeof AuthRoute
+  BestMembersRoute: typeof BestMembersRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
+  ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   NewRoute: typeof NewRoute
@@ -248,6 +300,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories': {
       id: '/categories'
       path: '/categories'
@@ -262,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/best-members': {
+      id: '/best-members'
+      path: '/best-members'
+      fullPath: '/best-members'
+      preLoaderRoute: typeof BestMembersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -269,11 +335,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/advertisement': {
+      id: '/advertisement'
+      path: '/advertisement'
+      fullPath: '/advertisement'
+      preLoaderRoute: typeof AdvertisementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -328,10 +408,14 @@ const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  AdvertisementRoute: AdvertisementRoute,
   AuthRoute: AuthRoute,
+  BestMembersRoute: BestMembersRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
+  ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   NewRoute: NewRoute,
