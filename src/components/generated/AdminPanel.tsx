@@ -26,9 +26,12 @@ import {
   ShoppingCart,
   Settings as SettingsIcon,
   Save,
+  Megaphone,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "products" | "orders" | "settings";
+type Tab = "overview" | "users" | "threads" | "products" | "orders" | "ads" | "settings";
 
 type UserRow = {
   id: string;
