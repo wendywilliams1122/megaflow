@@ -44,15 +44,26 @@ function AuthPage() {
           setLoading(false);
           return;
         }
+        let signup_ip: string | undefined;
+        try {
+          const res = await fetch("https://api.ipify.org?format=json");
+          signup_ip = (await res.json()).ip;
+        } catch { /* ignore */ }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { username: cleanUsername, name: cleanUsername },
+            data: {
+              username: cleanUsername,
+              name: cleanUsername,
+              ref: search.ref ?? "",
+              signup_ip,
+            },
           },
         });
         if (error) throw error;
+
         toast.success("Account created! You are signed in.");
         navigate({ to: "/" });
       } else {
