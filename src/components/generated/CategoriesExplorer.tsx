@@ -386,7 +386,7 @@ export const CategoriesExplorer = () => {
         </main>
       </div>
 
-      <Footer />
+
 
       <button className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0ea5e9] text-white shadow-lg shadow-sky-100 transition hover:bg-sky-600 active:scale-95 lg:hidden" aria-label="Start a discussion">
         <Plus size={27} />
