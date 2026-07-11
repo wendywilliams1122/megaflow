@@ -239,9 +239,9 @@ function SettingsPage() {
                         <h2 className="truncate text-xl font-extrabold text-[#111827]">
                           {form.display_name || form.username || "Your name"}
                         </h2>
-                        {profile?.staff_badge && (
+                        {(profile as unknown as { staff_badge?: string | null })?.staff_badge && (
                           <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-purple-700">
-                            {profile.staff_badge}
+                            {(profile as unknown as { staff_badge?: string | null }).staff_badge}
                           </span>
                         )}
                       </div>
