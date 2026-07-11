@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
 import { SideRail } from "@/components/SideRail";
 import { RichBody } from "@/components/RichBody";
+import { UserBadge } from "@/components/UserBadge";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { toast } from "sonner";
