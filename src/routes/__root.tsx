@@ -12,6 +12,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 function NotFoundComponent() {
   return (
@@ -108,9 +109,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background">
+      <div className="flex min-h-screen flex-col bg-background">
         <Header />
-        <Outlet />
+        <div className="flex-1 pt-16">
+          <Outlet />
+        </div>
+        <Footer />
       </div>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>

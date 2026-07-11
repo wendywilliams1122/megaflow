@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { timeAgo } from "@/lib/forum";
 import { MessageSquare, Clock, ChevronRight, Pin } from "lucide-react";
 
@@ -46,7 +45,7 @@ function CategoryPage() {
   const color = category?.color ?? "#0ea5e9";
 
   return (
-    <div className="mx-auto flex max-w-[1440px] pt-16">
+    <div className="mx-auto flex max-w-[1440px]">
       <SideRail />
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
         {!category ? (
@@ -116,7 +115,6 @@ function CategoryPage() {
             </div>
           </>
         )}
-        <Footer />
       </main>
     </div>
   );

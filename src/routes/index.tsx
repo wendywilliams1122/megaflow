@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight } from "lucide-react";
@@ -71,7 +70,7 @@ function HomePage() {
   const { data: ads } = useAds("home");
 
   return (
-    <div className="mx-auto flex max-w-[1440px] pt-16">
+    <div className="mx-auto flex max-w-[1440px]">
       <SideRail />
 
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
@@ -223,7 +222,6 @@ function HomePage() {
           </div>
         </section>
 
-        <Footer />
       </main>
     </div>
   );

@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import { timeAgo } from "@/lib/forum";
 import { MessageSquare, Clock, Settings } from "lucide-react";
@@ -40,7 +39,7 @@ function UserPage() {
   });
 
   return (
-    <div className="mx-auto flex max-w-[1440px] pt-16">
+    <div className="mx-auto flex max-w-[1440px]">
       <SideRail />
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
         {!profile ? (
@@ -98,7 +97,6 @@ function UserPage() {
             </div>
           </>
         )}
-        <Footer />
       </main>
     </div>
   );

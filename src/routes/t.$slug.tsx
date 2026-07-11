@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { RichBody } from "@/components/RichBody";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
@@ -98,7 +97,7 @@ function ThreadPage() {
   const color = thread?.category?.color ?? "#0ea5e9";
 
   return (
-    <div className="mx-auto flex max-w-[1440px] pt-16">
+    <div className="mx-auto flex max-w-[1440px]">
       <SideRail />
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
@@ -289,7 +288,6 @@ function ThreadPage() {
             </>
           )}
         </div>
-        <Footer />
       </main>
     </div>
   );

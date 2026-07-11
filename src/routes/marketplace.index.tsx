@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Header } from "@/components/Header";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { addToCart } from "@/lib/cart";
 import { ShoppingBag, Package, Star, Search, SlidersHorizontal, ShoppingCart, Check } from "lucide-react";
@@ -96,7 +95,7 @@ function MarketplacePage() {
   return (
     <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
       <Header />
-      <div className="mx-auto flex max-w-[1440px] pt-16">
+      <div className="mx-auto flex max-w-[1440px]">
         <SideRail />
         <main className="min-w-0 flex-1 space-y-5 px-4 py-6 sm:px-6 lg:px-8">
           <header className="flex flex-wrap items-center justify-between gap-3">
@@ -283,7 +282,6 @@ function MarketplacePage() {
           </section>
         </main>
       </div>
-      <Footer />
     </div>
   );
 }

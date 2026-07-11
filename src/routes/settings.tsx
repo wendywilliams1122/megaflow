@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { Save, KeyRound, LogOut, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/settings")({
@@ -78,7 +77,7 @@ function SettingsPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-[1440px] pt-16">
+    <div className="mx-auto flex max-w-[1440px]">
       <SideRail />
       <main className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
@@ -147,7 +146,6 @@ function SettingsPage() {
             </button>
           </div>
         </div>
-        <Footer />
       </main>
     </div>
   );

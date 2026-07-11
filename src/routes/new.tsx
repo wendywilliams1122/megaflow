@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
-import { Footer } from "@/components/Footer";
 import { RichEditor } from "@/components/RichEditor";
 import { toast } from "sonner";
 import { makeThreadSlug } from "@/lib/forum";
@@ -102,7 +101,7 @@ function NewThreadPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-[1440px] pt-16">
+    <div className="mx-auto flex max-w-[1440px]">
       <SideRail />
       <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
@@ -230,7 +229,6 @@ function NewThreadPage() {
             </div>
           </form>
         </div>
-        <Footer />
       </main>
     </div>
   );
