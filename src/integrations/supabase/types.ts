@@ -170,6 +170,7 @@ export type Database = {
         Row: {
           author_id: string
           body: string
+          body_public: string | null
           created_at: string
           id: string
           thread_id: string
@@ -179,6 +180,7 @@ export type Database = {
         Insert: {
           author_id: string
           body: string
+          body_public?: string | null
           created_at?: string
           id?: string
           thread_id: string
@@ -188,6 +190,7 @@ export type Database = {
         Update: {
           author_id?: string
           body?: string
+          body_public?: string | null
           created_at?: string
           id?: string
           thread_id?: string
@@ -463,6 +466,7 @@ export type Database = {
         Row: {
           author_id: string
           body: string
+          body_public: string | null
           category_id: string
           created_at: string
           id: string
@@ -479,6 +483,7 @@ export type Database = {
         Insert: {
           author_id: string
           body: string
+          body_public?: string | null
           category_id: string
           created_at?: string
           id?: string
@@ -495,6 +500,7 @@ export type Database = {
         Update: {
           author_id?: string
           body?: string
+          body_public?: string | null
           category_id?: string
           created_at?: string
           id?: string
@@ -580,6 +586,10 @@ export type Database = {
     Functions: {
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
       can_view_spoiler: { Args: { _user_id: string }; Returns: boolean }
+      get_full_body: {
+        Args: { _target_id: string; _target_type: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

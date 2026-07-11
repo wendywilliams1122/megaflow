@@ -46,10 +46,19 @@ function ThreadPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("threads")
-        .select("id, slug, title, body, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points)")
+        .select("id, slug, title, body:body_public, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points)")
         .eq("slug", slug)
         .maybeSingle();
       return data as unknown as Thread | null;
+    },
+  });
+
+  const { data: threadFullBody } = useQuery({
+    queryKey: ["thread-body", thread?.id, user?.id],
+    enabled: !!thread?.id && !!user,
+    queryFn: async () => {
+      const { data } = await supabase.rpc("get_full_body", { _target_type: "thread", _target_id: thread!.id });
+      return (data as string | null) ?? null;
     },
   });
 
@@ -59,12 +68,27 @@ function ThreadPage() {
       if (!thread) return [];
       const { data } = await supabase
         .from("posts")
-        .select("id, body, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points)")
+        .select("id, body:body_public, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points)")
         .eq("thread_id", thread.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as Post[];
     },
     enabled: !!thread,
+  });
+
+  const { data: postFullBodies } = useQuery({
+    queryKey: ["post-bodies", thread?.id, user?.id, posts?.length],
+    enabled: !!user && !!posts && (posts?.length ?? 0) > 0,
+    queryFn: async () => {
+      const map: Record<string, string> = {};
+      await Promise.all(
+        (posts ?? []).map(async (p) => {
+          const { data } = await supabase.rpc("get_full_body", { _target_type: "post", _target_id: p.id });
+          if (typeof data === "string") map[p.id] = data;
+        }),
+      );
+      return map;
+    },
   });
 
   const submitReply = async (e: React.FormEvent) => {
@@ -177,7 +201,7 @@ function ThreadPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-4">
                         <VoteButtons targetType="thread" targetId={thread.id} initialScore={thread.vote_score} />
-                        <RichBody text={thread.body} className="text-base leading-7 text-[#374151]" />
+                        <RichBody text={threadFullBody ?? thread.body} className="text-base leading-7 text-[#374151]" />
                       </div>
                       {user?.id === thread.author_id && (
                         <button onClick={deleteThread} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
@@ -224,7 +248,7 @@ function ThreadPage() {
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex min-w-0 flex-1 gap-4">
                               <VoteButtons targetType="post" targetId={p.id} initialScore={p.vote_score} />
-                              <RichBody text={p.body} className="min-w-0 flex-1 text-sm leading-7 text-[#374151]" />
+                              <RichBody text={postFullBodies?.[p.id] ?? p.body} className="min-w-0 flex-1 text-sm leading-7 text-[#374151]" />
                             </div>
                             {user?.id === p.author_id && (
                               <button onClick={() => deletePost(p.id)} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
