@@ -1273,6 +1273,8 @@ export const AdminPanel = () => {
                 <div className="mb-2 flex items-center gap-2"><AlertTriangle size={16} className={settings.maintenance_mode ? "text-red-600" : "text-slate-600"} /><span className="text-sm font-extrabold">Maintenance mode</span></div>
                 <textarea rows={2} value={settings.maintenance_message ?? ""} onChange={(e) => setSettings({ ...settings, maintenance_message: e.target.value })} placeholder="We'll be right back — upgrading downloads…" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
                 <label className="mt-2 flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={settings.maintenance_mode} onChange={(e) => setSettings({ ...settings, maintenance_mode: e.target.checked })} />Enable maintenance mode (public site read-only for non-staff)</label>
+              </div>
+
 
               <label className="block text-xs font-bold text-[#6b7280]">Brand name<input value={settings.brand_name} onChange={(e) => setSettings({ ...settings, brand_name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
               <label className="block text-xs font-bold text-[#6b7280]">WhatsApp<input value={settings.whatsapp_number ?? ""} onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
