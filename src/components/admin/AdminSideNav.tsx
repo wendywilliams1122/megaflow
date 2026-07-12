@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, MessageSquare, Trash2, Flag, FolderTree, Tags,
+  LayoutDashboard, Users, MessageSquare, MessageCircle, Trash2, Flag, FolderTree, Tags,
   Award, Package, ShoppingCart, Megaphone, Image as ImageIcon, Settings,
   ShieldCheck, ClipboardList, ArrowLeft,
 } from "lucide-react";
