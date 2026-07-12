@@ -145,13 +145,28 @@ function HomePage() {
                 <div key={t.id} className="space-y-3">
                   {ad && <AdCard ad={ad} />}
                   <article
-                    className="group rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md hover:shadow-sky-100/70"
+                    className={`group relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-sky-100/70 ${
+                      t.is_pinned
+                        ? "border-amber-200 bg-gradient-to-br from-amber-50/60 via-white to-white"
+                        : "border-[#e5e7eb] hover:border-sky-200"
+                    }`}
                   >
+                    <span
+                      className="absolute inset-y-0 left-0 w-1 opacity-0 transition-opacity group-hover:opacity-100"
+                      style={{ backgroundColor: color }}
+                      aria-hidden
+                    />
                     <div className="flex items-start gap-3 sm:gap-4">
-                      <div
-                        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(authorName)}`}
-                      >
-                        {initials}
+                      <div className="flex flex-col items-center gap-2">
+                        <div
+                          className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white shadow-sm ring-2 ring-white ${toneFor(authorName)}`}
+                        >
+                          {initials}
+                        </div>
+                        <div className="flex min-w-[40px] flex-col items-center rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-1.5 py-1 leading-none">
+                          <span className="text-[11px] font-extrabold text-[#0ea5e9]">{t.vote_score}</span>
+                          <span className="text-[9px] font-bold uppercase tracking-wide text-[#9ca3af]">votes</span>
+                        </div>
                       </div>
 
                       <div className="min-w-0 flex-1">
@@ -160,36 +175,44 @@ function HomePage() {
                             <Link
                               to="/c/$slug"
                               params={{ slug: t.category.slug }}
-                              className="inline-flex rounded-full border px-2.5 py-1 text-xs font-bold"
+                              className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold transition-transform hover:scale-105"
                               style={{
                                 borderColor: color + "33",
                                 backgroundColor: color + "1a",
                                 color,
                               }}
                             >
+                              <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
                               {t.category.name}
                             </Link>
                           )}
                           {t.is_pinned && (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">
                               <Pin size={12} /> Pinned
                             </span>
                           )}
                         </div>
 
                         <Link to="/t/$slug" params={{ slug: t.slug }} className="block rounded-md">
-                          <h2 className="truncate text-base font-extrabold leading-snug text-[#111827] transition-colors group-hover:text-[#0ea5e9] sm:text-lg">
+                          <h2 className="line-clamp-2 text-base font-extrabold leading-snug text-[#111827] transition-colors group-hover:text-[#0ea5e9] sm:text-lg">
                             {t.title}
                           </h2>
                         </Link>
 
-                        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#6b7280]">
-                          <span className="font-semibold text-[#374151]">@{authorName}</span>
+                        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-[#6b7280]">
+                          <Link
+                            to="/u/$username"
+                            params={{ username: authorName }}
+                            className="font-semibold text-[#374151] hover:text-[#0ea5e9]"
+                          >
+                            @{authorName}
+                          </Link>
                           <span className="inline-flex items-center gap-1.5">
-                            <MessageSquare size={14} /> {t.reply_count} replies
+                            <MessageSquare size={14} className="text-[#9ca3af]" /> {t.reply_count}
+                            <span className="text-[#9ca3af]">replies</span>
                           </span>
                           <span className="inline-flex items-center gap-1.5">
-                            <Clock size={14} /> {timeAgo(t.last_activity_at)}
+                            <Clock size={14} className="text-[#9ca3af]" /> {timeAgo(t.last_activity_at)}
                           </span>
                         </div>
                       </div>
@@ -197,7 +220,7 @@ function HomePage() {
                       <Link
                         to="/t/$slug"
                         params={{ slug: t.slug }}
-                        className="hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[#6b7280] hover:bg-sky-50 hover:text-[#0ea5e9] sm:flex"
+                        className="hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-[#6b7280] transition-all group-hover:bg-sky-500 group-hover:text-white group-hover:shadow-md group-hover:shadow-sky-200 sm:flex"
                         aria-label={`Open ${t.title}`}
                       >
                         <ChevronRight size={19} />
@@ -207,6 +230,7 @@ function HomePage() {
                 </div>
               );
             })}
+
 
             {threads && threads.length === 0 && !isLoading && (
               <div className="rounded-xl border border-dashed border-[#e5e7eb] bg-white p-8 text-center text-sm text-[#6b7280]">
