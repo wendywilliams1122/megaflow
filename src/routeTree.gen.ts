@@ -14,6 +14,8 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NewRouteImport } from './routes/new'
+import { Route as ModRouteImport } from './routes/mod'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -55,6 +57,16 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModRoute = ModRouteImport.update({
+  id: '/mod',
+  path: '/mod',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
@@ -156,6 +168,8 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/messages': typeof MessagesRoute
+  '/mod': typeof ModRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -180,6 +194,8 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/messages': typeof MessagesRoute
+  '/mod': typeof ModRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -205,6 +221,8 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/leaderboard': typeof LeaderboardRoute
+  '/messages': typeof MessagesRoute
+  '/mod': typeof ModRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -231,6 +249,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/leaderboard'
+    | '/messages'
+    | '/mod'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -255,6 +275,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/leaderboard'
+    | '/messages'
+    | '/mod'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -279,6 +301,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/leaderboard'
+    | '/messages'
+    | '/mod'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -304,6 +328,8 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   LeaderboardRoute: typeof LeaderboardRoute
+  MessagesRoute: typeof MessagesRoute
+  ModRoute: typeof ModRoute
   NewRoute: typeof NewRoute
   NotificationsRoute: typeof NotificationsRoute
   RulesRoute: typeof RulesRoute
@@ -351,6 +377,20 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mod': {
+      id: '/mod'
+      path: '/mod'
+      fullPath: '/mod'
+      preLoaderRoute: typeof ModRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/leaderboard': {
@@ -488,6 +528,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   LeaderboardRoute: LeaderboardRoute,
+  MessagesRoute: MessagesRoute,
+  ModRoute: ModRoute,
   NewRoute: NewRoute,
   NotificationsRoute: NotificationsRoute,
   RulesRoute: RulesRoute,
