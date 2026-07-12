@@ -1509,7 +1509,89 @@ export const AdminPanel = () => {
             </section>
           )}
 
-          {/* ---------- USER 360° DRAWER ---------- */}
+          {/* ---------- TRASH ---------- */}
+          {tab === "trash" && (
+            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+              <div className="flex items-center gap-3 border-b border-[#e5e7eb] px-4 py-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-700 text-white"><Trash size={16} /></div>
+                <div><h2 className="text-sm font-extrabold">Trash</h2><p className="text-xs text-[#6b7280]">Soft-deleted threads — restore or permanently delete.</p></div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6b7280]">
+                    <tr><th className="px-4 py-3">Thread</th><th className="px-4 py-3">Author</th><th className="px-4 py-3">Deleted</th><th className="px-4 py-3">Reason</th><th className="px-4 py-3 text-right">Actions</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e5e7eb]">
+                    {trashThreads.map((t) => (
+                      <tr key={t.id} className="hover:bg-slate-50/70">
+                        <td className="px-4 py-3 font-semibold">{t.title}</td>
+                        <td className="px-4 py-3 text-[#6b7280]">{t.author?.username ?? "—"}</td>
+                        <td className="px-4 py-3 text-xs text-[#6b7280]">{t.deleted_at ? new Date(t.deleted_at).toLocaleString() : "—"}</td>
+                        <td className="max-w-xs px-4 py-3 text-xs text-[#6b7280]">{t.deleted_reason ?? "—"}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-1">
+                            <button onClick={() => restoreThread(t.id, t.title)} className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100"><RotateCcw size={12} /> Restore</button>
+                            {isAdmin && <button onClick={() => purgeThread(t.id, t.title)} className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50"><Trash2 size={12} /> Purge</button>}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {trashThreads.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-sm text-[#6b7280]">Trash is empty.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {/* ---------- SECURITY (2FA) ---------- */}
+          {tab === "security" && isAdmin && (
+            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white"><KeyRound size={18} /></div>
+                <div><h2 className="text-lg font-extrabold">Two-factor authentication</h2><p className="text-xs text-[#6b7280]">Protect your admin account with a TOTP app (Google Authenticator, 1Password, Authy).</p></div>
+              </div>
+
+              <div className="rounded-lg border border-[#e5e7eb] p-4">
+                <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Active factors</p>
+                {mfaFactors.length === 0 && <p className="text-xs text-[#6b7280]">No 2FA factors enrolled.</p>}
+                <ul className="space-y-2">
+                  {mfaFactors.map((f: any) => (
+                    <li key={f.id} className="flex items-center justify-between rounded border border-[#e5e7eb] px-3 py-2 text-sm">
+                      <div><span className="font-bold">{f.friendly_name || f.factor_type}</span> <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold uppercase">{f.status}</span></div>
+                      <button onClick={() => unenrollMfa(f.id)} className="rounded border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50">Remove</button>
+                    </li>
+                  ))}
+                </ul>
+                {!mfaEnroll && (
+                  <button onClick={startMfaEnroll} className="mt-3 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-700">Enroll new authenticator</button>
+                )}
+              </div>
+
+              {mfaEnroll && (
+                <div className="rounded-lg border-2 border-indigo-200 bg-indigo-50 p-4">
+                  <p className="mb-2 text-sm font-extrabold text-indigo-900">Scan the QR in your authenticator app</p>
+                  {mfaEnroll.qr && <img src={mfaEnroll.qr} alt="TOTP QR code" className="mx-auto my-3 h-48 w-48 rounded bg-white p-2" />}
+                  <p className="text-center text-xs text-indigo-800">Or enter secret manually: <code className="rounded bg-white px-2 py-0.5 font-mono">{mfaEnroll.secret}</code></p>
+                  <div className="mt-3 flex gap-2">
+                    <input value={mfaCode} onChange={(e) => setMfaCode(e.target.value)} placeholder="6-digit code" className="flex-1 rounded-lg border border-indigo-300 bg-white px-3 py-2 text-sm" />
+                    <button onClick={verifyMfaEnroll} className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-700">Verify & activate</button>
+                    <button onClick={() => { setMfaEnroll(null); setMfaCode(""); }} className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-xs font-bold">Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              <div className="rounded-lg border border-[#e5e7eb] p-4 text-xs text-[#6b7280]">
+                <p className="font-bold text-[#111827]">About "Force sign-out" &amp; "View as user"</p>
+                <ul className="mt-2 list-disc space-y-1 pl-4">
+                  <li>Force sign-out flags the account; the app signs the user out on their next request.</li>
+                  <li>"View as user" opens the target's public profile in a new tab and logs the action to the Audit log — it does not grant access to their private data.</li>
+                  <li>GDPR export bundles profile, roles, threads, replies, orders and badges into a downloadable JSON.</li>
+                </ul>
+              </div>
+            </section>
+          )}
+
+
           {userDetail && (
             <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={() => setUserDetail(null)}>
               <div className="h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
