@@ -1746,6 +1746,7 @@ export const AdminPanel = () => {
           {tab === "scheduled" && isAdmin && <ScheduledBroadcastsPanel />}
           {tab === "automation" && isAdmin && <AutomationPanel flash={flash} />}
           {tab === "notifications" && isAdmin && <NotificationsPanel flash={flash} />}
+          {tab === "searchanalytics" && isAdmin && <SearchAnalyticsPanel flash={flash} />}
           {tab === "quests" && isAdmin && <QuestsPanel flash={flash} />}
 
 
