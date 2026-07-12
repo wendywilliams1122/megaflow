@@ -818,6 +818,7 @@ export const AdminPanel = () => {
     loadMfaFactors();
   };
 
+  useEffect(() => {
     if (!isStaff) return;
     loadStats();
   }, [isStaff]);
