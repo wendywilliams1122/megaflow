@@ -59,9 +59,29 @@ function AdminGate() {
 }
 
 function AdminOtpLogin() {
+  const [method, setMethod] = useState<"password" | "otp">("password");
   const [step, setStep] = useState<"send" | "verify">("send");
   const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const passwordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: ADMIN_EMAIL,
+        password,
+      });
+      if (error) throw error;
+      if (!data.session) throw new Error("No session returned");
+      toast.success("Signed in as admin");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Invalid password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const sendCode = async () => {
     setLoading(true);
@@ -92,7 +112,6 @@ function AdminOtpLogin() {
       if (error) throw error;
       if (!data.session) throw new Error("No session returned");
       toast.success("Signed in as admin");
-      // onAuthStateChange in gate will re-check and render AdminPanel
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Invalid code");
     } finally {
@@ -109,12 +128,50 @@ function AdminOtpLogin() {
           </span>
           <h1 className="mt-3 text-xl font-extrabold">Admin Access</h1>
           <p className="text-sm text-muted-foreground">
-            A one-time code will be sent to<br />
+            Sign in as<br />
             <span className="font-medium text-foreground">{ADMIN_EMAIL}</span>
           </p>
         </div>
 
-        {step === "send" ? (
+        <div className="mb-4 grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-xs font-bold">
+          <button
+            onClick={() => { setMethod("password"); }}
+            className={`rounded-md py-1.5 transition-colors ${method === "password" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+          >
+            Password
+          </button>
+          <button
+            onClick={() => { setMethod("otp"); setStep("send"); }}
+            className={`rounded-md py-1.5 transition-colors ${method === "otp" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+          >
+            Email OTP
+          </button>
+        </div>
+
+        {method === "password" ? (
+          <form onSubmit={passwordLogin} className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                autoFocus
+                placeholder="Admin password"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading || password.length < 6}
+              className="w-full rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 disabled:opacity-50"
+            >
+              {loading ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+        ) : step === "send" ? (
           <button
             onClick={sendCode}
             disabled={loading}
