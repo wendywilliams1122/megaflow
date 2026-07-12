@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.is_email_domain_blocked(text) FROM PUBLIC, anon, authenticated;
