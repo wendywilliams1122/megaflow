@@ -64,7 +64,9 @@ type AdRow = {
 type ReportRow = {
   id: string; reporter_id: string | null; target_type: string; target_id: string;
   reason: string; status: string; resolution_note: string | null; created_at: string;
+  category: string | null; link_url: string | null;
   reporter: { username: string } | null;
+  target_preview?: { label: string; body: string | null; href: string | null } | null;
 };
 type CategoryRow = {
   id: string; slug: string; name: string; description: string | null;
@@ -142,6 +144,7 @@ export const AdminPanel = () => {
 
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [reportsStatus, setReportsStatus] = useState("pending");
+  const [reportsCategory, setReportsCategory] = useState("all");
 
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [editingCategory, setEditingCategory] = useState<Partial<CategoryRow> | null>(null);
@@ -276,11 +279,46 @@ export const AdminPanel = () => {
 
   const loadReports = async () => {
     let q = (supabase as any).from("reports")
-      .select("id, reporter_id, target_type, target_id, reason, status, resolution_note, created_at, reporter:profiles!reports_reporter_id_fkey(username)")
+      .select("id, reporter_id, target_type, target_id, reason, status, resolution_note, created_at, category, link_url, reporter:profiles!reports_reporter_id_fkey(username)")
       .order("created_at", { ascending: false }).limit(200);
     if (reportsStatus !== "all") q = q.eq("status", reportsStatus);
+    if (reportsCategory !== "all") q = q.eq("category", reportsCategory);
     const { data } = await q;
-    setReports((data as ReportRow[]) ?? []);
+    const rows = (data as ReportRow[]) ?? [];
+
+    // Enrich with target previews (batch by type)
+    const threadIds = rows.filter(r => r.target_type === "thread").map(r => r.target_id);
+    const postIds = rows.filter(r => r.target_type === "post").map(r => r.target_id);
+    const userIds = rows.filter(r => r.target_type === "user").map(r => r.target_id);
+
+    const [threads, posts, users] = await Promise.all([
+      threadIds.length ? supabase.from("threads").select("id, title, slug").in("id", threadIds) : Promise.resolve({ data: [] as any[] }),
+      postIds.length ? (supabase as any).from("posts").select("id, body, thread:threads(slug, title)").in("id", postIds) : Promise.resolve({ data: [] as any[] }),
+      userIds.length ? supabase.from("profiles").select("id, username, display_name").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const tMap: Record<string, any> = {}; (threads.data ?? []).forEach((t: any) => tMap[t.id] = t);
+    const pMap: Record<string, any> = {}; (posts.data ?? []).forEach((p: any) => pMap[p.id] = p);
+    const uMap: Record<string, any> = {}; (users.data ?? []).forEach((u: any) => uMap[u.id] = u);
+
+    const enriched = rows.map((r) => {
+      let target_preview: ReportRow["target_preview"] = null;
+      if (r.target_type === "thread" && tMap[r.target_id]) {
+        const t = tMap[r.target_id];
+        target_preview = { label: t.title, body: null, href: `/t/${t.slug}` };
+      } else if (r.target_type === "post" && pMap[r.target_id]) {
+        const p = pMap[r.target_id];
+        target_preview = {
+          label: p.thread?.title ? `Reply in "${p.thread.title}"` : "Reply",
+          body: p.body ?? null,
+          href: p.thread?.slug ? `/t/${p.thread.slug}` : null,
+        };
+      } else if (r.target_type === "user" && uMap[r.target_id]) {
+        const u = uMap[r.target_id];
+        target_preview = { label: `@${u.username}`, body: u.display_name ?? null, href: `/u/${u.username}` };
+      }
+      return { ...r, target_preview };
+    });
+    setReports(enriched);
   };
 
   const loadCategories = async () => {
@@ -832,7 +870,7 @@ export const AdminPanel = () => {
   useEffect(() => { if (isStaff && tab === "threads") loadThreads(); /* eslint-disable-next-line */ }, [isStaff, tab, threadsPage, threadsQ]);
   useEffect(() => { if (isStaff && tab === "products") loadProducts(); /* eslint-disable-next-line */ }, [isStaff, tab, productsPage, productsQ]);
   useEffect(() => { if (isStaff && tab === "orders") loadOrders(); /* eslint-disable-next-line */ }, [isStaff, tab, ordersPage, ordersQ, ordersStatus]);
-  useEffect(() => { if (isStaff && tab === "reports") loadReports(); /* eslint-disable-next-line */ }, [isStaff, tab, reportsStatus]);
+  useEffect(() => { if (isStaff && tab === "reports") loadReports(); /* eslint-disable-next-line */ }, [isStaff, tab, reportsStatus, reportsCategory]);
   useEffect(() => { if (isStaff && tab === "categories") loadCategories(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "badges") { loadBadges(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "tags") { loadTags(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
@@ -1091,42 +1129,137 @@ export const AdminPanel = () => {
 
           {/* ---------- REPORTS ---------- */}
           {tab === "reports" && (
-            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-500 text-white"><Flag size={16} /></div>
-                  <div><h2 className="text-sm font-extrabold">User reports</h2><p className="text-xs text-[#6b7280]">Review flagged threads, posts and users.</p></div>
+            <section className="space-y-4">
+              {/* Header + Filters */}
+              <div className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e7eb] px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-500 text-white"><Flag size={18} /></div>
+                    <div>
+                      <h2 className="text-sm font-extrabold">User reports</h2>
+                      <p className="text-xs text-[#6b7280]">Flagged threads, replies, users and broken links — all in one queue.</p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/mod-chats"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-xs font-bold text-[#374151] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
+                  >
+                    <MessageCircle size={14} /> Chats moderation
+                  </Link>
                 </div>
-                <select value={reportsStatus} onChange={(e) => setReportsStatus(e.target.value)} className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-sm">
-                  <option value="pending">Pending</option><option value="resolved">Resolved</option><option value="dismissed">Dismissed</option><option value="all">All</option>
-                </select>
+
+                {/* Category chips */}
+                <div className="flex flex-wrap items-center gap-2 border-b border-[#e5e7eb] bg-slate-50 px-4 py-3">
+                  {[
+                    { v: "all", l: "All reasons" },
+                    { v: "spam", l: "Spam" },
+                    { v: "harassment", l: "Harassment" },
+                    { v: "broken_link", l: "Broken links" },
+                    { v: "inappropriate", l: "Inappropriate" },
+                    { v: "misinformation", l: "Misinformation" },
+                    { v: "copyright", l: "Copyright" },
+                    { v: "other", l: "Other" },
+                  ].map((c) => (
+                    <button
+                      key={c.v}
+                      onClick={() => setReportsCategory(c.v)}
+                      className={`rounded-full border px-3 py-1 text-xs font-bold capitalize ${
+                        reportsCategory === c.v
+                          ? "border-rose-500 bg-rose-500 text-white"
+                          : "border-[#e5e7eb] bg-white text-[#374151] hover:border-rose-300"
+                      }`}
+                    >{c.l}</button>
+                  ))}
+                  <div className="ml-auto flex items-center gap-2">
+                    <label className="text-xs font-bold text-[#6b7280]">Status</label>
+                    <select value={reportsStatus} onChange={(e) => setReportsStatus(e.target.value)} className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-sm">
+                      <option value="pending">Pending</option>
+                      <option value="resolved">Resolved</option>
+                      <option value="dismissed">Dismissed</option>
+                      <option value="all">All</option>
+                    </select>
+                  </div>
+                </div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6b7280]">
-                    <tr><th className="px-4 py-3">Target</th><th className="px-4 py-3">Reporter</th><th className="px-4 py-3">Reason</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">When</th><th className="px-4 py-3 text-right">Actions</th></tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e5e7eb]">
-                    {reports.map((r) => (
-                      <tr key={r.id} className="hover:bg-slate-50/70 align-top">
-                        <td className="px-4 py-3"><span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold uppercase text-slate-700">{r.target_type}</span><p className="mt-1 font-mono text-xs text-[#6b7280]">{r.target_id.slice(0, 8)}…</p></td>
-                        <td className="px-4 py-3 text-[#6b7280]">{r.reporter?.username ?? "—"}</td>
-                        <td className="max-w-md px-4 py-3 text-[#374151]"><p className="line-clamp-3">{r.reason}</p></td>
-                        <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase ${r.status === "pending" ? "bg-amber-100 text-amber-700" : r.status === "resolved" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>{r.status}</span></td>
-                        <td className="px-4 py-3 text-xs text-[#6b7280]">{new Date(r.created_at).toLocaleString()}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex justify-end gap-1">
-                            {r.status === "pending" && <>
-                              <button disabled={busy === r.id} onClick={() => resolveReport(r, "resolved")} className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100">Resolve</button>
-                              <button disabled={busy === r.id} onClick={() => resolveReport(r, "dismissed")} className="rounded-md border border-[#e5e7eb] bg-white px-2 py-1 text-xs font-bold text-[#6b7280] hover:border-slate-400">Dismiss</button>
-                            </>}
+
+              {/* Cards */}
+              <div className="grid gap-3">
+                {reports.length === 0 && (
+                  <div className="rounded-xl border border-dashed border-[#e5e7eb] bg-white p-10 text-center text-sm text-[#6b7280]">
+                    Nothing here — the queue is clear.
+                  </div>
+                )}
+                {reports.map((r) => {
+                  const catCfg: Record<string, { bg: string; label: string }> = {
+                    spam: { bg: "bg-amber-100 text-amber-700", label: "Spam" },
+                    harassment: { bg: "bg-rose-100 text-rose-700", label: "Harassment" },
+                    broken_link: { bg: "bg-orange-100 text-orange-700", label: "Broken link" },
+                    inappropriate: { bg: "bg-fuchsia-100 text-fuchsia-700", label: "Inappropriate" },
+                    misinformation: { bg: "bg-yellow-100 text-yellow-700", label: "Misinformation" },
+                    copyright: { bg: "bg-indigo-100 text-indigo-700", label: "Copyright" },
+                    other: { bg: "bg-slate-100 text-slate-700", label: "Other" },
+                  };
+                  const cat = catCfg[r.category ?? "other"] ?? catCfg.other;
+                  const tType: Record<string, string> = {
+                    thread: "bg-sky-100 text-sky-700",
+                    post: "bg-emerald-100 text-emerald-700",
+                    user: "bg-purple-100 text-purple-700",
+                  };
+                  return (
+                    <div key={r.id} className="rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm">
+                      <div className="flex flex-wrap items-center gap-2 text-[10px] font-extrabold uppercase">
+                        <span className={`rounded-full px-2 py-0.5 ${tType[r.target_type] ?? "bg-slate-100 text-slate-700"}`}>{r.target_type}</span>
+                        <span className={`rounded-full px-2 py-0.5 ${cat.bg}`}>{cat.label}</span>
+                        <span className={`rounded-full px-2 py-0.5 ${r.status === "pending" ? "bg-amber-100 text-amber-700" : r.status === "resolved" ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"}`}>{r.status}</span>
+                        <span className="ml-auto text-[11px] font-semibold normal-case text-[#6b7280]">
+                          by @{r.reporter?.username ?? "—"} · {new Date(r.created_at).toLocaleString()}
+                        </span>
+                      </div>
+
+                      {r.target_preview && (
+                        <div className="mt-3 rounded-lg border border-[#e5e7eb] bg-slate-50 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-bold text-[#111827] line-clamp-1">{r.target_preview.label}</p>
+                            {r.target_preview.href && (
+                              <a href={r.target_preview.href} target="_blank" rel="noreferrer" className="shrink-0 text-xs font-bold text-[#0ea5e9] hover:underline">Open →</a>
+                            )}
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {reports.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-sm text-[#6b7280]">No reports.</td></tr>}
-                  </tbody>
-                </table>
+                          {r.target_preview.body && (
+                            <p className="mt-1 text-xs text-[#4b5563] line-clamp-3 whitespace-pre-wrap">{r.target_preview.body}</p>
+                          )}
+                        </div>
+                      )}
+
+                      {r.link_url && (
+                        <div className="mt-2 flex items-center gap-2 rounded-lg border border-orange-200 bg-orange-50 p-2 text-xs">
+                          <span className="font-extrabold uppercase text-orange-700">Broken URL</span>
+                          <a href={r.link_url} target="_blank" rel="noreferrer" className="truncate font-mono text-orange-800 hover:underline">{r.link_url}</a>
+                        </div>
+                      )}
+
+                      <p className="mt-3 whitespace-pre-wrap text-sm text-[#374151]">{r.reason}</p>
+
+                      {r.resolution_note && (
+                        <p className="mt-2 rounded-lg bg-emerald-50 p-2 text-xs text-emerald-800"><b>Resolution note:</b> {r.resolution_note}</p>
+                      )}
+
+                      {r.status === "pending" && (
+                        <div className="mt-3 flex flex-wrap justify-end gap-2">
+                          <button
+                            disabled={busy === r.id}
+                            onClick={() => resolveReport(r, "resolved")}
+                            className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100"
+                          >Mark resolved</button>
+                          <button
+                            disabled={busy === r.id}
+                            onClick={() => resolveReport(r, "dismissed")}
+                            className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 text-xs font-bold text-[#6b7280] hover:border-slate-400"
+                          >Dismiss</button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           )}

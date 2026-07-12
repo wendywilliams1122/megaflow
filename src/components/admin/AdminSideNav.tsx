@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, MessageSquare, Trash2, Flag, FolderTree, Tags,
+  LayoutDashboard, Users, MessageSquare, MessageCircle, Trash2, Flag, FolderTree, Tags,
   Award, Package, ShoppingCart, Megaphone, Image as ImageIcon, Settings,
   ShieldCheck, ClipboardList, ArrowLeft,
 } from "lucide-react";
@@ -113,6 +113,19 @@ export function AdminSideNav({
             </div>
           );
         })}
+
+        <div className="mb-4">
+          <p className="mb-1.5 px-2 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#9ca3af]">
+            Direct Messages
+          </p>
+          <Link
+            to="/mod-chats"
+            className="group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-[#4b5563] hover:bg-[#f6f7f8] hover:text-[#111827]"
+          >
+            <MessageCircle size={17} />
+            <span className="flex-1 truncate text-left">Chats moderation</span>
+          </Link>
+        </div>
 
         <div className="mt-6 border-t border-[#e5e7eb] pt-4">
           <Link
