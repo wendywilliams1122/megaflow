@@ -34,6 +34,20 @@ type Post = {
 const TONES = ["bg-sky-500","bg-indigo-500","bg-emerald-500","bg-amber-500","bg-cyan-500","bg-purple-500","bg-rose-500","bg-slate-500"];
 function toneFor(name: string){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return TONES[h%TONES.length];}
 
+// Remove a duplicated title if the body starts with it (plain or wrapped in <h1..h3>/<p>/<strong>).
+function stripLeadingTitle(body: string | null | undefined, title: string): string {
+  if (!body || !title) return body ?? "";
+  const t = title.trim();
+  if (!t) return body;
+  const esc = t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(
+    `^\\s*(?:<(h[1-3]|p|strong|b)[^>]*>\\s*)?${esc}\\s*(?:</\\1>)?\\s*(?:<br\\s*/?>|\\n)?`,
+    "i",
+  );
+  return body.replace(pattern, "").replace(/^\s+/, "");
+}
+
+
 function ThreadPage() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
