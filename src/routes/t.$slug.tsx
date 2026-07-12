@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
 import { ReactionBar } from "@/components/ReactionBar";
 import { BookmarkButton } from "@/components/BookmarkButton";
+import { ReportButton } from "@/components/ReportButton";
 import { SideRail } from "@/components/SideRail";
 import { RichBody } from "@/components/RichBody";
 import { UserBadge } from "@/components/UserBadge";
@@ -228,7 +229,10 @@ function ThreadPage() {
                     </div>
                     <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#e5e7eb] pt-4">
                       <ReactionBar targetType="thread" targetId={thread.id} initialCounts={thread.reaction_counts ?? {}} />
-                      <div className="ml-auto"><BookmarkButton threadId={thread.id} /></div>
+                      <div className="ml-auto flex items-center gap-3">
+                        <ReportButton targetType="thread" targetId={thread.id} />
+                        <BookmarkButton threadId={thread.id} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -275,8 +279,9 @@ function ThreadPage() {
                               </button>
                             )}
                           </div>
-                          <div className="mt-4 border-t border-[#e5e7eb] pt-3">
+                          <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-[#e5e7eb] pt-3">
                             <ReactionBar targetType="post" targetId={p.id} initialCounts={p.reaction_counts ?? {}} />
+                            <div className="ml-auto"><ReportButton targetType="post" targetId={p.id} /></div>
                           </div>
                         </div>
                       </div>
