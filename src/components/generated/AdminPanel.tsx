@@ -304,6 +304,8 @@ export const AdminPanel = () => {
       downloads_min_points: data.downloads_min_points ?? 0,
       announcement: data.announcement ?? "",
       announcement_active: !!data.announcement_active,
+      maintenance_mode: !!data.maintenance_mode,
+      maintenance_message: data.maintenance_message ?? "",
     });
   };
 
