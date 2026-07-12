@@ -1404,24 +1404,81 @@ export const AdminPanel = () => {
           )}
 
           {/* ---------- BADGES ---------- */}
-          {tab === "badges" && isAdmin && (
-            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
-              <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
-                <div><h2 className="text-sm font-extrabold">Badges</h2><p className="text-xs text-[#6b7280]">Create/edit badges. Award manually from a user's 360° view.</p></div>
-                <button onClick={() => setEditingBadge({ id: "", name: "", description: "", icon: "🏅", tier: "bronze", criteria: {} })} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600"><Plus size={12} className="mr-1 inline" /> New badge</button>
+          {tab === "badges" && isAdmin && (() => {
+            const tierStyles: Record<string, { grad: string; ring: string; chip: string; label: string }> = {
+              bronze:   { grad: "from-amber-100 via-white to-white",      ring: "border-amber-200",    chip: "bg-amber-100 text-amber-800",    label: "Bronze" },
+              silver:   { grad: "from-slate-100 via-white to-white",      ring: "border-slate-300",    chip: "bg-slate-100 text-slate-700",    label: "Silver" },
+              gold:     { grad: "from-yellow-100 via-white to-white",     ring: "border-yellow-300",   chip: "bg-yellow-100 text-yellow-800",  label: "Gold" },
+              platinum: { grad: "from-indigo-100 via-sky-50 to-white",    ring: "border-indigo-300",   chip: "bg-indigo-100 text-indigo-700",  label: "Platinum" },
+              special:  { grad: "from-fuchsia-100 via-pink-50 to-white",  ring: "border-fuchsia-300",  chip: "bg-fuchsia-100 text-fuchsia-700", label: "Special" },
+            };
+            const totalAwarded = badgesList.reduce((s, b) => s + (b.awarded_count ?? 0), 0);
+            return (
+            <section className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-sm">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#6b7280]">Total badges</p>
+                  <p className="mt-1 text-2xl font-extrabold tabular-nums">{badgesList.length}</p>
+                </div>
+                <div className="rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-sm">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#6b7280]">Times awarded</p>
+                  <p className="mt-1 text-2xl font-extrabold tabular-nums">{totalAwarded.toLocaleString()}</p>
+                </div>
+                <div className="rounded-2xl border border-[#e5e7eb] bg-gradient-to-br from-[#0ea5e9] to-indigo-600 p-4 text-white shadow-sm">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest opacity-90">Ready to launch</p>
+                  <button onClick={() => setEditingBadge({ id: "", name: "", description: "", icon: "🏅", tier: "bronze", criteria: {} })} className="mt-1 inline-flex items-center gap-1 text-sm font-extrabold hover:underline"><Plus size={14} /> Create new badge</button>
+                </div>
               </div>
-              <div className="grid gap-3 p-4 md:grid-cols-2 lg:grid-cols-3">
-                {badgesList.map((b) => (
-                  <div key={b.id} className="rounded-lg border border-[#e5e7eb] p-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2"><span className="text-2xl">{b.icon}</span><div><p className="text-sm font-extrabold">{b.name}</p><p className="text-[10px] uppercase tracking-wider text-[#6b7280]">{b.tier} · {b.id}</p></div></div>
-                      <div className="flex gap-1"><button onClick={() => setEditingBadge(b)} className="rounded border border-[#e5e7eb] p-1 hover:border-sky-300"><Pencil size={12} /></button><button onClick={() => deleteBadge(b.id)} className="rounded border border-red-200 p-1 text-red-600 hover:bg-red-50"><Trash2 size={12} /></button></div>
-                    </div>
-                    <p className="mt-2 text-xs text-[#6b7280]">{b.description}</p>
+
+              <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
+                  <div>
+                    <h2 className="text-sm font-extrabold">Badge library</h2>
+                    <p className="text-xs text-[#6b7280]">Curate achievements. Award manually from a member's 360° drawer.</p>
                   </div>
-                ))}
-                {badgesList.length === 0 && <p className="col-span-full py-6 text-center text-sm text-[#6b7280]">No badges yet.</p>}
+                  <button onClick={() => setEditingBadge({ id: "", name: "", description: "", icon: "🏅", tier: "bronze", criteria: {} })} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600"><Plus size={12} className="mr-1 inline" /> New badge</button>
+                </div>
+                <div className="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
+                  {badgesList.map((b) => {
+                    const s = tierStyles[b.tier] ?? tierStyles.bronze;
+                    return (
+                      <div key={b.id} className={`group relative overflow-hidden rounded-2xl border ${s.ring} bg-gradient-to-br ${s.grad} p-4 shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md`}>
+                        <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                          <button onClick={() => setEditingBadge(b)} className="rounded-md border border-white/70 bg-white/90 p-1 text-[#374151] shadow-sm hover:border-sky-300 hover:text-sky-600" title="Edit"><Pencil size={12} /></button>
+                          <button onClick={() => deleteBadge(b.id)} className="rounded-md border border-white/70 bg-white/90 p-1 text-red-600 shadow-sm hover:bg-red-50" title="Delete"><Trash2 size={12} /></button>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-3xl shadow-sm ring-2 ${s.ring}`}>
+                            {b.icon}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-extrabold text-[#111827]">{b.name}</p>
+                            <div className="mt-0.5 flex flex-wrap items-center gap-1">
+                              <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${s.chip}`}>{s.label}</span>
+                              <span className="rounded-full bg-white/80 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#6b7280] ring-1 ring-[#e5e7eb]">{b.id}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="mt-3 line-clamp-2 min-h-[2.5rem] text-xs leading-5 text-[#4b5563]">{b.description || <span className="italic text-[#9ca3af]">No description.</span>}</p>
+                        <div className="mt-3 flex items-center justify-between border-t border-white/60 pt-3">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#6b7280]">
+                            <Users size={11} /> {(b.awarded_count ?? 0).toLocaleString()} awarded
+                          </span>
+                          <button onClick={() => setEditingBadge(b)} className="text-[11px] font-extrabold text-[#0ea5e9] hover:underline">Edit →</button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {badgesList.length === 0 && (
+                    <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#e5e7eb] py-10 text-center">
+                      <span className="text-3xl">🏅</span>
+                      <p className="mt-2 text-sm font-bold text-[#111827]">No badges yet</p>
+                      <p className="text-xs text-[#6b7280]">Create your first badge to start rewarding members.</p>
+                    </div>
+                  )}
+                </div>
               </div>
+
               {editingBadge && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setEditingBadge(null)}>
                   <div className="w-full max-w-md space-y-3 rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
@@ -1440,7 +1497,9 @@ export const AdminPanel = () => {
                 </div>
               )}
             </section>
-          )}
+            );
+          })()}
+
 
           {/* ---------- TAGS ---------- */}
           {tab === "tags" && isAdmin && (
