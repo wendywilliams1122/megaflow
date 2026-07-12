@@ -205,7 +205,7 @@ export const AdminPanel = () => {
     const { data } = await supabase
       .from("threads")
       .select(
-        "id, slug, title, is_pinned, is_locked, vote_score, reply_count, created_at, author:profiles(username), category:categories(slug, name)",
+        "id, slug, title, is_pinned, is_locked, vote_score, reply_count, created_at, author:profiles(username), category:categories!threads_category_id_fkey(slug, name)",
       )
       .order("created_at", { ascending: false })
       .limit(100);
