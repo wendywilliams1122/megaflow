@@ -23,7 +23,7 @@ type Conversation = { id: string; user_min: string; user_max: string; status: "p
 type Profile = { id: string; username: string; display_name: string | null; avatar_url: string | null };
 
 function MessagesPage() {
-  const { user } = useAuth();
+  const { user, isModerator } = useAuth();
   const { to } = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
