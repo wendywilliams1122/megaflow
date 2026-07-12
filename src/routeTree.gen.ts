@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as BestMembersRouteImport } from './routes/best-members'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdvertisementRouteImport } from './routes/advertisement'
@@ -44,6 +46,11 @@ const RulesRoute = RulesRouteImport.update({
   path: '/rules',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -67,6 +74,11 @@ const CategoriesRoute = CategoriesRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookmarksRoute = BookmarksRouteImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BestMembersRoute = BestMembersRouteImport.update({
@@ -132,11 +144,13 @@ export interface FileRoutesByFullPath {
   '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
   '/best-members': typeof BestMembersRoute
+  '/bookmarks': typeof BookmarksRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
+  '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
@@ -153,11 +167,13 @@ export interface FileRoutesByTo {
   '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
   '/best-members': typeof BestMembersRoute
+  '/bookmarks': typeof BookmarksRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
+  '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
@@ -175,11 +191,13 @@ export interface FileRoutesById {
   '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
   '/best-members': typeof BestMembersRoute
+  '/bookmarks': typeof BookmarksRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
   '/new': typeof NewRoute
+  '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
   '/settings': typeof SettingsRoute
   '/support': typeof SupportRoute
@@ -198,11 +216,13 @@ export interface FileRouteTypes {
     | '/advertisement'
     | '/auth'
     | '/best-members'
+    | '/bookmarks'
     | '/cart'
     | '/categories'
     | '/contact'
     | '/dashboard'
     | '/new'
+    | '/notifications'
     | '/rules'
     | '/settings'
     | '/support'
@@ -219,11 +239,13 @@ export interface FileRouteTypes {
     | '/advertisement'
     | '/auth'
     | '/best-members'
+    | '/bookmarks'
     | '/cart'
     | '/categories'
     | '/contact'
     | '/dashboard'
     | '/new'
+    | '/notifications'
     | '/rules'
     | '/settings'
     | '/support'
@@ -240,11 +262,13 @@ export interface FileRouteTypes {
     | '/advertisement'
     | '/auth'
     | '/best-members'
+    | '/bookmarks'
     | '/cart'
     | '/categories'
     | '/contact'
     | '/dashboard'
     | '/new'
+    | '/notifications'
     | '/rules'
     | '/settings'
     | '/support'
@@ -262,11 +286,13 @@ export interface RootRouteChildren {
   AdvertisementRoute: typeof AdvertisementRoute
   AuthRoute: typeof AuthRoute
   BestMembersRoute: typeof BestMembersRoute
+  BookmarksRoute: typeof BookmarksRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
   NewRoute: typeof NewRoute
+  NotificationsRoute: typeof NotificationsRoute
   RulesRoute: typeof RulesRoute
   SettingsRoute: typeof SettingsRoute
   SupportRoute: typeof SupportRoute
@@ -298,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/rules'
       fullPath: '/rules'
       preLoaderRoute: typeof RulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/new': {
@@ -333,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bookmarks': {
+      id: '/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/bookmarks'
+      preLoaderRoute: typeof BookmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/best-members': {
@@ -422,11 +462,13 @@ const rootRouteChildren: RootRouteChildren = {
   AdvertisementRoute: AdvertisementRoute,
   AuthRoute: AuthRoute,
   BestMembersRoute: BestMembersRoute,
+  BookmarksRoute: BookmarksRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
   NewRoute: NewRoute,
+  NotificationsRoute: NotificationsRoute,
   RulesRoute: RulesRoute,
   SettingsRoute: SettingsRoute,
   SupportRoute: SupportRoute,
