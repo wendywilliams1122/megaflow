@@ -1882,6 +1882,9 @@ export const AdminPanel = () => {
               </div>
             </div>
           )}
+
+          {tab === "modactions" && <ModActionsPanel />}
+          {tab === "automod" && <AutomodPanel canEdit={isAdmin} />}
         </main>
       </div>
     </div>
