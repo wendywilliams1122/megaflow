@@ -1434,7 +1434,7 @@ export const AdminPanel = () => {
                         <td className="px-4 py-3 text-right font-extrabold tabular-nums">{new Intl.NumberFormat("en-US", { style: "currency", currency: o.currency }).format((o.unit_price_cents * o.quantity) / 100)}</td>
                         <td className="px-4 py-3">
                           <select disabled={busy === o.id} value={o.status} onChange={(e) => updateOrderStatus(o, e.target.value as OrderRow["status"])} className={`rounded-md border px-2 py-1 text-xs font-bold ${o.status === "new" ? "border-amber-300 bg-amber-50 text-amber-700" : o.status === "contacted" ? "border-sky-300 bg-sky-50 text-sky-700" : o.status === "completed" ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-red-300 bg-red-50 text-red-700"}`}>
-                            <option value="new">New</option><option value="contacted">Contacted</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+                            <option value="new">New</option><option value="contacted">Contacted</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option><option value="refunded">Refunded</option>
                           </select>
                         </td>
                         <td className="px-4 py-3 text-xs text-[#6b7280]">{new Date(o.created_at).toLocaleString()}</td>
