@@ -65,11 +65,19 @@ export function useAuth() {
   };
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((evt, s) => {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
         setTimeout(() => loadUserData(s.user.id), 0);
+        if (evt === "SIGNED_IN") {
+          setTimeout(async () => {
+            let ip: string | null = null;
+            try { ip = (await (await fetch("https://api.ipify.org?format=json")).json()).ip ?? null; } catch { /* ignore */ }
+            const ua = typeof navigator !== "undefined" ? navigator.userAgent : null;
+            try { await (supabase as any).rpc("log_session_device", { _ip: ip, _user_agent: ua }); } catch { /* ignore */ }
+          }, 0);
+        }
       } else {
         setProfile(null);
         setRoles([]);

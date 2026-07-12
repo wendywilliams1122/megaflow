@@ -521,19 +521,28 @@ export type Database = {
       profile_ips: {
         Row: {
           last_ip: string | null
+          last_seen_at: string
+          last_user_agent: string | null
           signup_ip: string | null
+          signup_user_agent: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           last_ip?: string | null
+          last_seen_at?: string
+          last_user_agent?: string | null
           signup_ip?: string | null
+          signup_user_agent?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           last_ip?: string | null
+          last_seen_at?: string
+          last_user_agent?: string | null
           signup_ip?: string | null
+          signup_user_agent?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1060,6 +1069,10 @@ export type Database = {
       }
       is_email_domain_blocked: { Args: { _email: string }; Returns: boolean }
       level_for_points: { Args: { _pts: number }; Returns: number }
+      log_session_device: {
+        Args: { _ip: string; _user_agent: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
