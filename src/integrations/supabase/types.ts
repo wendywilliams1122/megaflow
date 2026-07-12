@@ -1041,6 +1041,33 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_searches: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          notify_on_new: boolean
+          query: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          notify_on_new?: boolean
+          query: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          notify_on_new?: boolean
+          query?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_broadcasts: {
         Row: {
           body: string | null
@@ -1090,6 +1117,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      search_log: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          result_count: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          result_count?: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          result_count?: number
+          user_id?: string | null
+        }
+        Relationships: []
       }
       site_settings: {
         Row: {
@@ -1223,6 +1274,7 @@ export type Database = {
           original_category_id: string | null
           reaction_counts: Json
           reply_count: number
+          search_tsv: unknown
           slug: string
           title: string
           updated_at: string
@@ -1246,6 +1298,7 @@ export type Database = {
           original_category_id?: string | null
           reaction_counts?: Json
           reply_count?: number
+          search_tsv?: unknown
           slug: string
           title: string
           updated_at?: string
@@ -1269,6 +1322,7 @@ export type Database = {
           original_category_id?: string | null
           reaction_counts?: Json
           reply_count?: number
+          search_tsv?: unknown
           slug?: string
           title?: string
           updated_at?: string
@@ -1503,6 +1557,16 @@ export type Database = {
         Args: { _badge_id: string; _user_id: string }
         Returns: undefined
       }
+      admin_search_analytics: {
+        Args: { _days?: number }
+        Returns: {
+          top_queries: Json
+          total_searches: number
+          unique_users: number
+          zero_result_queries: Json
+          zero_result_searches: number
+        }[]
+      }
       admin_shadow_ban: {
         Args: { _enabled: boolean; _reason?: string; _user_id: string }
         Returns: undefined
@@ -1569,6 +1633,15 @@ export type Database = {
         Args: { _ip: string; _user_agent: string }
         Returns: undefined
       }
+      related_threads: {
+        Args: { _limit?: number; _thread_id: string }
+        Returns: {
+          id: string
+          overlap: number
+          slug: string
+          title: string
+        }[]
+      }
       run_due_broadcasts: { Args: never; Returns: number }
       run_notification_digests: {
         Args: { _digest_type?: string }
@@ -1581,6 +1654,18 @@ export type Database = {
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       spam_score: { Args: { _body: string }; Returns: number }
+      trending_threads: {
+        Args: { _days?: number; _limit?: number }
+        Returns: {
+          created_at: string
+          id: string
+          reply_count: number
+          score: number
+          slug: string
+          title: string
+          vote_score: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
