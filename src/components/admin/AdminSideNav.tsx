@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, MessageSquare, MessageCircle, Trash2, Flag, FolderTree, Tags,
   Award, Package, ShoppingCart, Megaphone, Image as ImageIcon, Settings,
-  ShieldCheck, ClipboardList, ArrowLeft, Zap, Gavel, Ticket, CalendarClock, Cog,
+  ShieldCheck, ClipboardList, ArrowLeft, Zap, Gavel, Ticket, CalendarClock, Cog, Target,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
