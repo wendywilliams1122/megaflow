@@ -13,7 +13,7 @@ import { UserBadge } from "@/components/UserBadge";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { toast } from "sonner";
-import { Lock, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine, EyeOff } from "lucide-react";
+import { Lock, LockOpen, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/t/$slug")({
   component: ThreadPage,
@@ -24,6 +24,8 @@ type Thread = {
   vote_score: number; reply_count: number;
   reaction_counts: Record<string, number> | null;
   is_pinned: boolean; is_locked: boolean;
+  category_id: string | null;
+  original_category_id: string | null;
   created_at: string; author_id: string;
   category: { slug: string; name: string; color: string | null } | null;
   author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
@@ -55,7 +57,7 @@ function stripLeadingTitle(body: string | null | undefined, title: string): stri
 
 function ThreadPage() {
   const { slug } = Route.useParams();
-  const { user } = useAuth();
+  const { user, isModerator } = useAuth();
   const qc = useQueryClient();
   const [reply, setReply] = useState("");
   const [replying, setReplying] = useState(false);
@@ -66,7 +68,7 @@ function ThreadPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("threads")
-        .select("id, slug, title, body:body_public, vote_score, reply_count, reaction_counts, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points, staff_badge)")
+        .select("id, slug, title, body:body_public, vote_score, reply_count, reaction_counts, is_pinned, is_locked, category_id, original_category_id, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points, staff_badge)")
         .eq("slug", slug)
         .maybeSingle();
       return data as unknown as Thread | null;
@@ -131,6 +133,32 @@ function ThreadPage() {
     if (error) return toast.error(error.message);
     toast.success("Deleted");
     window.location.href = "/";
+  };
+
+  const toggleClose = async () => {
+    if (!thread) return;
+    const isClosed = thread.category?.slug === "closed-threads";
+    if (isClosed) {
+      if (!thread.original_category_id) return toast.error("No original category recorded");
+      const { error } = await supabase
+        .from("threads")
+        .update({ is_locked: false, category_id: thread.original_category_id, original_category_id: null })
+        .eq("id", thread.id);
+      if (error) return toast.error(error.message);
+      toast.success("Thread reopened");
+    } else {
+      if (!confirm("Close this thread? It will move to Closed Threads and no more replies are allowed.")) return;
+      const { data: cat, error: catErr } = await supabase
+        .from("categories").select("id").eq("slug", "closed-threads").maybeSingle();
+      if (catErr || !cat) return toast.error("Closed Threads category missing");
+      const { error } = await supabase
+        .from("threads")
+        .update({ is_locked: true, original_category_id: thread.category_id ?? null, category_id: cat.id })
+        .eq("id", thread.id);
+      if (error) return toast.error(error.message);
+      toast.success("Thread closed");
+    }
+    qc.invalidateQueries({ queryKey: ["thread", slug] });
   };
   const deletePost = async (id: string) => {
     if (!confirm("Delete this reply?")) return;
@@ -221,11 +249,22 @@ function ThreadPage() {
                         <VoteButtons targetType="thread" targetId={thread.id} initialScore={thread.vote_score} />
                         <RichBody text={stripLeadingTitle(threadFullBody ?? thread.body, thread.title)} className="text-base leading-7 text-[#374151]" />
                       </div>
-                      {user?.id === thread.author_id && (
-                        <button onClick={deleteThread} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
-                          <Trash2 size={16} />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {isModerator && (
+                          <button
+                            onClick={toggleClose}
+                            title={thread.category?.slug === "closed-threads" ? "Reopen thread" : "Close thread"}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-xs font-bold text-[#374151] hover:border-amber-300 hover:text-amber-700"
+                          >
+                            {thread.category?.slug === "closed-threads" ? (<><LockOpen size={12} /> Reopen</>) : (<><Lock size={12} /> Close</>)}
+                          </button>
+                        )}
+                        {user?.id === thread.author_id && (
+                          <button onClick={deleteThread} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#e5e7eb] pt-4">
                       <ReactionBar targetType="thread" targetId={thread.id} initialCounts={thread.reaction_counts ?? {}} />
