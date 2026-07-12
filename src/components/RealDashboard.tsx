@@ -29,7 +29,7 @@ export function RealDashboard() {
         supabase.from("bookmarks").select("id", { count: "exact", head: true }).eq("user_id", uid),
         supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", uid).eq("is_read", false),
         supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_id", uid).is("read_at", null),
-        supabase.from("threads").select("id, title, slug, reply_count, view_count, last_activity_at, categories(name)").eq("author_id", uid).order("last_activity_at", { ascending: false }).limit(6),
+        supabase.from("threads").select("id, title, slug, reply_count, view_count, last_activity_at, category:categories!threads_category_id_fkey(name)").eq("author_id", uid).order("last_activity_at", { ascending: false }).limit(6),
         supabase.from("notifications").select("id, title, body, link, created_at, is_read").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
         supabase.from("messages").select("id, body, created_at, read_at, sender_id, profiles!messages_sender_id_fkey(username, display_name, avatar_url)").eq("recipient_id", uid).order("created_at", { ascending: false }).limit(5),
       ]);
@@ -207,7 +207,7 @@ export function RealDashboard() {
                       <Link to="/t/$slug" params={{ slug: t.slug }} className="line-clamp-1 text-sm font-bold text-slate-900 group-hover:text-sky-600">{t.title}</Link>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">{t.categories?.name ?? "General"}</span>
+                      <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">{t.category?.name ?? "General"}</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4 text-slate-400">
