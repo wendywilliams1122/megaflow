@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NewRouteImport } from './routes/new'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CategoriesRouteImport } from './routes/categories'
@@ -54,6 +55,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/categories': typeof CategoriesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/dashboard'
+    | '/leaderboard'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/dashboard'
+    | '/leaderboard'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/contact'
     | '/dashboard'
+    | '/leaderboard'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   CategoriesRoute: typeof CategoriesRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   NewRoute: typeof NewRoute
   NotificationsRoute: typeof NotificationsRoute
   RulesRoute: typeof RulesRoute
@@ -338,6 +351,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -467,6 +487,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesRoute: CategoriesRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
+  LeaderboardRoute: LeaderboardRoute,
   NewRoute: NewRoute,
   NotificationsRoute: NotificationsRoute,
   RulesRoute: RulesRoute,
