@@ -410,7 +410,11 @@ export type Database = {
           body: string
           body_public: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deleted_reason: string | null
           id: string
+          is_deleted: boolean
           reaction_counts: Json
           thread_id: string
           updated_at: string
@@ -421,7 +425,11 @@ export type Database = {
           body: string
           body_public?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_reason?: string | null
           id?: string
+          is_deleted?: boolean
           reaction_counts?: Json
           thread_id: string
           updated_at?: string
@@ -432,7 +440,11 @@ export type Database = {
           body?: string
           body_public?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_reason?: string | null
           id?: string
+          is_deleted?: boolean
           reaction_counts?: Json
           thread_id?: string
           updated_at?: string
@@ -555,6 +567,7 @@ export type Database = {
           cover_url: string | null
           created_at: string
           display_name: string | null
+          force_reauth_at: string | null
           headline: string | null
           id: string
           is_banned: boolean
@@ -567,6 +580,7 @@ export type Database = {
           social_linkedin: string | null
           social_twitter: string | null
           staff_badge: string | null
+          totp_enabled: boolean
           trust_score: number
           updated_at: string
           username: string
@@ -578,6 +592,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
+          force_reauth_at?: string | null
           headline?: string | null
           id: string
           is_banned?: boolean
@@ -590,6 +605,7 @@ export type Database = {
           social_linkedin?: string | null
           social_twitter?: string | null
           staff_badge?: string | null
+          totp_enabled?: boolean
           trust_score?: number
           updated_at?: string
           username: string
@@ -601,6 +617,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           display_name?: string | null
+          force_reauth_at?: string | null
           headline?: string | null
           id?: string
           is_banned?: boolean
@@ -613,6 +630,7 @@ export type Database = {
           social_linkedin?: string | null
           social_twitter?: string | null
           staff_badge?: string | null
+          totp_enabled?: boolean
           trust_score?: number
           updated_at?: string
           username?: string
@@ -815,7 +833,11 @@ export type Database = {
           body_public: string | null
           category_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          deleted_reason: string | null
           id: string
+          is_deleted: boolean
           is_locked: boolean
           is_pinned: boolean
           last_activity_at: string
@@ -834,7 +856,11 @@ export type Database = {
           body_public?: string | null
           category_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_reason?: string | null
           id?: string
+          is_deleted?: boolean
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
@@ -853,7 +879,11 @@ export type Database = {
           body_public?: string | null
           category_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          deleted_reason?: string | null
           id?: string
+          is_deleted?: boolean
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
@@ -980,12 +1010,24 @@ export type Database = {
         Args: { _body: string; _link: string; _title: string }
         Returns: number
       }
+      admin_export_user_data: { Args: { _user_id: string }; Returns: Json }
+      admin_force_signout: { Args: { _user_id: string }; Returns: undefined }
+      admin_log_impersonate: {
+        Args: { _reason?: string; _user_id: string }
+        Returns: undefined
+      }
       admin_merge_tags: {
         Args: { _from: string; _to: string }
         Returns: undefined
       }
+      admin_purge_thread: { Args: { _thread_id: string }; Returns: undefined }
+      admin_restore_thread: { Args: { _thread_id: string }; Returns: undefined }
       admin_revoke_badge: {
         Args: { _badge_id: string; _user_id: string }
+        Returns: undefined
+      }
+      admin_soft_delete_thread: {
+        Args: { _reason?: string; _thread_id: string }
         Returns: undefined
       }
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
