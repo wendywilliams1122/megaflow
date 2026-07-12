@@ -13,6 +13,9 @@ import { TopContentCard } from "@/components/admin/TopContentCard";
 import { SuspiciousActivityCard } from "@/components/admin/SuspiciousActivityCard";
 import { AdvancedUserSearch } from "@/components/admin/AdvancedUserSearch";
 import { LoginAttemptsCard } from "@/components/admin/LoginAttemptsCard";
+import { CouponsPanel } from "@/components/admin/CouponsPanel";
+import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcastsPanel";
+import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
