@@ -8,12 +8,18 @@ import { Spoiler } from "@/components/Spoiler";
 function extractDownloads(input: string): { body: string; downloads: DownloadItem[] } {
   const downloads: DownloadItem[] = [];
   const re = /\[download\s+url=["']([^"']+)["'](?:\s+label=["']([^"']*)["'])?\s*\]/gi;
-  const body = input.replace(re, (_m, url, label) => {
+  let body = input.replace(re, (_m, url, label) => {
     downloads.push({ url: String(url), label: String(label ?? "").trim() || "Download" });
+    return "";
+  });
+  // Public-body placeholder markers (for signed-out / ineligible viewers)
+  body = body.replace(/\[download-locked\]/gi, () => {
+    downloads.push({ url: "", label: "Locked resource" });
     return "";
   });
   return { body, downloads };
 }
+
 
 function looksLikeHtml(s: string) {
   return /<[a-z][\s\S]*>/i.test(s);
