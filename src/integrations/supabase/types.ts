@@ -705,6 +705,8 @@ export type Database = {
           contact_email: string | null
           downloads_min_points: number
           id: boolean
+          maintenance_message: string | null
+          maintenance_mode: boolean
           max_comments_per_day: number
           max_threads_per_day: number
           points_comment: number
@@ -722,6 +724,8 @@ export type Database = {
           contact_email?: string | null
           downloads_min_points?: number
           id?: boolean
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
           max_comments_per_day?: number
           max_threads_per_day?: number
           points_comment?: number
@@ -739,6 +743,8 @@ export type Database = {
           contact_email?: string | null
           downloads_min_points?: number
           id?: boolean
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
           max_comments_per_day?: number
           max_threads_per_day?: number
           points_comment?: number
@@ -966,6 +972,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_award_badge: {
+        Args: { _badge_id: string; _user_id: string }
+        Returns: undefined
+      }
+      admin_broadcast: {
+        Args: { _body: string; _link: string; _title: string }
+        Returns: number
+      }
+      admin_merge_tags: {
+        Args: { _from: string; _to: string }
+        Returns: undefined
+      }
+      admin_revoke_badge: {
+        Args: { _badge_id: string; _user_id: string }
+        Returns: undefined
+      }
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
       can_view_spoiler: { Args: { _user_id: string }; Returns: boolean }
       check_and_award_badges: { Args: { _user_id: string }; Returns: undefined }
