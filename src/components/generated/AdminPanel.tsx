@@ -841,6 +841,7 @@ export const AdminPanel = () => {
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users", adminOnly: true },
     { id: "threads", label: "Threads" },
+    { id: "trash", label: "Trash", adminOnly: false },
     { id: "reports", label: "Reports", badge: stats?.pending_reports ?? 0 },
     { id: "categories", label: "Categories", adminOnly: true },
     { id: "tags", label: "Tags", adminOnly: true },
@@ -850,6 +851,7 @@ export const AdminPanel = () => {
     { id: "broadcast", label: "Broadcast", adminOnly: true },
     { id: "ads", label: "Ads", adminOnly: true },
     { id: "settings", label: "Settings", adminOnly: true },
+    { id: "security", label: "Security", adminOnly: true },
     { id: "audit", label: "Audit log", adminOnly: true },
   ], [stats?.pending_reports]);
 
