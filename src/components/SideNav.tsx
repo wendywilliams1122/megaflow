@@ -67,8 +67,9 @@ export function SideNav({ onNavigate }: { onNavigate?: () => void }) {
             {profile.username.slice(0, 2).toUpperCase()}
           </div>
           <h2 className="mb-1 text-base font-bold text-[#111827]">@{profile.username}</h2>
+          <div className="mb-2 flex justify-center"><LevelBadge points={(profile as any).points} /></div>
           <p className="mb-4 text-sm leading-6 text-[#6b7280]">
-            <span className="font-semibold text-[#0ea5e9]">{profile.reputation}</span> reputation
+            <span className="font-semibold text-[#0ea5e9]">{(profile as any).points ?? profile.reputation}</span> points
           </p>
           <Link
             to="/u/$username"
