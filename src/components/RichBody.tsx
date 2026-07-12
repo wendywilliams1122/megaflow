@@ -8,19 +8,34 @@ import { Spoiler } from "@/components/Spoiler";
 function extractDownloads(input: string): { body: string; downloads: DownloadItem[] } {
   const downloads: DownloadItem[] = [];
   const re = /\[download\s+url=["']([^"']+)["'](?:\s+label=["']([^"']*)["'])?\s*\]/gi;
-  const body = input.replace(re, (_m, url, label) => {
+  let body = input.replace(re, (_m, url, label) => {
     downloads.push({ url: String(url), label: String(label ?? "").trim() || "Download" });
+    return "";
+  });
+  // Public-body placeholder markers (for signed-out / ineligible viewers)
+  body = body.replace(/\[download-locked\]/gi, () => {
+    downloads.push({ url: "", label: "Locked resource" });
     return "";
   });
   return { body, downloads };
 }
+
 
 function looksLikeHtml(s: string) {
   return /<[a-z][\s\S]*>/i.test(s);
 }
 
 export function RichBody({ text, className }: { text: string; className?: string }) {
-  const { body, downloads } = extractDownloads(text ?? "");
+  const { body: rawBody, downloads } = extractDownloads(text ?? "");
+  // Count and strip locked-spoiler markers so we can render placeholder Spoiler notices.
+  const lockedSpoilers = (rawBody.match(/\[spoiler-locked\]/gi) ?? []).length;
+  const body = rawBody.replace(/\[spoiler-locked\]/gi, "");
+
+  const lockedSpoilerBlocks = lockedSpoilers > 0
+    ? Array.from({ length: lockedSpoilers }).map((_, i) => (
+        <Spoiler key={`ls-${i}`}><span /></Spoiler>
+      ))
+    : null;
 
   // Legacy plain-text spoilers: render inline (still gated).
   if (!looksLikeHtml(body) && /\[spoiler\]/i.test(body)) {
@@ -36,6 +51,7 @@ export function RichBody({ text, className }: { text: string; className?: string
     return (
       <div className={className}>
         <div>{parts}</div>
+        {lockedSpoilerBlocks}
         <DownloadList items={downloads} />
       </div>
     );
@@ -49,6 +65,7 @@ export function RichBody({ text, className }: { text: string; className?: string
     return (
       <div className={className}>
         <div className="tiptap prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: clean }} />
+        {lockedSpoilerBlocks}
         <DownloadList items={downloads} />
       </div>
     );
@@ -57,7 +74,9 @@ export function RichBody({ text, className }: { text: string; className?: string
   return (
     <div className={className}>
       <div className="whitespace-pre-wrap">{body}</div>
+      {lockedSpoilerBlocks}
       <DownloadList items={downloads} />
     </div>
   );
 }
+
