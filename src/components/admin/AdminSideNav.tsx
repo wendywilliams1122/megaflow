@@ -2,14 +2,14 @@ import { Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, MessageSquare, MessageCircle, Trash2, Flag, FolderTree, Tags,
   Award, Package, ShoppingCart, Megaphone, Image as ImageIcon, Settings,
-  ShieldCheck, ClipboardList, ArrowLeft,
+  ShieldCheck, ClipboardList, ArrowLeft, Zap, Gavel,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type AdminTab =
   | "overview" | "users" | "threads" | "trash" | "reports" | "categories"
   | "tags" | "badges" | "products" | "orders" | "broadcast" | "ads"
-  | "settings" | "security" | "audit";
+  | "settings" | "security" | "audit" | "modactions" | "automod";
 
 type Item = {
   id: AdminTab;
