@@ -226,6 +226,10 @@ function ThreadPage() {
                         </button>
                       )}
                     </div>
+                    <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#e5e7eb] pt-4">
+                      <ReactionBar targetType="thread" targetId={thread.id} initialCounts={thread.reaction_counts ?? {}} />
+                      <div className="ml-auto"><BookmarkButton threadId={thread.id} /></div>
+                    </div>
                   </div>
                 </div>
               </article>
