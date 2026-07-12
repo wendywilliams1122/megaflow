@@ -774,6 +774,7 @@ export type Database = {
           is_locked: boolean
           is_pinned: boolean
           last_activity_at: string
+          original_category_id: string | null
           reaction_counts: Json
           reply_count: number
           slug: string
@@ -792,6 +793,7 @@ export type Database = {
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
+          original_category_id?: string | null
           reaction_counts?: Json
           reply_count?: number
           slug: string
@@ -810,6 +812,7 @@ export type Database = {
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
+          original_category_id?: string | null
           reaction_counts?: Json
           reply_count?: number
           slug?: string
@@ -829,6 +832,13 @@ export type Database = {
           {
             foreignKeyName: "threads_category_id_fkey"
             columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "threads_original_category_id_fkey"
+            columns: ["original_category_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
