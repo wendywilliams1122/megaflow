@@ -8,8 +8,8 @@ import type { ComponentType } from "react";
 
 export type AdminTab =
   | "overview" | "users" | "threads" | "trash" | "reports" | "categories"
-  | "tags" | "badges" | "products" | "orders" | "broadcast" | "ads"
-  | "settings" | "security" | "audit" | "modactions" | "automod";
+  | "tags" | "badges" | "products" | "orders" | "coupons" | "broadcast"
+  | "scheduled" | "ads" | "settings" | "security" | "audit" | "modactions" | "automod";
 
 type Item = {
   id: AdminTab;
