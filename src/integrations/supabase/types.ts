@@ -166,32 +166,88 @@ export type Database = {
         }
         Relationships: []
       }
+      conversations: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          id: string
+          last_message_at: string | null
+          status: string
+          status_changed_by: string | null
+          status_note: string | null
+          updated_at: string
+          user_max: string
+          user_min: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          status?: string
+          status_changed_by?: string | null
+          status_note?: string | null
+          updated_at?: string
+          user_max: string
+          user_min: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          status?: string
+          status_changed_by?: string | null
+          status_note?: string | null
+          updated_at?: string
+          user_max?: string
+          user_min?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
+          conversation_id: string | null
           created_at: string
           id: string
+          is_staff_intervention: boolean
           read_at: string | null
           recipient_id: string
           sender_id: string
         }
         Insert: {
           body: string
+          conversation_id?: string | null
           created_at?: string
           id?: string
+          is_staff_intervention?: boolean
           read_at?: string | null
           recipient_id: string
           sender_id: string
         }
         Update: {
           body?: string
+          conversation_id?: string | null
           created_at?: string
           id?: string
+          is_staff_intervention?: boolean
           read_at?: string | null
           recipient_id?: string
           sender_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
