@@ -2,14 +2,14 @@ import { Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, MessageSquare, MessageCircle, Trash2, Flag, FolderTree, Tags,
   Award, Package, ShoppingCart, Megaphone, Image as ImageIcon, Settings,
-  ShieldCheck, ClipboardList, ArrowLeft, Zap, Gavel, Ticket, CalendarClock, Cog, Target,
+  ShieldCheck, ClipboardList, ArrowLeft, Zap, Gavel, Ticket, CalendarClock, Cog, Target, Bell,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type AdminTab =
   | "overview" | "users" | "threads" | "trash" | "reports" | "categories"
   | "tags" | "badges" | "quests" | "products" | "orders" | "coupons" | "broadcast"
-  | "scheduled" | "ads" | "settings" | "security" | "audit" | "modactions" | "automod" | "automation";
+  | "scheduled" | "ads" | "settings" | "security" | "audit" | "modactions" | "automod" | "automation" | "notifications";
 
 type Item = {
   id: AdminTab;
@@ -62,6 +62,7 @@ export function AdminSideNav({
       items: [
         { id: "broadcast", label: "Broadcast", icon: Megaphone, adminOnly: true },
         { id: "scheduled", label: "Scheduled", icon: CalendarClock, adminOnly: true },
+        { id: "notifications", label: "Notifications", icon: Bell, adminOnly: true },
         { id: "automation", label: "Automation", icon: Cog, adminOnly: true },
         { id: "ads", label: "Advertisements", icon: ImageIcon, adminOnly: true },
         { id: "settings", label: "Site Settings", icon: Settings, adminOnly: true },
