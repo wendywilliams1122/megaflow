@@ -49,7 +49,7 @@ function BookmarksPage() {
       const { data } = await supabase
         .from("bookmarks" as never)
         .select(
-          "id, created_at, note, thread:threads(id, slug, title, reply_count, vote_score, created_at, author:profiles(username), category:categories(name, slug, color))",
+          "id, created_at, note, thread:threads(id, slug, title, reply_count, vote_score, created_at, author:profiles(username), category:categories!threads_category_id_fkey(name, slug, color))",
         )
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
