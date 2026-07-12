@@ -56,6 +56,7 @@ function AuthPage() {
           const res = await fetch("https://api.ipify.org?format=json");
           signup_ip = (await res.json()).ip;
         } catch { /* ignore */ }
+        const signup_user_agent = typeof navigator !== "undefined" ? navigator.userAgent : undefined;
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -66,6 +67,7 @@ function AuthPage() {
               name: cleanUsername,
               ref: search.ref ?? "",
               signup_ip,
+              signup_user_agent,
             },
           },
         });

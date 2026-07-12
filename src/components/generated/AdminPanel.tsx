@@ -889,7 +889,7 @@ export const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
-      <div className="mx-auto flex max-w-[1440px] pt-4">
+      <div className="flex w-full pt-4">
         <AdminSideNav tab={tab} setTab={setTab} isAdmin={isAdmin} pendingReports={stats?.pending_reports ?? 0} />
         <main className="min-w-0 flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           {msg && <div className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-700">{msg}</div>}
@@ -1631,7 +1631,7 @@ export const AdminPanel = () => {
 
           {userDetail && (
             <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={() => setUserDetail(null)}>
-              <div className="h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="h-full w-full max-w-4xl overflow-y-auto bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-xl font-extrabold">User 360°</h2>
                   <button onClick={() => setUserDetail(null)}><X size={20} /></button>
@@ -1709,12 +1709,35 @@ export const AdminPanel = () => {
                           {userDetail.orders.length === 0 && <li className="text-[#6b7280]">No orders</li>}
                         </ul>
                       </div>
-                      <div className="rounded-lg border border-[#e5e7eb] p-4">
-                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">IPs ({userDetail.ips.length})</p>
-                        <ul className="space-y-1 font-mono text-xs">
-                          {userDetail.ips.map((ip: any, i: number) => <li key={i}>{ip.last_ip ?? ip.signup_ip}</li>)}
-                          {userDetail.ips.length === 0 && <li className="text-[#6b7280] font-sans">No IPs recorded</li>}
-                        </ul>
+                      <div className="rounded-lg border border-[#e5e7eb] p-4 md:col-span-2">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">IP & Device history ({userDetail.ips.length})</p>
+                        {userDetail.ips.length === 0 ? (
+                          <p className="text-xs text-[#6b7280]">No IP or device recorded yet.</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {userDetail.ips.map((ip: any, i: number) => {
+                              const ua = ip.last_user_agent ?? ip.signup_user_agent ?? "";
+                              const device = /Mobi|Android|iPhone|iPad/i.test(ua) ? "Mobile" : ua ? "Desktop" : "Unknown";
+                              const browser = /Edg\//.test(ua) ? "Edge" : /Chrome/.test(ua) ? "Chrome" : /Firefox/.test(ua) ? "Firefox" : /Safari/.test(ua) ? "Safari" : "Unknown";
+                              const os = /Windows/.test(ua) ? "Windows" : /Mac OS X|Macintosh/.test(ua) ? "macOS" : /Android/.test(ua) ? "Android" : /iPhone|iPad|iOS/.test(ua) ? "iOS" : /Linux/.test(ua) ? "Linux" : "Unknown";
+                              return (
+                                <div key={i} className="rounded-md border border-[#e5e7eb] bg-[#f9fafb] p-3 text-xs">
+                                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                                    <span className="rounded bg-sky-100 px-1.5 py-0.5 font-mono font-bold text-sky-700">{ip.last_ip ?? ip.signup_ip ?? "—"}</span>
+                                    <span className="rounded bg-slate-100 px-1.5 py-0.5 font-bold uppercase text-slate-700">{device}</span>
+                                    <span className="rounded bg-emerald-100 px-1.5 py-0.5 font-bold text-emerald-700">{browser}</span>
+                                    <span className="rounded bg-violet-100 px-1.5 py-0.5 font-bold text-violet-700">{os}</span>
+                                    {ip.last_seen_at && <span className="ml-auto text-[10px] text-[#6b7280]">Last seen {new Date(ip.last_seen_at).toLocaleString()}</span>}
+                                  </div>
+                                  {ip.signup_ip && ip.signup_ip !== ip.last_ip && (
+                                    <p className="mb-1 text-[10px] text-[#6b7280]">Signup IP: <span className="font-mono">{ip.signup_ip}</span></p>
+                                  )}
+                                  {ua && <p className="break-all font-mono text-[10px] leading-snug text-[#6b7280]">{ua}</p>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
