@@ -1707,6 +1707,11 @@ export const AdminPanel = () => {
             </section>
           )}
 
+          {tab === "coupons" && isAdmin && <CouponsPanel />}
+          {tab === "scheduled" && isAdmin && <ScheduledBroadcastsPanel />}
+
+
+
           {/* ---------- TRASH ---------- */}
           {tab === "trash" && (
             <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
