@@ -1302,6 +1302,18 @@ export type Database = {
         Returns: string
       }
       expire_temp_bans: { Args: never; Returns: number }
+      find_similar_threads: {
+        Args: { _days?: number }
+        Returns: {
+          a_id: string
+          a_slug: string
+          a_title: string
+          b_id: string
+          b_slug: string
+          b_title: string
+          sim: number
+        }[]
+      }
       get_full_body: {
         Args: { _target_id: string; _target_type: string }
         Returns: string
@@ -1320,6 +1332,8 @@ export type Database = {
         Returns: undefined
       }
       run_due_broadcasts: { Args: never; Returns: number }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
