@@ -22,7 +22,7 @@ type NavItem = {
   id: string;
   label: string;
   icon: ComponentType<{ size?: number }>;
-  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/categories" | "/dashboard" | "/settings" | "/bookmarks" | "/notifications";
+  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/leaderboard" | "/categories" | "/dashboard" | "/settings" | "/bookmarks" | "/notifications";
   authOnly?: boolean;
 };
 
@@ -41,6 +41,7 @@ const sidebarNavItems: NavItem[] = [
   { id: "ads", label: "Advertisement", icon: Globe, to: "/advertisement" },
   { id: "about", label: "About Us", icon: Info, to: "/about" },
   { id: "best", label: "Best Members", icon: Trophy, to: "/best-members" },
+  { id: "leaderboard", label: "Leaderboard", icon: Trophy, to: "/leaderboard" },
 ];
 
 
