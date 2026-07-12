@@ -64,7 +64,9 @@ type AdRow = {
 type ReportRow = {
   id: string; reporter_id: string | null; target_type: string; target_id: string;
   reason: string; status: string; resolution_note: string | null; created_at: string;
+  category: string | null; link_url: string | null;
   reporter: { username: string } | null;
+  target_preview?: { label: string; body: string | null; href: string | null } | null;
 };
 type CategoryRow = {
   id: string; slug: string; name: string; description: string | null;
