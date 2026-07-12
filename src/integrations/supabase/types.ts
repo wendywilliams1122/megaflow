@@ -71,6 +71,38 @@ export type Database = {
         }
         Relationships: []
       }
+      bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmarks_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           color: string | null
@@ -103,6 +135,66 @@ export type Database = {
           sort_order?: number
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          actor_id: string | null
+          body: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          metadata: Json
+          post_id: string | null
+          thread_id: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          metadata?: Json
+          post_id?: string | null
+          thread_id?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          metadata?: Json
+          post_id?: string | null
+          thread_id?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
@@ -173,6 +265,7 @@ export type Database = {
           body_public: string | null
           created_at: string
           id: string
+          reaction_counts: Json
           thread_id: string
           updated_at: string
           vote_score: number
@@ -183,6 +276,7 @@ export type Database = {
           body_public?: string | null
           created_at?: string
           id?: string
+          reaction_counts?: Json
           thread_id: string
           updated_at?: string
           vote_score?: number
@@ -193,6 +287,7 @@ export type Database = {
           body_public?: string | null
           created_at?: string
           id?: string
+          reaction_counts?: Json
           thread_id?: string
           updated_at?: string
           vote_score?: number
@@ -387,6 +482,33 @@ export type Database = {
           },
         ]
       }
+      reactions: {
+        Row: {
+          created_at: string
+          id: string
+          reaction: Database["public"]["Enums"]["reaction_type"]
+          target_id: string
+          target_type: Database["public"]["Enums"]["reaction_target"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reaction: Database["public"]["Enums"]["reaction_type"]
+          target_id: string
+          target_type: Database["public"]["Enums"]["reaction_target"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reaction?: Database["public"]["Enums"]["reaction_type"]
+          target_id?: string
+          target_type?: Database["public"]["Enums"]["reaction_target"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           brand_name: string
@@ -497,6 +619,7 @@ export type Database = {
           is_locked: boolean
           is_pinned: boolean
           last_activity_at: string
+          reaction_counts: Json
           reply_count: number
           slug: string
           title: string
@@ -514,6 +637,7 @@ export type Database = {
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
+          reaction_counts?: Json
           reply_count?: number
           slug: string
           title: string
@@ -531,6 +655,7 @@ export type Database = {
           is_locked?: boolean
           is_pinned?: boolean
           last_activity_at?: string
+          reaction_counts?: Json
           reply_count?: number
           slug?: string
           title?: string
@@ -610,6 +735,20 @@ export type Database = {
     Functions: {
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
       can_view_spoiler: { Args: { _user_id: string }; Returns: boolean }
+      create_notification: {
+        Args: {
+          _actor_id: string
+          _body: string
+          _link: string
+          _metadata?: Json
+          _post_id: string
+          _thread_id: string
+          _title: string
+          _type: Database["public"]["Enums"]["notification_type"]
+          _user_id: string
+        }
+        Returns: string
+      }
       get_full_body: {
         Args: { _target_id: string; _target_type: string }
         Returns: string
@@ -625,6 +764,16 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      notification_type:
+        | "reply"
+        | "mention"
+        | "reaction"
+        | "bookmark"
+        | "badge"
+        | "system"
+        | "moderation"
+      reaction_target: "thread" | "post"
+      reaction_type: "like" | "love" | "haha" | "insightful" | "thanks"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -753,6 +902,17 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      notification_type: [
+        "reply",
+        "mention",
+        "reaction",
+        "bookmark",
+        "badge",
+        "system",
+        "moderation",
+      ],
+      reaction_target: ["thread", "post"],
+      reaction_type: ["like", "love", "haha", "insightful", "thanks"],
     },
   },
 } as const

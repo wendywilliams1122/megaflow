@@ -4,6 +4,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
+import { ReactionBar } from "@/components/ReactionBar";
+import { BookmarkButton } from "@/components/BookmarkButton";
 import { SideRail } from "@/components/SideRail";
 import { RichBody } from "@/components/RichBody";
 import { UserBadge } from "@/components/UserBadge";
@@ -19,6 +21,7 @@ export const Route = createFileRoute("/t/$slug")({
 type Thread = {
   id: string; slug: string; title: string; body: string;
   vote_score: number; reply_count: number;
+  reaction_counts: Record<string, number> | null;
   is_pinned: boolean; is_locked: boolean;
   created_at: string; author_id: string;
   category: { slug: string; name: string; color: string | null } | null;
@@ -27,6 +30,7 @@ type Thread = {
 
 type Post = {
   id: string; body: string; vote_score: number; created_at: string; author_id: string;
+  reaction_counts: Record<string, number> | null;
   author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
 };
 
@@ -61,7 +65,7 @@ function ThreadPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("threads")
-        .select("id, slug, title, body:body_public, vote_score, reply_count, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points, staff_badge)")
+        .select("id, slug, title, body:body_public, vote_score, reply_count, reaction_counts, is_pinned, is_locked, created_at, author_id, category:categories(slug, name, color), author:profiles(username, display_name, avatar_url, reputation, is_banned, points, staff_badge)")
         .eq("slug", slug)
         .maybeSingle();
       return data as unknown as Thread | null;
@@ -83,7 +87,7 @@ function ThreadPage() {
       if (!thread) return [];
       const { data } = await supabase
         .from("posts")
-        .select("id, body:body_public, vote_score, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points, staff_badge)")
+        .select("id, body:body_public, vote_score, reaction_counts, created_at, author_id, author:profiles(username, display_name, reputation, is_banned, points, staff_badge)")
         .eq("thread_id", thread.id)
         .order("created_at", { ascending: true });
       return (data ?? []) as unknown as Post[];
@@ -222,6 +226,10 @@ function ThreadPage() {
                         </button>
                       )}
                     </div>
+                    <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#e5e7eb] pt-4">
+                      <ReactionBar targetType="thread" targetId={thread.id} initialCounts={thread.reaction_counts ?? {}} />
+                      <div className="ml-auto"><BookmarkButton threadId={thread.id} /></div>
+                    </div>
                   </div>
                 </div>
               </article>
@@ -266,6 +274,9 @@ function ThreadPage() {
                                 <Trash2 size={14} />
                               </button>
                             )}
+                          </div>
+                          <div className="mt-4 border-t border-[#e5e7eb] pt-3">
+                            <ReactionBar targetType="post" targetId={p.id} initialCounts={p.reaction_counts ?? {}} />
                           </div>
                         </div>
                       </div>

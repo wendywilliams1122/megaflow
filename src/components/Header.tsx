@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag, ShoppingCart } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { SideNav } from "@/components/SideNav";
+import { NotificationBell } from "@/components/NotificationBell";
 import megaflowLogo from "@/assets/megaflow-logo.png";
 
 
@@ -91,6 +92,7 @@ export function Header() {
               </span>
             )}
           </Link>
+          {user && <NotificationBell />}
           {isModerator && (
             <Link to="/admin" className="hidden items-center gap-1.5 rounded-lg bg-red-50 px-2.5 py-2 text-sm font-bold text-red-700 hover:bg-red-100 lg:flex">
               <Shield size={16} /> <span>{isAdmin ? "Admin" : "Staff"}</span>
