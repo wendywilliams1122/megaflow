@@ -166,6 +166,12 @@ export const AdminPanel = () => {
   const [userDetailBusy, setUserDetailBusy] = useState(false);
   const [awardBadgeId, setAwardBadgeId] = useState("");
 
+  // Trash + Security
+  const [trashThreads, setTrashThreads] = useState<any[]>([]);
+  const [mfaEnroll, setMfaEnroll] = useState<{ id: string; qr: string; secret: string } | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaFactors, setMfaFactors] = useState<any[]>([]);
+
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const flash = (m: string) => { setMsg(m); setTimeout(() => setMsg(null), 2500); };
