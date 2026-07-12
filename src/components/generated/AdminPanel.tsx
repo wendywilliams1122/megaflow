@@ -18,6 +18,8 @@ import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcasts
 import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
 import { AutomationPanel } from "@/components/admin/AutomationPanel";
+import { BadgeIcon } from "@/components/admin/BadgeIcon";
+import { QuestsPanel, WeeklyLeaderboardCard } from "@/components/admin/QuestsPanel";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -31,7 +33,7 @@ import {
   ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod" | "automation";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "quests" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod" | "automation";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any; awarded_count?: number };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
@@ -1013,7 +1015,10 @@ export const AdminPanel = () => {
                 <TopContentCard />
                 <SalesAnalyticsCard />
               </section>
-              <AdminAnalytics />
+              <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
+                <WeeklyLeaderboardCard />
+                <AdminAnalytics />
+              </section>
 
             </>
           )}
@@ -1617,8 +1622,8 @@ export const AdminPanel = () => {
                           <button onClick={() => deleteBadge(b.id)} className="rounded-md border border-white/70 bg-white/90 p-1 text-red-600 shadow-sm hover:bg-red-50" title="Delete"><Trash2 size={12} /></button>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-3xl shadow-sm ring-2 ${s.ring}`}>
-                            {b.icon}
+                          <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-[#111827] shadow-sm ring-2 ${s.ring}`}>
+                            <BadgeIcon icon={b.icon} size={26} />
                           </div>
                           <div className="min-w-0">
                             <p className="truncate text-sm font-extrabold text-[#111827]">{b.name}</p>
@@ -1654,7 +1659,12 @@ export const AdminPanel = () => {
                     <div className="flex items-center justify-between"><h3 className="text-base font-extrabold">{editingBadge.id ? "Edit" : "New"} badge</h3><button onClick={() => setEditingBadge(null)}><X size={16} /></button></div>
                     <label className="block text-xs font-bold text-[#6b7280]">ID (slug)<input disabled={!!badgesList.find((b) => b.id === editingBadge.id)} value={editingBadge.id ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm disabled:bg-slate-50" /></label>
                     <label className="block text-xs font-bold text-[#6b7280]">Name<input value={editingBadge.name ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
-                    <label className="block text-xs font-bold text-[#6b7280]">Icon (emoji)<input value={editingBadge.icon ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, icon: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Icon (emoji or lucide name e.g. crown, flame, star)
+                      <div className="mt-1 flex items-center gap-2">
+                        <input value={editingBadge.icon ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, icon: e.target.value })} className="flex-1 rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#e5e7eb] bg-slate-50"><BadgeIcon icon={editingBadge.icon || ""} size={20} /></div>
+                      </div>
+                    </label>
                     <label className="block text-xs font-bold text-[#6b7280]">Tier
                       <select value={editingBadge.tier ?? "bronze"} onChange={(e) => setEditingBadge({ ...editingBadge, tier: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm">
                         {["bronze","silver","gold","platinum","special"].map((t) => <option key={t}>{t}</option>)}
@@ -1733,6 +1743,7 @@ export const AdminPanel = () => {
           {tab === "coupons" && isAdmin && <CouponsPanel />}
           {tab === "scheduled" && isAdmin && <ScheduledBroadcastsPanel />}
           {tab === "automation" && isAdmin && <AutomationPanel flash={flash} />}
+          {tab === "quests" && isAdmin && <QuestsPanel flash={flash} />}
 
 
 

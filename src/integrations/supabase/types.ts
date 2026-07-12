@@ -707,13 +707,16 @@ export type Database = {
           bio: string | null
           cover_url: string | null
           created_at: string
+          current_streak: number
           display_name: string | null
           force_reauth_at: string | null
           headline: string | null
           id: string
           is_banned: boolean
           is_shadow_banned: boolean
+          last_active_on: string | null
           location: string | null
+          longest_streak: number
           points: number
           referral_code: string
           referred_by: string | null
@@ -734,13 +737,16 @@ export type Database = {
           bio?: string | null
           cover_url?: string | null
           created_at?: string
+          current_streak?: number
           display_name?: string | null
           force_reauth_at?: string | null
           headline?: string | null
           id: string
           is_banned?: boolean
           is_shadow_banned?: boolean
+          last_active_on?: string | null
           location?: string | null
+          longest_streak?: number
           points?: number
           referral_code: string
           referred_by?: string | null
@@ -761,13 +767,16 @@ export type Database = {
           bio?: string | null
           cover_url?: string | null
           created_at?: string
+          current_streak?: number
           display_name?: string | null
           force_reauth_at?: string | null
           headline?: string | null
           id?: string
           is_banned?: boolean
           is_shadow_banned?: boolean
+          last_active_on?: string | null
           location?: string | null
+          longest_streak?: number
           points?: number
           referral_code?: string
           referred_by?: string | null
@@ -788,6 +797,108 @@ export type Database = {
             columns: ["referred_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quest_progress: {
+        Row: {
+          completed_at: string | null
+          id: string
+          progress: number
+          quest_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          progress?: number
+          quest_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          progress?: number
+          quest_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quest_progress_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "quests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quest_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quests: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          metric: string
+          reward_badge_id: string | null
+          reward_points: number
+          starts_at: string
+          target: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          metric: string
+          reward_badge_id?: string | null
+          reward_points?: number
+          starts_at?: string
+          target: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          metric?: string
+          reward_badge_id?: string | null
+          reward_points?: number
+          starts_at?: string
+          target?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quests_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quests_reward_badge_id_fkey"
+            columns: ["reward_badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
             referencedColumns: ["id"]
           },
         ]
@@ -1232,6 +1343,44 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          points_earned: number
+          posts_created: number
+          threads_created: number
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_earned?: number
+          posts_created?: number
+          threads_created?: number
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_earned?: number
+          posts_created?: number
+          threads_created?: number
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_snapshots_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1298,9 +1447,11 @@ export type Database = {
         Returns: undefined
       }
       auto_lock_stale_threads: { Args: never; Returns: number }
+      bump_streak: { Args: never; Returns: undefined }
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
       can_view_spoiler: { Args: { _user_id: string }; Returns: boolean }
       check_and_award_badges: { Args: { _user_id: string }; Returns: undefined }
+      close_weekly_leaderboard: { Args: never; Returns: number }
       create_notification: {
         Args: {
           _actor_id: string

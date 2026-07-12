@@ -2,13 +2,13 @@ import { Link } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, MessageSquare, MessageCircle, Trash2, Flag, FolderTree, Tags,
   Award, Package, ShoppingCart, Megaphone, Image as ImageIcon, Settings,
-  ShieldCheck, ClipboardList, ArrowLeft, Zap, Gavel, Ticket, CalendarClock, Cog,
+  ShieldCheck, ClipboardList, ArrowLeft, Zap, Gavel, Ticket, CalendarClock, Cog, Target,
 } from "lucide-react";
 import type { ComponentType } from "react";
 
 export type AdminTab =
   | "overview" | "users" | "threads" | "trash" | "reports" | "categories"
-  | "tags" | "badges" | "products" | "orders" | "coupons" | "broadcast"
+  | "tags" | "badges" | "quests" | "products" | "orders" | "coupons" | "broadcast"
   | "scheduled" | "ads" | "settings" | "security" | "audit" | "modactions" | "automod" | "automation";
 
 type Item = {
@@ -46,6 +46,7 @@ export function AdminSideNav({
         { id: "categories", label: "Categories", icon: FolderTree, adminOnly: true },
         { id: "tags", label: "Tags", icon: Tags, adminOnly: true },
         { id: "badges", label: "Badges", icon: Award, adminOnly: true },
+        { id: "quests", label: "Quests", icon: Target, adminOnly: true },
       ],
     },
     {
