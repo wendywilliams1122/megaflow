@@ -62,6 +62,7 @@ export function AdminSideNav({
       items: [
         { id: "broadcast", label: "Broadcast", icon: Megaphone, adminOnly: true },
         { id: "scheduled", label: "Scheduled", icon: CalendarClock, adminOnly: true },
+        { id: "notifications", label: "Notifications", icon: Bell, adminOnly: true },
         { id: "automation", label: "Automation", icon: Cog, adminOnly: true },
         { id: "ads", label: "Advertisements", icon: ImageIcon, adminOnly: true },
         { id: "settings", label: "Site Settings", icon: Settings, adminOnly: true },
