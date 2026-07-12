@@ -19,6 +19,7 @@ import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
 import { AutomationPanel } from "@/components/admin/AutomationPanel";
 import { NotificationsPanel } from "@/components/admin/NotificationsPanel";
+import { SearchAnalyticsPanel } from "@/components/admin/SearchAnalyticsPanel";
 import { BadgeIcon } from "@/components/admin/BadgeIcon";
 import { QuestsPanel, WeeklyLeaderboardCard } from "@/components/admin/QuestsPanel";
 import { RichEditor } from "@/components/RichEditor";
