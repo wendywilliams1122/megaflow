@@ -431,25 +431,27 @@ export const AdminPanel = () => {
     loadThreads();
   };
   const deleteThread = async (t: ThreadRow) => {
-    if (!confirm(`Delete thread "${t.title}"?`)) return;
+    const reason = prompt(`Move thread "${t.title}" to Trash. Optional reason:`, "");
+    if (reason === null) return;
     setBusy(t.id);
-    const { error } = await supabase.from("threads").delete().eq("id", t.id);
+    const { error } = await (supabase as any).rpc("admin_soft_delete_thread", { _thread_id: t.id, _reason: reason || null });
     setBusy(null);
     if (error) return flash("Failed: " + error.message);
-    flash("Thread deleted");
-    logAction("thread.delete", "thread", t.id, { title: t.title });
+    flash("Moved to trash");
+    logAction("thread.soft_delete", "thread", t.id, { title: t.title, reason });
     loadThreads(); loadStats();
   };
   const bulkDeleteThreads = async () => {
     if (threadsSel.size === 0) return;
-    if (!confirm(`Delete ${threadsSel.size} threads? This cannot be undone.`)) return;
+    if (!confirm(`Move ${threadsSel.size} threads to Trash?`)) return;
     setBusy("bulk-thread");
     const ids = [...threadsSel];
-    const { error } = await supabase.from("threads").delete().in("id", ids);
+    for (const id of ids) {
+      await (supabase as any).rpc("admin_soft_delete_thread", { _thread_id: id, _reason: "bulk" });
+    }
     setBusy(null);
-    if (error) return flash("Failed: " + error.message);
-    flash(`Deleted ${ids.length} threads`);
-    logAction("thread.bulk_delete", "thread", null as any, { ids });
+    flash(`Moved ${ids.length} threads to Trash`);
+    logAction("thread.bulk_soft_delete", "thread", null as any, { ids });
     loadThreads(); loadStats();
   };
 
