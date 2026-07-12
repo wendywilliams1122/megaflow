@@ -6,6 +6,10 @@ import { BlockedDomainsCard } from "@/components/admin/BlockedDomainsCard";
 import { MultiAccountIPCard } from "@/components/admin/MultiAccountIPCard";
 import { ModActionsPanel } from "@/components/admin/ModActionsPanel";
 import { AutomodPanel } from "@/components/admin/AutomodPanel";
+import { UserNotesCard } from "@/components/admin/UserNotesCard";
+import { GrowthChartsCard } from "@/components/admin/GrowthChartsCard";
+import { LiveActivityFeed } from "@/components/admin/LiveActivityFeed";
+import { TopContentCard } from "@/components/admin/TopContentCard";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
