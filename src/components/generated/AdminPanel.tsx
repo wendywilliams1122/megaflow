@@ -1775,8 +1775,11 @@ export const AdminPanel = () => {
                   <li>GDPR export bundles profile, roles, threads, replies, orders and badges into a downloadable JSON.</li>
                 </ul>
               </div>
+
+              <LoginAttemptsCard />
             </section>
           )}
+
 
 
           {userDetail && (
