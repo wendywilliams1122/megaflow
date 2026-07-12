@@ -257,16 +257,48 @@ function MessagesPage() {
               </div>
             </header>
 
+            {activeConv && activeConv.status !== "active" && (
+              <div className={`flex items-start gap-2 border-b px-4 py-3 text-sm ${
+                activeConv.status === "pending" ? "border-amber-200 bg-amber-50 text-amber-800" :
+                activeConv.status === "stopped" ? "border-slate-200 bg-slate-50 text-slate-700" :
+                "border-red-200 bg-red-50 text-red-700"
+              }`}>
+                {activeConv.status === "pending" && <Clock size={16} className="mt-0.5" />}
+                {activeConv.status === "stopped" && <Ban size={16} className="mt-0.5" />}
+                {activeConv.status === "ended" && <XCircle size={16} className="mt-0.5" />}
+                <div>
+                  <div className="font-bold">
+                    {activeConv.status === "pending" && "Waiting for staff approval"}
+                    {activeConv.status === "stopped" && "Paused by staff"}
+                    {activeConv.status === "ended" && "Ended by staff"}
+                  </div>
+                  <div className="text-xs opacity-80">
+                    {activeConv.status === "pending" && "Your first message was delivered. Further replies unlock once a moderator approves this chat."}
+                    {activeConv.status === "stopped" && "A moderator has paused this conversation. It may resume later."}
+                    {activeConv.status === "ended" && "This conversation has been closed by staff."}
+                    {activeConv.status_note && <span className="mt-1 block italic">Note: {activeConv.status_note}</span>}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex-1 space-y-2 overflow-y-auto p-4">
               {conversation.map((m) => {
                 const mine = m.sender_id === user.id;
+                const staff = m.is_staff_intervention;
                 return (
                   <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+                      staff ? "border-2 border-red-400 bg-red-50 text-red-900" :
                       mine ? "bg-[#0ea5e9] text-white" : "bg-[#f1f5f9] text-[#111827]"
                     }`}>
+                      {staff && (
+                        <div className="mb-1 flex items-center gap-1 text-[10px] font-extrabold uppercase text-red-700">
+                          <ShieldAlert size={10} /> Staff intervention
+                        </div>
+                      )}
                       <div className="whitespace-pre-wrap break-words">{m.body}</div>
-                      <div className={`mt-1 text-[10px] ${mine ? "text-sky-100" : "text-[#6b7280]"}`}>
+                      <div className={`mt-1 text-[10px] ${staff ? "text-red-700" : mine ? "text-sky-100" : "text-[#6b7280]"}`}>
                         {timeAgo(m.created_at)}
                       </div>
                     </div>
@@ -284,12 +316,18 @@ function MessagesPage() {
                   onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                   rows={2}
                   maxLength={4000}
-                  placeholder="Type a message…"
-                  className="flex-1 resize-none rounded-lg border border-[#e5e7eb] p-2 text-sm outline-none focus:border-[#0ea5e9]"
+                  placeholder={
+                    !canSend && activeConv?.status === "pending" ? "Waiting for staff approval…" :
+                    !canSend && activeConv?.status === "stopped" ? "Conversation paused by staff" :
+                    !canSend && activeConv?.status === "ended" ? "Conversation ended by staff" :
+                    "Type a message…"
+                  }
+                  disabled={!canSend}
+                  className="flex-1 resize-none rounded-lg border border-[#e5e7eb] p-2 text-sm outline-none focus:border-[#0ea5e9] disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 <button
                   onClick={send}
-                  disabled={text.trim().length === 0}
+                  disabled={text.trim().length === 0 || !canSend}
                   className="inline-flex items-center gap-1 self-end rounded-lg bg-[#0ea5e9] px-4 py-2 text-sm font-bold text-white hover:bg-[#0284c7] disabled:opacity-50"
                 >
                   <Send size={14} /> Send
