@@ -9,7 +9,7 @@ import type { ComponentType } from "react";
 export type AdminTab =
   | "overview" | "users" | "threads" | "trash" | "reports" | "categories"
   | "tags" | "badges" | "products" | "orders" | "coupons" | "broadcast"
-  | "scheduled" | "ads" | "settings" | "security" | "audit" | "modactions" | "automod";
+  | "scheduled" | "ads" | "settings" | "security" | "audit" | "modactions" | "automod" | "automation";
 
 type Item = {
   id: AdminTab;
