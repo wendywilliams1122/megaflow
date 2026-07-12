@@ -1003,6 +1003,8 @@ export const AdminPanel = () => {
 
           {/* ---------- USERS ---------- */}
           {tab === "users" && isAdmin && (
+            <>
+            <AdvancedUserSearch onOpen={openUserDetail} />
             <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] px-4 py-3">
                 <SearchInput value={usersQ} onChange={(v) => { setUsersPage(0); setUsersQ(v); }} placeholder="Search username / name…" />
