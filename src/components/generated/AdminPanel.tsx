@@ -4,6 +4,8 @@ import { AdminSideNav } from "@/components/admin/AdminSideNav";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { BlockedDomainsCard } from "@/components/admin/BlockedDomainsCard";
 import { MultiAccountIPCard } from "@/components/admin/MultiAccountIPCard";
+import { ModActionsPanel } from "@/components/admin/ModActionsPanel";
+import { AutomodPanel } from "@/components/admin/AutomodPanel";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -17,7 +19,7 @@ import {
   ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit" | "security";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any; awarded_count?: number };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
@@ -1882,6 +1884,9 @@ export const AdminPanel = () => {
               </div>
             </div>
           )}
+
+          {tab === "modactions" && <ModActionsPanel />}
+          {tab === "automod" && <AutomodPanel canEdit={isAdmin} />}
         </main>
       </div>
     </div>

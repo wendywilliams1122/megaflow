@@ -86,6 +86,48 @@ export type Database = {
         }
         Relationships: []
       }
+      automod_rules: {
+        Row: {
+          action: string
+          created_at: string
+          created_by: string | null
+          hits: number
+          id: string
+          is_enabled: boolean
+          is_regex: boolean
+          name: string
+          pattern: string
+          target_scope: string
+          updated_at: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          created_by?: string | null
+          hits?: number
+          id?: string
+          is_enabled?: boolean
+          is_regex?: boolean
+          name: string
+          pattern: string
+          target_scope?: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          created_by?: string | null
+          hits?: number
+          id?: string
+          is_enabled?: boolean
+          is_regex?: boolean
+          name?: string
+          pattern?: string
+          target_scope?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           created_at: string
@@ -281,6 +323,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mod_actions: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          reason: string | null
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reason?: string | null
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          reason?: string | null
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -572,6 +647,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          banned_until: string | null
           bio: string | null
           cover_url: string | null
           created_at: string
@@ -580,6 +656,7 @@ export type Database = {
           headline: string | null
           id: string
           is_banned: boolean
+          is_shadow_banned: boolean
           location: string | null
           points: number
           referral_code: string
@@ -597,6 +674,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          banned_until?: string | null
           bio?: string | null
           cover_url?: string | null
           created_at?: string
@@ -605,6 +683,7 @@ export type Database = {
           headline?: string | null
           id: string
           is_banned?: boolean
+          is_shadow_banned?: boolean
           location?: string | null
           points?: number
           referral_code: string
@@ -622,6 +701,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          banned_until?: string | null
           bio?: string | null
           cover_url?: string | null
           created_at?: string
@@ -630,6 +710,7 @@ export type Database = {
           headline?: string | null
           id?: string
           is_banned?: boolean
+          is_shadow_banned?: boolean
           location?: string | null
           points?: number
           referral_code?: string
@@ -964,6 +1045,36 @@ export type Database = {
           },
         ]
       }
+      user_notes: {
+        Row: {
+          author_id: string | null
+          body: string
+          created_at: string
+          id: string
+          pinned: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1031,6 +1142,16 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: undefined
       }
+      admin_log_mod_action: {
+        Args: {
+          _action: string
+          _metadata?: Json
+          _reason?: string
+          _target_id: string
+          _target_type: string
+        }
+        Returns: string
+      }
       admin_merge_tags: {
         Args: { _from: string; _to: string }
         Returns: undefined
@@ -1041,8 +1162,20 @@ export type Database = {
         Args: { _badge_id: string; _user_id: string }
         Returns: undefined
       }
+      admin_shadow_ban: {
+        Args: { _enabled: boolean; _reason?: string; _user_id: string }
+        Returns: undefined
+      }
       admin_soft_delete_thread: {
         Args: { _reason?: string; _thread_id: string }
+        Returns: undefined
+      }
+      admin_temp_ban: {
+        Args: { _reason?: string; _until: string; _user_id: string }
+        Returns: undefined
+      }
+      admin_unban: {
+        Args: { _reason?: string; _user_id: string }
         Returns: undefined
       }
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
@@ -1062,6 +1195,7 @@ export type Database = {
         }
         Returns: string
       }
+      expire_temp_bans: { Args: never; Returns: number }
       get_full_body: {
         Args: { _target_id: string; _target_type: string }
         Returns: string
