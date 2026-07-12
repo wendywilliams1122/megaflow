@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useSiteSettings } from "@/hooks/use-site-settings";
 import { addToCart } from "@/lib/cart";
+import { RichBody } from "@/components/RichBody";
+
 import {
   Package,
   Star,
@@ -186,8 +188,12 @@ function ProductPage() {
                 </div>
 
                 {product.description && (
-                  <p className="text-sm leading-relaxed text-[#374151]">{product.description}</p>
+                  <RichBody
+                    text={product.description}
+                    className="text-sm leading-relaxed text-[#374151]"
+                  />
                 )}
+
 
                 {/* Buyer info */}
                 <div className="rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm">

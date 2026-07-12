@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { SideRail } from "@/components/SideRail";
 import { BlockedDomainsCard } from "@/components/admin/BlockedDomainsCard";
 import { MultiAccountIPCard } from "@/components/admin/MultiAccountIPCard";
+import { RichEditor } from "@/components/RichEditor";
+
 
 
 import { useAuth } from "@/hooks/use-auth";
@@ -840,15 +842,21 @@ export const AdminPanel = () => {
                         className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
                       />
                     </label>
-                    <label className="text-xs font-bold text-[#6b7280] md:col-span-2">
+                    <div className="text-xs font-bold text-[#6b7280] md:col-span-2">
                       Description
-                      <textarea
-                        rows={3}
-                        value={editingProduct.description ?? ""}
-                        onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
-                        className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm font-normal text-[#111827] focus:border-[#0ea5e9] focus:outline-none focus:ring-2 focus:ring-sky-100"
-                      />
-                    </label>
+                      <div className="mt-1">
+                        <RichEditor
+                          value={editingProduct.description ?? ""}
+                          onChange={(html) => setEditingProduct({ ...editingProduct, description: html })}
+                          placeholder="Describe your product — use headings, lists, images, videos, links…"
+                          minHeight={320}
+                        />
+                      </div>
+                      <p className="mt-1 text-[11px] font-normal text-[#9ca3af]">
+                        Full block editor: headings, bold, lists, quotes, code, images (upload), YouTube embeds, links.
+                      </p>
+                    </div>
+
                     <label className="text-xs font-bold text-[#6b7280]">
                       Price (cents)
                       <input
