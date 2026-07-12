@@ -18,6 +18,7 @@ import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcasts
 import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
 import { AutomationPanel } from "@/components/admin/AutomationPanel";
+import { NotificationsPanel } from "@/components/admin/NotificationsPanel";
 import { BadgeIcon } from "@/components/admin/BadgeIcon";
 import { QuestsPanel, WeeklyLeaderboardCard } from "@/components/admin/QuestsPanel";
 import { RichEditor } from "@/components/RichEditor";
