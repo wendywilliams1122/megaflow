@@ -1537,6 +1537,19 @@ export const AdminPanel = () => {
                       {userDetail.ban_reason && <p className="mt-2 rounded bg-red-50 p-2 text-xs text-red-700"><b>Ban reason:</b> {userDetail.ban_reason}</p>}
                     </div>
 
+                    {isAdmin && (
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Account actions</p>
+                        <div className="flex flex-wrap gap-2">
+                          <button onClick={() => viewAsUser(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-xs font-bold hover:border-sky-300 hover:text-sky-600"><UserCog size={12} /> View as user</button>
+                          <button onClick={() => gdprExport(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-xs font-bold hover:border-emerald-300 hover:text-emerald-600"><FileJson size={12} /> GDPR export</button>
+                          <button onClick={() => forceSignOut(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50"><LogOut size={12} /> Force sign-out</button>
+                        </div>
+                        {userDetail.profile.force_reauth_at && <p className="mt-2 text-[10px] text-[#6b7280]">Last forced sign-out: {new Date(userDetail.profile.force_reauth_at).toLocaleString()}</p>}
+                      </div>
+                    )}
+
+
                     <div className="rounded-lg border border-[#e5e7eb] p-4">
                       <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Badges ({userDetail.badges.length})</p>
                       <div className="flex flex-wrap gap-2">
