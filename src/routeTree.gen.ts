@@ -26,6 +26,7 @@ import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as BestMembersRouteImport } from './routes/best-members'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdvertisementRouteImport } from './routes/advertisement'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -122,6 +123,11 @@ const AdvertisementRoute = AdvertisementRouteImport.update({
   path: '/advertisement',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
   '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
   '/best-members': typeof BestMembersRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
   '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
   '/best-members': typeof BestMembersRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
   '/advertisement': typeof AdvertisementRoute
   '/auth': typeof AuthRoute
   '/best-members': typeof BestMembersRoute
@@ -267,6 +276,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/admin-login'
     | '/advertisement'
     | '/auth'
     | '/best-members'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/admin-login'
     | '/advertisement'
     | '/auth'
     | '/best-members'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/admin-login'
     | '/advertisement'
     | '/auth'
     | '/best-members'
@@ -355,6 +367,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AdvertisementRoute: typeof AdvertisementRoute
   AuthRoute: typeof AuthRoute
   BestMembersRoute: typeof BestMembersRoute
@@ -502,6 +515,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdvertisementRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -579,6 +599,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AdvertisementRoute: AdvertisementRoute,
   AuthRoute: AuthRoute,
   BestMembersRoute: BestMembersRoute,
