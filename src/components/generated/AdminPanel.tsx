@@ -984,7 +984,14 @@ export const AdminPanel = () => {
                 <BlockedDomainsCard flash={flash} />
                 <MultiAccountIPCard />
               </section>
-              <AdminAnalytics />
+              <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
+                <GrowthChartsCard />
+                <LiveActivityFeed />
+              </section>
+              <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
+                <TopContentCard />
+                <AdminAnalytics />
+              </section>
 
             </>
           )}
