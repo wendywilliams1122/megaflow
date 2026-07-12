@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NewRouteImport } from './routes/new'
+import { Route as ModChatsRouteImport } from './routes/mod-chats'
 import { Route as ModRouteImport } from './routes/mod'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -31,6 +32,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as ModChatIdRouteImport } from './routes/mod-chat.$id'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 
@@ -57,6 +59,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModChatsRoute = ModChatsRouteImport.update({
+  id: '/mod-chats',
+  path: '/mod-chats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModRoute = ModRouteImport.update({
@@ -144,6 +151,11 @@ const TSlugRoute = TSlugRouteImport.update({
   path: '/t/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModChatIdRoute = ModChatIdRouteImport.update({
+  id: '/mod-chat/$id',
+  path: '/mod-chat/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
   id: '/marketplace/$slug',
   path: '/marketplace/$slug',
@@ -170,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/messages': typeof MessagesRoute
   '/mod': typeof ModRoute
+  '/mod-chats': typeof ModChatsRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -177,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/mod-chat/$id': typeof ModChatIdRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/marketplace/': typeof MarketplaceIndexRoute
@@ -196,6 +210,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/messages': typeof MessagesRoute
   '/mod': typeof ModRoute
+  '/mod-chats': typeof ModChatsRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -203,6 +218,7 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/mod-chat/$id': typeof ModChatIdRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/marketplace': typeof MarketplaceIndexRoute
@@ -223,6 +239,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/messages': typeof MessagesRoute
   '/mod': typeof ModRoute
+  '/mod-chats': typeof ModChatsRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -230,6 +247,7 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/c/$slug': typeof CSlugRoute
   '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/mod-chat/$id': typeof ModChatIdRoute
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/marketplace/': typeof MarketplaceIndexRoute
@@ -251,6 +269,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/messages'
     | '/mod'
+    | '/mod-chats'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -258,6 +277,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/c/$slug'
     | '/marketplace/$slug'
+    | '/mod-chat/$id'
     | '/t/$slug'
     | '/u/$username'
     | '/marketplace/'
@@ -277,6 +297,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/messages'
     | '/mod'
+    | '/mod-chats'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -284,6 +305,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/c/$slug'
     | '/marketplace/$slug'
+    | '/mod-chat/$id'
     | '/t/$slug'
     | '/u/$username'
     | '/marketplace'
@@ -303,6 +325,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/messages'
     | '/mod'
+    | '/mod-chats'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -310,6 +333,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/c/$slug'
     | '/marketplace/$slug'
+    | '/mod-chat/$id'
     | '/t/$slug'
     | '/u/$username'
     | '/marketplace/'
@@ -330,6 +354,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   MessagesRoute: typeof MessagesRoute
   ModRoute: typeof ModRoute
+  ModChatsRoute: typeof ModChatsRoute
   NewRoute: typeof NewRoute
   NotificationsRoute: typeof NotificationsRoute
   RulesRoute: typeof RulesRoute
@@ -337,6 +362,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   CSlugRoute: typeof CSlugRoute
   MarketplaceSlugRoute: typeof MarketplaceSlugRoute
+  ModChatIdRoute: typeof ModChatIdRoute
   TSlugRoute: typeof TSlugRoute
   UUsernameRoute: typeof UUsernameRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
@@ -377,6 +403,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mod-chats': {
+      id: '/mod-chats'
+      path: '/mod-chats'
+      fullPath: '/mod-chats'
+      preLoaderRoute: typeof ModChatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mod': {
@@ -498,6 +531,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mod-chat/$id': {
+      id: '/mod-chat/$id'
+      path: '/mod-chat/$id'
+      fullPath: '/mod-chat/$id'
+      preLoaderRoute: typeof ModChatIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/marketplace/$slug': {
       id: '/marketplace/$slug'
       path: '/marketplace/$slug'
@@ -530,6 +570,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   MessagesRoute: MessagesRoute,
   ModRoute: ModRoute,
+  ModChatsRoute: ModChatsRoute,
   NewRoute: NewRoute,
   NotificationsRoute: NotificationsRoute,
   RulesRoute: RulesRoute,
@@ -537,6 +578,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   CSlugRoute: CSlugRoute,
   MarketplaceSlugRoute: MarketplaceSlugRoute,
+  ModChatIdRoute: ModChatIdRoute,
   TSlugRoute: TSlugRoute,
   UUsernameRoute: UUsernameRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
