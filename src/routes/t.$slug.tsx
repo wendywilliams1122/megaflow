@@ -17,6 +17,24 @@ import { toast } from "sonner";
 import { Lock, LockOpen, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/t/$slug")({
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.slug.replace(/-/g, " ").replace(/\s\w{5}$/, "")} - MegaFlow` },
+      { property: "og:title", content: `${params.slug.replace(/-/g, " ").replace(/\s\w{5}$/, "")} - MegaFlow` },
+      { property: "og:type", content: "article" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "DiscussionForumPosting",
+          headline: params.slug.replace(/-/g, " "),
+          url: `https://megaflow.lovable.app/t/${params.slug}`,
+        }),
+      },
+    ],
+  }),
   component: ThreadPage,
 });
 
