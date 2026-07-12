@@ -41,6 +41,8 @@ export function AdminSideNav({
         { id: "threads", label: "Threads", icon: MessageSquare },
         { id: "trash", label: "Trash", icon: Trash2 },
         { id: "reports", label: "Reports", icon: Flag, badge: pendingReports },
+        { id: "modactions", label: "Mod Actions", icon: Gavel },
+        { id: "automod", label: "AutoMod", icon: Zap, adminOnly: true },
         { id: "categories", label: "Categories", icon: FolderTree, adminOnly: true },
         { id: "tags", label: "Tags", icon: Tags, adminOnly: true },
         { id: "badges", label: "Badges", icon: Award, adminOnly: true },
