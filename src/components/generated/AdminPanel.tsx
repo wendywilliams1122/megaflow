@@ -323,6 +323,8 @@ export const AdminPanel = () => {
       downloads_min_points: settings.downloads_min_points,
       announcement: settings.announcement?.trim() || null,
       announcement_active: settings.announcement_active,
+      maintenance_mode: settings.maintenance_mode,
+      maintenance_message: settings.maintenance_message?.trim() || null,
     }).eq("id", true);
     setBusy(null);
     if (error) return flash("Failed: " + error.message);
