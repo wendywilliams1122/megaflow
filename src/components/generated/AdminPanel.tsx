@@ -144,6 +144,7 @@ export const AdminPanel = () => {
 
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [reportsStatus, setReportsStatus] = useState("pending");
+  const [reportsCategory, setReportsCategory] = useState("all");
 
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [editingCategory, setEditingCategory] = useState<Partial<CategoryRow> | null>(null);
