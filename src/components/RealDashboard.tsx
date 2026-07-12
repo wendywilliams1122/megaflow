@@ -31,8 +31,16 @@ export function RealDashboard() {
         supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_id", uid).is("read_at", null),
         supabase.from("threads").select("id, title, slug, reply_count, view_count, last_activity_at, category:categories!threads_category_id_fkey(name)").eq("author_id", uid).order("last_activity_at", { ascending: false }).limit(6),
         supabase.from("notifications").select("id, title, body, link, created_at, is_read").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
-        supabase.from("messages").select("id, body, created_at, read_at, sender_id, profiles!messages_sender_id_fkey(username, display_name, avatar_url)").eq("recipient_id", uid).order("created_at", { ascending: false }).limit(5),
+        supabase.from("messages").select("id, body, created_at, read_at, sender_id, recipient_id").or(`sender_id.eq.${uid},recipient_id.eq.${uid}`).order("created_at", { ascending: false }).limit(5),
       ]);
+      const msgList = (msgs.data ?? []) as any[];
+      const otherIds = Array.from(new Set(msgList.map((m) => (m.sender_id === uid ? m.recipient_id : m.sender_id))));
+      let profMap: Record<string, any> = {};
+      if (otherIds.length > 0) {
+        const { data: profs } = await supabase.from("profiles").select("id, username, display_name, avatar_url").in("id", otherIds);
+        (profs ?? []).forEach((p: any) => { profMap[p.id] = p; });
+      }
+      const msgsWithProfile = msgList.map((m) => ({ ...m, other: profMap[m.sender_id === uid ? m.recipient_id : m.sender_id], outgoing: m.sender_id === uid }));
       return {
         threads: threadsCount.count ?? 0,
         posts: postsCount.count ?? 0,
@@ -41,7 +49,7 @@ export function RealDashboard() {
         unreadMsgs: unreadMsgs.count ?? 0,
         myThreads: (myThreads.data ?? []) as any[],
         notifs: (notifs.data ?? []) as any[],
-        msgs: (msgs.data ?? []) as any[],
+        msgs: msgsWithProfile,
       };
     },
   });
@@ -160,13 +168,15 @@ export function RealDashboard() {
               <div className="p-6 text-center text-sm text-slate-500">No messages yet.</div>
             )}
             {data?.msgs.map((m: any) => (
-              <Link key={m.id} to="/messages" className={`flex gap-3 p-4 hover:bg-slate-50 ${!m.read_at ? "bg-sky-50/20" : ""}`}>
+              <Link key={m.id} to="/messages" className={`flex gap-3 p-4 hover:bg-slate-50 ${!m.outgoing && !m.read_at ? "bg-sky-50/20" : ""}`}>
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-100 font-bold text-sky-700">
-                  {(m.profiles?.username ?? "?").slice(0, 2).toUpperCase()}
+                  {(m.other?.username ?? "?").slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="mb-0.5 flex items-center justify-between">
-                    <span className="text-sm font-bold text-slate-900">{m.profiles?.display_name || m.profiles?.username || "User"}</span>
+                    <span className="text-sm font-bold text-slate-900">
+                      {m.outgoing ? "To " : ""}{m.other?.display_name || m.other?.username || "User"}
+                    </span>
                     <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{timeAgo(m.created_at)}</span>
                   </div>
                   <p className="truncate text-xs leading-tight text-slate-500">{m.body}</p>
