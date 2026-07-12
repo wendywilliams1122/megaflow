@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { SideRail } from "@/components/SideRail";
+import { AdminSideNav } from "@/components/admin/AdminSideNav";
+import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { BlockedDomainsCard } from "@/components/admin/BlockedDomainsCard";
 import { MultiAccountIPCard } from "@/components/admin/MultiAccountIPCard";
 import { RichEditor } from "@/components/RichEditor";
