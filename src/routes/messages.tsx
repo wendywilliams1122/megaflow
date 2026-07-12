@@ -37,13 +37,36 @@ function MessagesPage() {
       if (!user) return [];
       const { data } = await supabase
         .from("messages")
-        .select("id, sender_id, recipient_id, body, read_at, created_at")
+        .select("id, sender_id, recipient_id, body, read_at, created_at, is_staff_intervention")
         .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order("created_at", { ascending: true });
       return (data ?? []) as Msg[];
     },
     enabled: !!user,
   });
+
+  const { data: conversations } = useQuery({
+    queryKey: ["conversations", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data } = await supabase
+        .from("conversations")
+        .select("id, user_min, user_max, status, status_note")
+        .or(`user_min.eq.${user.id},user_max.eq.${user.id}`);
+      return (data ?? []) as Conversation[];
+    },
+    enabled: !!user,
+  });
+
+  const convByPartner = useMemo(() => {
+    const m: Record<string, Conversation> = {};
+    if (!user || !conversations) return m;
+    for (const c of conversations) {
+      const other = c.user_min === user.id ? c.user_max : c.user_min;
+      m[other] = c;
+    }
+    return m;
+  }, [conversations, user]);
 
   // Derive conversation partners
   const partners = useMemo(() => {
