@@ -51,6 +51,15 @@ const sidebarNavItems: NavItem[] = [
 export function SideNav({ onNavigate }: { onNavigate?: () => void }) {
   const { user, profile } = useAuth();
 
+  const { data: isMod } = useQuery({
+    queryKey: ["is-mod-nav", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id);
+      return (data ?? []).some((r: any) => r.role === "admin" || r.role === "moderator");
+    },
+  });
+
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -113,7 +122,7 @@ export function SideNav({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
 
       <nav className="space-y-1" aria-label="Forum navigation">
-        {sidebarNavItems.filter((i) => !i.authOnly || !!user).map((item) => {
+        {sidebarNavItems.filter((i) => (!i.authOnly || !!user) && (i.id !== "mod" || !!isMod)).map((item) => {
           const Icon = item.icon;
           return (
             <Link
