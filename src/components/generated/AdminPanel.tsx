@@ -716,8 +716,9 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </section>
-              <BlockedDomainsCard />
+              <BlockedDomainsCard flash={flash} />
               <MultiAccountIPCard />
+
             </>
           )}
 
