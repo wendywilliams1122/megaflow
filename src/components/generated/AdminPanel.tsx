@@ -17,6 +17,7 @@ import { CouponsPanel } from "@/components/admin/CouponsPanel";
 import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcastsPanel";
 import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
+import { AutomationPanel } from "@/components/admin/AutomationPanel";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
