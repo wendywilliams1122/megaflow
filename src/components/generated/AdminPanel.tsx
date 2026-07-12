@@ -19,6 +19,7 @@ import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
 import { AutomationPanel } from "@/components/admin/AutomationPanel";
 import { NotificationsPanel } from "@/components/admin/NotificationsPanel";
+import { SearchAnalyticsPanel } from "@/components/admin/SearchAnalyticsPanel";
 import { BadgeIcon } from "@/components/admin/BadgeIcon";
 import { QuestsPanel, WeeklyLeaderboardCard } from "@/components/admin/QuestsPanel";
 import { RichEditor } from "@/components/RichEditor";
@@ -34,7 +35,7 @@ import {
   ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "quests" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod" | "automation" | "notifications";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "quests" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod" | "automation" | "notifications" | "searchanalytics";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any; awarded_count?: number };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
@@ -1745,6 +1746,7 @@ export const AdminPanel = () => {
           {tab === "scheduled" && isAdmin && <ScheduledBroadcastsPanel />}
           {tab === "automation" && isAdmin && <AutomationPanel flash={flash} />}
           {tab === "notifications" && isAdmin && <NotificationsPanel flash={flash} />}
+          {tab === "searchanalytics" && isAdmin && <SearchAnalyticsPanel flash={flash} />}
           {tab === "quests" && isAdmin && <QuestsPanel flash={flash} />}
 
 
