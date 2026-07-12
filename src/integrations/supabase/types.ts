@@ -413,6 +413,69 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_digest_log: {
+        Row: {
+          digest_type: string
+          id: string
+          notification_count: number
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          digest_type: string
+          id?: string
+          notification_count?: number
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          digest_type?: string
+          id?: string
+          notification_count?: number
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_prefs: {
+        Row: {
+          email_digest: string
+          mute_follows: boolean
+          mute_mentions: boolean
+          mute_reactions: boolean
+          mute_replies: boolean
+          mute_system: boolean
+          quiet_hours_end: number | null
+          quiet_hours_start: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          email_digest?: string
+          mute_follows?: boolean
+          mute_mentions?: boolean
+          mute_reactions?: boolean
+          mute_replies?: boolean
+          mute_system?: boolean
+          quiet_hours_end?: number | null
+          quiet_hours_start?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          email_digest?: string
+          mute_follows?: boolean
+          mute_mentions?: boolean
+          mute_reactions?: boolean
+          mute_replies?: boolean
+          mute_system?: boolean
+          quiet_hours_end?: number | null
+          quiet_hours_start?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           actor_id: string | null
@@ -1424,6 +1487,16 @@ export type Database = {
         Args: { _from: string; _to: string }
         Returns: undefined
       }
+      admin_notification_stats: {
+        Args: never
+        Returns: {
+          digests_sent_7d: number
+          total_notifications: number
+          unread_notifications: number
+          users_muting_all: number
+          users_with_prefs: number
+        }[]
+      }
       admin_purge_thread: { Args: { _thread_id: string }; Returns: undefined }
       admin_restore_thread: { Args: { _thread_id: string }; Returns: undefined }
       admin_revoke_badge: {
@@ -1497,6 +1570,14 @@ export type Database = {
         Returns: undefined
       }
       run_due_broadcasts: { Args: never; Returns: number }
+      run_notification_digests: {
+        Args: { _digest_type?: string }
+        Returns: number
+      }
+      should_notify: {
+        Args: { _type: string; _user_id: string }
+        Returns: boolean
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       spam_score: { Args: { _body: string }; Returns: number }
