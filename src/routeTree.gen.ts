@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as NewRouteImport } from './routes/new'
+import { Route as ModChatsRouteImport } from './routes/mod-chats'
 import { Route as ModRouteImport } from './routes/mod'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -57,6 +58,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModChatsRoute = ModChatsRouteImport.update({
+  id: '/mod-chats',
+  path: '/mod-chats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModRoute = ModRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/messages': typeof MessagesRoute
   '/mod': typeof ModRoute
+  '/mod-chats': typeof ModChatsRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/messages': typeof MessagesRoute
   '/mod': typeof ModRoute
+  '/mod-chats': typeof ModChatsRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -223,6 +231,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/messages': typeof MessagesRoute
   '/mod': typeof ModRoute
+  '/mod-chats': typeof ModChatsRoute
   '/new': typeof NewRoute
   '/notifications': typeof NotificationsRoute
   '/rules': typeof RulesRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/messages'
     | '/mod'
+    | '/mod-chats'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -277,6 +287,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/messages'
     | '/mod'
+    | '/mod-chats'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -303,6 +314,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/messages'
     | '/mod'
+    | '/mod-chats'
     | '/new'
     | '/notifications'
     | '/rules'
@@ -330,6 +342,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   MessagesRoute: typeof MessagesRoute
   ModRoute: typeof ModRoute
+  ModChatsRoute: typeof ModChatsRoute
   NewRoute: typeof NewRoute
   NotificationsRoute: typeof NotificationsRoute
   RulesRoute: typeof RulesRoute
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mod-chats': {
+      id: '/mod-chats'
+      path: '/mod-chats'
+      fullPath: '/mod-chats'
+      preLoaderRoute: typeof ModChatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mod': {
@@ -530,6 +550,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   MessagesRoute: MessagesRoute,
   ModRoute: ModRoute,
+  ModChatsRoute: ModChatsRoute,
   NewRoute: NewRoute,
   NotificationsRoute: NotificationsRoute,
   RulesRoute: RulesRoute,
