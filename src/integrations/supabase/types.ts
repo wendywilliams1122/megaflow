@@ -921,6 +921,7 @@ export type Database = {
         Row: {
           announcement: string | null
           announcement_active: boolean
+          auto_lock_stale_days: number
           brand_name: string
           contact_email: string | null
           downloads_min_points: number
@@ -940,6 +941,7 @@ export type Database = {
         Insert: {
           announcement?: string | null
           announcement_active?: boolean
+          auto_lock_stale_days?: number
           brand_name?: string
           contact_email?: string | null
           downloads_min_points?: number
@@ -959,6 +961,7 @@ export type Database = {
         Update: {
           announcement?: string | null
           announcement_active?: boolean
+          auto_lock_stale_days?: number
           brand_name?: string
           contact_email?: string | null
           downloads_min_points?: number
@@ -1244,6 +1247,16 @@ export type Database = {
       }
       admin_export_user_data: { Args: { _user_id: string }; Returns: Json }
       admin_force_signout: { Args: { _user_id: string }; Returns: undefined }
+      admin_list_cron_jobs: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobname: string
+          last_run: string
+          last_status: string
+          schedule: string
+        }[]
+      }
       admin_log_impersonate: {
         Args: { _reason?: string; _user_id: string }
         Returns: undefined
@@ -1284,6 +1297,7 @@ export type Database = {
         Args: { _reason?: string; _user_id: string }
         Returns: undefined
       }
+      auto_lock_stale_threads: { Args: never; Returns: number }
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
       can_view_spoiler: { Args: { _user_id: string }; Returns: boolean }
       check_and_award_badges: { Args: { _user_id: string }; Returns: undefined }
@@ -1334,6 +1348,7 @@ export type Database = {
       run_due_broadcasts: { Args: never; Returns: number }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      spam_score: { Args: { _body: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

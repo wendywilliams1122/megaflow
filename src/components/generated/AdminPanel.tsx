@@ -17,6 +17,7 @@ import { CouponsPanel } from "@/components/admin/CouponsPanel";
 import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcastsPanel";
 import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
+import { AutomationPanel } from "@/components/admin/AutomationPanel";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -30,7 +31,7 @@ import {
   ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod" | "automation";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any; awarded_count?: number };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
@@ -1731,6 +1732,7 @@ export const AdminPanel = () => {
 
           {tab === "coupons" && isAdmin && <CouponsPanel />}
           {tab === "scheduled" && isAdmin && <ScheduledBroadcastsPanel />}
+          {tab === "automation" && isAdmin && <AutomationPanel flash={flash} />}
 
 
 
