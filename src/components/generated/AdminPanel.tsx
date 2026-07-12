@@ -13,7 +13,7 @@ import {
   Plus, Pencil, X, ShoppingCart, Settings as SettingsIcon, Save,
   Megaphone, Eye, EyeOff, Search, ChevronLeft, ChevronRight, Download,
   Flag, FolderTree, DollarSign, Plus as PlusIcon, Minus, AlertTriangle,
-  ClipboardList, Bell,
+  ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
 type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit" | "security";
