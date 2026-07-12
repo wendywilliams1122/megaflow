@@ -834,6 +834,8 @@ export const AdminPanel = () => {
   useEffect(() => { if (isStaff && tab === "ads") loadAds(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && (tab === "settings" || tab === "broadcast")) loadSettings(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "audit") loadAudit(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "trash") loadTrash(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "security") loadMfaFactors(); /* eslint-disable-next-line */ }, [isStaff, tab]);
 
   const tabs: { id: Tab; label: string; adminOnly?: boolean; badge?: number }[] = useMemo(() => [
     { id: "overview", label: "Overview" },
