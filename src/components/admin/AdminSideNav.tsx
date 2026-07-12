@@ -53,7 +53,14 @@ export function AdminSideNav({
       items: [
         { id: "products", label: "Products", icon: Package },
         { id: "orders", label: "Orders", icon: ShoppingCart },
+        { id: "coupons", label: "Coupons", icon: Ticket, adminOnly: true },
       ],
+    },
+    {
+      title: "System",
+      items: [
+        { id: "broadcast", label: "Broadcast", icon: Megaphone, adminOnly: true },
+        { id: "scheduled", label: "Scheduled", icon: CalendarClock, adminOnly: true },
     },
     {
       title: "System",
