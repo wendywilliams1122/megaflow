@@ -31,7 +31,7 @@ export function useAuth() {
       const [{ data: p }, { data: mod }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, username, display_name, avatar_url, reputation, points, trust_score, referral_code, is_banned")
+          .select("id, username, display_name, avatar_url, reputation, points, trust_score, referral_code, is_banned, force_reauth_at")
           .eq("id", userId)
           .maybeSingle(),
         supabase
@@ -41,6 +41,17 @@ export function useAuth() {
           .maybeSingle(),
       ]);
       if (p) {
+        // Admin-triggered force sign-out
+        const forceAt = (p as any).force_reauth_at ? Date.parse((p as any).force_reauth_at) : 0;
+        const { data: { session: cur } } = await supabase.auth.getSession();
+        const sessAt = cur?.user?.created_at ? Date.parse(cur.user.created_at) : Date.now();
+        // Use last sign-in when available
+        const signedInAt = (cur as any)?.user?.last_sign_in_at ? Date.parse((cur as any).user.last_sign_in_at) : sessAt;
+        if (forceAt && forceAt > signedInAt) {
+          await supabase.auth.signOut();
+          setProfile(null);
+          return;
+        }
         setProfile({ ...(p as Profile), ban_reason: mod?.ban_reason ?? null, warnings: mod?.warnings ?? 0 });
       } else {
         setProfile(null);
