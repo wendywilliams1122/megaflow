@@ -684,8 +684,10 @@ export type Database = {
       }
       reports: {
         Row: {
+          category: Database["public"]["Enums"]["report_category"]
           created_at: string
           id: string
+          link_url: string | null
           reason: string
           reporter_id: string
           resolution_note: string | null
@@ -697,8 +699,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: Database["public"]["Enums"]["report_category"]
           created_at?: string
           id?: string
+          link_url?: string | null
           reason: string
           reporter_id: string
           resolution_note?: string | null
@@ -710,8 +714,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: Database["public"]["Enums"]["report_category"]
           created_at?: string
           id?: string
+          link_url?: string | null
           reason?: string
           reporter_id?: string
           resolution_note?: string | null
@@ -1086,6 +1092,14 @@ export type Database = {
         | "moderation"
       reaction_target: "thread" | "post"
       reaction_type: "like" | "love" | "haha" | "insightful" | "thanks"
+      report_category:
+        | "spam"
+        | "harassment"
+        | "broken_link"
+        | "inappropriate"
+        | "misinformation"
+        | "copyright"
+        | "other"
       report_status: "open" | "resolved" | "dismissed"
       report_target: "thread" | "post" | "user"
     }
@@ -1227,6 +1241,15 @@ export const Constants = {
       ],
       reaction_target: ["thread", "post"],
       reaction_type: ["like", "love", "haha", "insightful", "thanks"],
+      report_category: [
+        "spam",
+        "harassment",
+        "broken_link",
+        "inappropriate",
+        "misinformation",
+        "copyright",
+        "other",
+      ],
       report_status: ["open", "resolved", "dismissed"],
       report_target: ["thread", "post", "user"],
     },
