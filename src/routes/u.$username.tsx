@@ -8,6 +8,8 @@ import { MessageSquare, Clock, Settings } from "lucide-react";
 import { UserBadge } from "@/components/UserBadge";
 import { LevelBadge } from "@/components/LevelBadge";
 import { BadgeList } from "@/components/BadgeList";
+import { ReportButton } from "@/components/ReportButton";
+import { MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/u/$username")({
   component: UserPage,
