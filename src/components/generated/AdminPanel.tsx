@@ -938,6 +938,7 @@ export const AdminPanel = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap justify-end gap-1">
+                            <button onClick={() => openUserDetail(u.id)} className="rounded-md border border-[#e5e7eb] px-2 py-1 text-xs font-bold hover:border-sky-300 hover:text-sky-600" title="View 360°">View</button>
                             <button onClick={() => toggleRole(u, "admin")} className="rounded-md border border-[#e5e7eb] px-2 py-1 text-xs font-bold hover:border-red-300 hover:text-red-600" title="Toggle admin">
                               {u.roles.includes("admin") ? <ShieldOff size={13} /> : <ShieldCheck size={13} />}
                             </button>
