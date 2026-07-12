@@ -75,11 +75,22 @@ function UserPage() {
                 </div>
                 {profile.bio && <p className="mt-2 text-sm text-[#374151]">{profile.bio}</p>}
               </div>
-              {user?.id === profile.id && (
+              {user?.id === profile.id ? (
                 <Link to="/settings" className="inline-flex items-center gap-2 rounded-lg border border-[#e5e7eb] bg-white px-4 py-2 text-sm font-bold text-[#111827] hover:border-[#0ea5e9] hover:text-[#0ea5e9]">
                   <Settings size={16} /> Edit Profile
                 </Link>
-              )}
+              ) : user ? (
+                <div className="flex flex-col items-end gap-2">
+                  <Link
+                    to="/messages"
+                    search={{ to: profile.username }}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#0ea5e9] px-4 py-2 text-sm font-bold text-white hover:bg-[#0284c7]"
+                  >
+                    <MessageCircle size={16} /> Message
+                  </Link>
+                  <ReportButton targetType="user" targetId={profile.id} />
+                </div>
+              ) : null}
             </section>
 
 
