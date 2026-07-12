@@ -1655,7 +1655,12 @@ export const AdminPanel = () => {
                     <div className="flex items-center justify-between"><h3 className="text-base font-extrabold">{editingBadge.id ? "Edit" : "New"} badge</h3><button onClick={() => setEditingBadge(null)}><X size={16} /></button></div>
                     <label className="block text-xs font-bold text-[#6b7280]">ID (slug)<input disabled={!!badgesList.find((b) => b.id === editingBadge.id)} value={editingBadge.id ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm disabled:bg-slate-50" /></label>
                     <label className="block text-xs font-bold text-[#6b7280]">Name<input value={editingBadge.name ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
-                    <label className="block text-xs font-bold text-[#6b7280]">Icon (emoji)<input value={editingBadge.icon ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, icon: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Icon (emoji or lucide name e.g. crown, flame, star)
+                      <div className="mt-1 flex items-center gap-2">
+                        <input value={editingBadge.icon ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, icon: e.target.value })} className="flex-1 rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#e5e7eb] bg-slate-50"><BadgeIcon icon={editingBadge.icon || ""} size={20} /></div>
+                      </div>
+                    </label>
                     <label className="block text-xs font-bold text-[#6b7280]">Tier
                       <select value={editingBadge.tier ?? "bronze"} onChange={(e) => setEditingBadge({ ...editingBadge, tier: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm">
                         {["bronze","silver","gold","platinum","special"].map((t) => <option key={t}>{t}</option>)}
