@@ -997,8 +997,9 @@ export const AdminPanel = () => {
               </section>
               <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
                 <TopContentCard />
-                <AdminAnalytics />
+                <SalesAnalyticsCard />
               </section>
+              <AdminAnalytics />
 
             </>
           )}
