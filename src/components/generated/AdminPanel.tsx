@@ -18,6 +18,7 @@ import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcasts
 import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
 import { AutomationPanel } from "@/components/admin/AutomationPanel";
+import { BadgeIcon } from "@/components/admin/BadgeIcon";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
