@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /mod
+Disallow: /mod-chats
+Disallow: /mod-chat/
+Disallow: /messages
+Disallow: /notifications
+Disallow: /settings
+Disallow: /dashboard
+Disallow: /bookmarks
+Disallow: /cart
+
+Sitemap: https://megaflow.lovable.app/api/public/sitemap.xml
