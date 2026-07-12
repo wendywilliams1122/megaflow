@@ -246,9 +246,17 @@ function ThreadPage() {
                   </aside>
                   <div className="min-w-0 flex-1 p-5 sm:p-6">
                     <div className="flex items-start justify-between gap-4">
-                      <div className="flex gap-4">
+                      <div className="flex min-w-0 flex-1 gap-4">
                         <VoteButtons targetType="thread" targetId={thread.id} initialScore={thread.vote_score} />
-                        <RichBody text={stripLeadingTitle(threadFullBody ?? thread.body, thread.title)} className="text-base leading-7 text-[#374151]" />
+                        <InlineEdit
+                          table="threads"
+                          id={thread.id}
+                          initialBody={stripLeadingTitle(threadFullBody ?? thread.body, thread.title)}
+                          initialTitle={thread.title}
+                          canEdit={user?.id === thread.author_id || isModerator}
+                          onSaved={() => qc.invalidateQueries({ queryKey: ["thread", slug] })}
+                          bodyClassName="text-base leading-7 text-[#374151]"
+                        />
                       </div>
                       <div className="flex items-center gap-1">
                         {isModerator && (
