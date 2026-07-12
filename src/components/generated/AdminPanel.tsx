@@ -1174,6 +1174,7 @@ export const AdminPanel = () => {
               </div>
               <Pager page={threadsPage} total={threadsTotal} onPage={setThreadsPage} />
             </section>
+            </div>
           )}
 
           {/* ---------- REPORTS ---------- */}
