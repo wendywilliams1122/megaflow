@@ -35,6 +35,7 @@ import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as ModChatIdRouteImport } from './routes/mod-chat.$id'
 import { Route as MarketplaceSlugRouteImport } from './routes/marketplace.$slug'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
+import { Route as ApiPublicSitemapDotxmlRouteImport } from './routes/api/public/sitemap[.]xml'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -166,6 +167,11 @@ const CSlugRoute = CSlugRouteImport.update({
   path: '/c/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSitemapDotxmlRoute = ApiPublicSitemapDotxmlRouteImport.update({
+  id: '/api/public/sitemap.xml',
+  path: '/api/public/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/marketplace': typeof MarketplaceIndexRoute
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/t/$slug': typeof TSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/api/public/sitemap.xml': typeof ApiPublicSitemapDotxmlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/t/$slug'
     | '/u/$username'
     | '/marketplace/'
+    | '/api/public/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/t/$slug'
     | '/u/$username'
     | '/marketplace'
+    | '/api/public/sitemap.xml'
   id:
     | '__root__'
     | '/'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/t/$slug'
     | '/u/$username'
     | '/marketplace/'
+    | '/api/public/sitemap.xml'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -366,6 +378,7 @@ export interface RootRouteChildren {
   TSlugRoute: typeof TSlugRoute
   UUsernameRoute: typeof UUsernameRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  ApiPublicSitemapDotxmlRoute: typeof ApiPublicSitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -552,6 +565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/sitemap.xml': {
+      id: '/api/public/sitemap.xml'
+      path: '/api/public/sitemap.xml'
+      fullPath: '/api/public/sitemap.xml'
+      preLoaderRoute: typeof ApiPublicSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -582,6 +602,7 @@ const rootRouteChildren: RootRouteChildren = {
   TSlugRoute: TSlugRoute,
   UUsernameRoute: UUsernameRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
+  ApiPublicSitemapDotxmlRoute: ApiPublicSitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
