@@ -53,6 +53,36 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          created_at: string
+          criteria: Json
+          description: string
+          icon: string
+          id: string
+          name: string
+          tier: string
+        }
+        Insert: {
+          created_at?: string
+          criteria?: Json
+          description: string
+          icon?: string
+          id: string
+          name: string
+          tier?: string
+        }
+        Update: {
+          created_at?: string
+          criteria?: Json
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          tier?: string
+        }
+        Relationships: []
+      }
       blocked_email_domains: {
         Row: {
           created_at: string
@@ -680,6 +710,35 @@ export type Database = {
           },
         ]
       }
+      user_badges: {
+        Row: {
+          awarded_at: string
+          badge_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          badge_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -735,6 +794,7 @@ export type Database = {
     Functions: {
       can_view_downloads: { Args: { _user_id: string }; Returns: boolean }
       can_view_spoiler: { Args: { _user_id: string }; Returns: boolean }
+      check_and_award_badges: { Args: { _user_id: string }; Returns: undefined }
       create_notification: {
         Args: {
           _actor_id: string
@@ -761,6 +821,7 @@ export type Database = {
         Returns: boolean
       }
       is_email_domain_blocked: { Args: { _email: string }; Returns: boolean }
+      level_for_points: { Args: { _pts: number }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

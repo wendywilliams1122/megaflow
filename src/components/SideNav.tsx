@@ -10,6 +10,7 @@ import {
   Bookmark, Bell,
 } from "lucide-react";
 import type { ComponentType } from "react";
+import { LevelBadge } from "@/components/LevelBadge";
 
 
 const iconMap: Record<string, ComponentType<{ size?: number }>> = {
@@ -22,7 +23,7 @@ type NavItem = {
   id: string;
   label: string;
   icon: ComponentType<{ size?: number }>;
-  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/categories" | "/dashboard" | "/settings" | "/bookmarks" | "/notifications";
+  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/leaderboard" | "/categories" | "/dashboard" | "/settings" | "/bookmarks" | "/notifications";
   authOnly?: boolean;
 };
 
@@ -41,6 +42,7 @@ const sidebarNavItems: NavItem[] = [
   { id: "ads", label: "Advertisement", icon: Globe, to: "/advertisement" },
   { id: "about", label: "About Us", icon: Info, to: "/about" },
   { id: "best", label: "Best Members", icon: Trophy, to: "/best-members" },
+  { id: "leaderboard", label: "Leaderboard", icon: Trophy, to: "/leaderboard" },
 ];
 
 
@@ -66,8 +68,9 @@ export function SideNav({ onNavigate }: { onNavigate?: () => void }) {
             {profile.username.slice(0, 2).toUpperCase()}
           </div>
           <h2 className="mb-1 text-base font-bold text-[#111827]">@{profile.username}</h2>
+          <div className="mb-2 flex justify-center"><LevelBadge points={(profile as any).points} /></div>
           <p className="mb-4 text-sm leading-6 text-[#6b7280]">
-            <span className="font-semibold text-[#0ea5e9]">{profile.reputation}</span> reputation
+            <span className="font-semibold text-[#0ea5e9]">{(profile as any).points ?? profile.reputation}</span> points
           </p>
           <Link
             to="/u/$username"

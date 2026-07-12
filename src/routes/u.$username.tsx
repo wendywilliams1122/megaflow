@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { timeAgo } from "@/lib/forum";
 import { MessageSquare, Clock, Settings } from "lucide-react";
 import { UserBadge } from "@/components/UserBadge";
+import { LevelBadge } from "@/components/LevelBadge";
+import { BadgeList } from "@/components/BadgeList";
 
 export const Route = createFileRoute("/u/$username")({
   component: UserPage,
@@ -63,9 +65,12 @@ function UserPage() {
                   <UserBadge points={profile.points ?? undefined} staffBadge={(profile as any).staff_badge} isBanned={profile.is_banned ?? undefined} />
                 </div>
                 <p className="text-sm text-[#6b7280]">@{profile.username}</p>
-                <p className="mt-1 text-xs text-[#6b7280]">
-                  <span className="font-bold text-[#0ea5e9]">{profile.points ?? profile.reputation}</span> points
-                </p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-3">
+                  <LevelBadge points={profile.points} />
+                  <span className="text-xs text-[#6b7280]">
+                    <span className="font-bold text-[#0ea5e9]">{profile.points ?? profile.reputation}</span> points
+                  </span>
+                </div>
                 {profile.bio && <p className="mt-2 text-sm text-[#374151]">{profile.bio}</p>}
               </div>
               {user?.id === profile.id && (
@@ -75,6 +80,9 @@ function UserPage() {
               )}
             </section>
 
+
+            <h2 className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#6b7280]">Badges</h2>
+            <div className="mb-6"><BadgeList userId={profile.id} /></div>
 
             <h2 className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#6b7280]">Threads</h2>
             <div className="space-y-3">
