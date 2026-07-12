@@ -279,11 +279,46 @@ export const AdminPanel = () => {
 
   const loadReports = async () => {
     let q = (supabase as any).from("reports")
-      .select("id, reporter_id, target_type, target_id, reason, status, resolution_note, created_at, reporter:profiles!reports_reporter_id_fkey(username)")
+      .select("id, reporter_id, target_type, target_id, reason, status, resolution_note, created_at, category, link_url, reporter:profiles!reports_reporter_id_fkey(username)")
       .order("created_at", { ascending: false }).limit(200);
     if (reportsStatus !== "all") q = q.eq("status", reportsStatus);
+    if (reportsCategory !== "all") q = q.eq("category", reportsCategory);
     const { data } = await q;
-    setReports((data as ReportRow[]) ?? []);
+    const rows = (data as ReportRow[]) ?? [];
+
+    // Enrich with target previews (batch by type)
+    const threadIds = rows.filter(r => r.target_type === "thread").map(r => r.target_id);
+    const postIds = rows.filter(r => r.target_type === "post").map(r => r.target_id);
+    const userIds = rows.filter(r => r.target_type === "user").map(r => r.target_id);
+
+    const [threads, posts, users] = await Promise.all([
+      threadIds.length ? supabase.from("threads").select("id, title, slug").in("id", threadIds) : Promise.resolve({ data: [] as any[] }),
+      postIds.length ? (supabase as any).from("posts").select("id, body, thread:threads(slug, title)").in("id", postIds) : Promise.resolve({ data: [] as any[] }),
+      userIds.length ? supabase.from("profiles").select("id, username, display_name").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const tMap: Record<string, any> = {}; (threads.data ?? []).forEach((t: any) => tMap[t.id] = t);
+    const pMap: Record<string, any> = {}; (posts.data ?? []).forEach((p: any) => pMap[p.id] = p);
+    const uMap: Record<string, any> = {}; (users.data ?? []).forEach((u: any) => uMap[u.id] = u);
+
+    const enriched = rows.map((r) => {
+      let target_preview: ReportRow["target_preview"] = null;
+      if (r.target_type === "thread" && tMap[r.target_id]) {
+        const t = tMap[r.target_id];
+        target_preview = { label: t.title, body: null, href: `/t/${t.slug}` };
+      } else if (r.target_type === "post" && pMap[r.target_id]) {
+        const p = pMap[r.target_id];
+        target_preview = {
+          label: p.thread?.title ? `Reply in "${p.thread.title}"` : "Reply",
+          body: p.body ?? null,
+          href: p.thread?.slug ? `/t/${p.thread.slug}` : null,
+        };
+      } else if (r.target_type === "user" && uMap[r.target_id]) {
+        const u = uMap[r.target_id];
+        target_preview = { label: `@${u.username}`, body: u.display_name ?? null, href: `/u/${u.username}` };
+      }
+      return { ...r, target_preview };
+    });
+    setReports(enriched);
   };
 
   const loadCategories = async () => {
