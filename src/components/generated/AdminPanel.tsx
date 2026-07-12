@@ -1090,6 +1090,7 @@ export const AdminPanel = () => {
               </div>
               <Pager page={usersPage} total={usersTotal} onPage={setUsersPage} />
             </section>
+            </>
           )}
 
           {/* ---------- THREADS ---------- */}
