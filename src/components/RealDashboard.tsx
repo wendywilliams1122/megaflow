@@ -168,13 +168,15 @@ export function RealDashboard() {
               <div className="p-6 text-center text-sm text-slate-500">No messages yet.</div>
             )}
             {data?.msgs.map((m: any) => (
-              <Link key={m.id} to="/messages" className={`flex gap-3 p-4 hover:bg-slate-50 ${!m.read_at ? "bg-sky-50/20" : ""}`}>
+              <Link key={m.id} to="/messages" className={`flex gap-3 p-4 hover:bg-slate-50 ${!m.outgoing && !m.read_at ? "bg-sky-50/20" : ""}`}>
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-100 font-bold text-sky-700">
-                  {(m.profiles?.username ?? "?").slice(0, 2).toUpperCase()}
+                  {(m.other?.username ?? "?").slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="mb-0.5 flex items-center justify-between">
-                    <span className="text-sm font-bold text-slate-900">{m.profiles?.display_name || m.profiles?.username || "User"}</span>
+                    <span className="text-sm font-bold text-slate-900">
+                      {m.outgoing ? "To " : ""}{m.other?.display_name || m.other?.username || "User"}
+                    </span>
                     <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400">{timeAgo(m.created_at)}</span>
                   </div>
                   <p className="truncate text-xs leading-tight text-slate-500">{m.body}</p>
