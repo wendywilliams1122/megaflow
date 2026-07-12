@@ -46,6 +46,7 @@ export function AdminSideNav({
         { id: "categories", label: "Categories", icon: FolderTree, adminOnly: true },
         { id: "tags", label: "Tags", icon: Tags, adminOnly: true },
         { id: "badges", label: "Badges", icon: Award, adminOnly: true },
+        { id: "quests", label: "Quests", icon: Target, adminOnly: true },
       ],
     },
     {
