@@ -33,6 +33,14 @@ export function RealDashboard() {
         supabase.from("notifications").select("id, title, body, link, created_at, is_read").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
         supabase.from("messages").select("id, body, created_at, read_at, sender_id, recipient_id").or(`sender_id.eq.${uid},recipient_id.eq.${uid}`).order("created_at", { ascending: false }).limit(5),
       ]);
+      const msgList = (msgs.data ?? []) as any[];
+      const otherIds = Array.from(new Set(msgList.map((m) => (m.sender_id === uid ? m.recipient_id : m.sender_id))));
+      let profMap: Record<string, any> = {};
+      if (otherIds.length > 0) {
+        const { data: profs } = await supabase.from("profiles").select("id, username, display_name, avatar_url").in("id", otherIds);
+        (profs ?? []).forEach((p: any) => { profMap[p.id] = p; });
+      }
+      const msgsWithProfile = msgList.map((m) => ({ ...m, other: profMap[m.sender_id === uid ? m.recipient_id : m.sender_id], outgoing: m.sender_id === uid }));
       return {
         threads: threadsCount.count ?? 0,
         posts: postsCount.count ?? 0,
@@ -41,7 +49,7 @@ export function RealDashboard() {
         unreadMsgs: unreadMsgs.count ?? 0,
         myThreads: (myThreads.data ?? []) as any[],
         notifs: (notifs.data ?? []) as any[],
-        msgs: (msgs.data ?? []) as any[],
+        msgs: msgsWithProfile,
       };
     },
   });
