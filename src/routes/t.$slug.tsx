@@ -249,11 +249,22 @@ function ThreadPage() {
                         <VoteButtons targetType="thread" targetId={thread.id} initialScore={thread.vote_score} />
                         <RichBody text={stripLeadingTitle(threadFullBody ?? thread.body, thread.title)} className="text-base leading-7 text-[#374151]" />
                       </div>
-                      {user?.id === thread.author_id && (
-                        <button onClick={deleteThread} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
-                          <Trash2 size={16} />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {isModerator && (
+                          <button
+                            onClick={toggleClose}
+                            title={thread.category?.slug === "closed-threads" ? "Reopen thread" : "Close thread"}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-xs font-bold text-[#374151] hover:border-amber-300 hover:text-amber-700"
+                          >
+                            {thread.category?.slug === "closed-threads" ? (<><LockOpen size={12} /> Reopen</>) : (<><Lock size={12} /> Close</>)}
+                          </button>
+                        )}
+                        {user?.id === thread.author_id && (
+                          <button onClick={deleteThread} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-[#e5e7eb] pt-4">
                       <ReactionBar targetType="thread" targetId={thread.id} initialCounts={thread.reaction_counts ?? {}} />
