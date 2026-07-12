@@ -25,9 +25,10 @@ export function InlineEdit({ table, id, initialBody, initialTitle, canEdit, onSa
     if (!body.trim()) return toast.error("Body can't be empty");
     if (table === "threads" && !title.trim()) return toast.error("Title can't be empty");
     setSaving(true);
-    const patch: Record<string, unknown> = { body };
-    if (table === "threads") patch.title = title;
-    const { error } = await supabase.from(table).update(patch).eq("id", id);
+    const query = table === "threads"
+      ? supabase.from("threads").update({ body, title })
+      : supabase.from("posts").update({ body });
+    const { error } = await query.eq("id", id);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Updated");
