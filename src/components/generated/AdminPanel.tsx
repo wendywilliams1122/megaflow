@@ -901,7 +901,7 @@ export const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
       <div className="mx-auto flex max-w-[1440px] pt-4">
-        <SideRail />
+        <AdminSideNav tab={tab} setTab={setTab} isAdmin={isAdmin} pendingReports={stats?.pending_reports ?? 0} />
         <main className="min-w-0 flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           {msg && <div className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-700">{msg}</div>}
 
@@ -913,20 +913,6 @@ export const AdminPanel = () => {
             </div>
           </header>
 
-          <nav className="flex flex-wrap gap-1 border-b border-[#e5e7eb]">
-            {tabs.map((t) => {
-              if (t.adminOnly && !isAdmin) return null;
-              return (
-                <button key={t.id} onClick={() => setTab(t.id)}
-                  className={`flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-bold capitalize transition-colors ${
-                    tab === t.id ? "border-[#0ea5e9] text-[#0ea5e9]" : "border-transparent text-[#6b7280] hover:text-[#111827]"
-                  }`}>
-                  {t.label}
-                  {t.badge ? <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-extrabold text-white">{t.badge}</span> : null}
-                </button>
-              );
-            })}
-          </nav>
 
           {/* ---------- OVERVIEW ---------- */}
           {tab === "overview" && (
