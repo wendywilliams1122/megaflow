@@ -842,23 +842,8 @@ export const AdminPanel = () => {
   useEffect(() => { if (isStaff && tab === "trash") loadTrash(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "security") loadMfaFactors(); /* eslint-disable-next-line */ }, [isStaff, tab]);
 
-  const tabs: { id: Tab; label: string; adminOnly?: boolean; badge?: number }[] = useMemo(() => [
-    { id: "overview", label: "Overview" },
-    { id: "users", label: "Users", adminOnly: true },
-    { id: "threads", label: "Threads" },
-    { id: "trash", label: "Trash", adminOnly: false },
-    { id: "reports", label: "Reports", badge: stats?.pending_reports ?? 0 },
-    { id: "categories", label: "Categories", adminOnly: true },
-    { id: "tags", label: "Tags", adminOnly: true },
-    { id: "badges", label: "Badges", adminOnly: true },
-    { id: "products", label: "Products" },
-    { id: "orders", label: "Orders" },
-    { id: "broadcast", label: "Broadcast", adminOnly: true },
-    { id: "ads", label: "Ads", adminOnly: true },
-    { id: "settings", label: "Settings", adminOnly: true },
-    { id: "security", label: "Security", adminOnly: true },
-    { id: "audit", label: "Audit log", adminOnly: true },
-  ], [stats?.pending_reports]);
+
+
 
   if (loading) return <div className="min-h-screen bg-[#f6f7f8] pt-8 text-center text-[#6b7280]">Loading…</div>;
   if (!user) {
