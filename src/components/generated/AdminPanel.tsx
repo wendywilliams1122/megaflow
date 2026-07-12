@@ -30,7 +30,7 @@ import {
   ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod" | "automation";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any; awarded_count?: number };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
