@@ -16,6 +16,7 @@ import { LoginAttemptsCard } from "@/components/admin/LoginAttemptsCard";
 import { CouponsPanel } from "@/components/admin/CouponsPanel";
 import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcastsPanel";
 import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
+import { DuplicateThreadsCard } from "@/components/admin/DuplicateThreadsCard";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
