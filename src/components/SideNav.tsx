@@ -10,6 +10,7 @@ import {
   Bookmark, Bell,
 } from "lucide-react";
 import type { ComponentType } from "react";
+import { LevelBadge } from "@/components/LevelBadge";
 
 
 const iconMap: Record<string, ComponentType<{ size?: number }>> = {
