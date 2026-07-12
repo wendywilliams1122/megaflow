@@ -27,11 +27,11 @@ export function RealDashboard() {
         supabase.from("threads").select("id", { count: "exact", head: true }).eq("author_id", uid),
         supabase.from("posts").select("id", { count: "exact", head: true }).eq("author_id", uid),
         supabase.from("bookmarks").select("id", { count: "exact", head: true }).eq("user_id", uid),
-        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", uid).eq("read", false),
-        supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_id", uid).eq("read", false),
+        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", uid).eq("is_read", false),
+        supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_id", uid).is("read_at", null),
         supabase.from("threads").select("id, title, slug, reply_count, view_count, last_activity_at, categories(name)").eq("author_id", uid).order("last_activity_at", { ascending: false }).limit(6),
-        supabase.from("notifications").select("id, title, body, link, created_at, read").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
-        supabase.from("messages").select("id, body, created_at, read, sender_id, profiles!messages_sender_id_fkey(username, display_name, avatar_url)").eq("recipient_id", uid).order("created_at", { ascending: false }).limit(5),
+        supabase.from("notifications").select("id, title, body, link, created_at, is_read").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
+        supabase.from("messages").select("id, body, created_at, read_at, sender_id, profiles!messages_sender_id_fkey(username, display_name, avatar_url)").eq("recipient_id", uid).order("created_at", { ascending: false }).limit(5),
       ]);
       return {
         threads: threadsCount.count ?? 0,
