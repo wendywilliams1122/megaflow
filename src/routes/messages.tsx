@@ -157,8 +157,21 @@ function MessagesPage() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation.length, active]);
 
+  const activeConv = active ? convByPartner[active] : undefined;
+  const myMsgCount = active && user
+    ? conversation.filter((m) => m.sender_id === user.id).length
+    : 0;
+  const canSend = (() => {
+    if (!active || !user) return false;
+    if (isModerator) return true;
+    if (!activeConv) return true; // first-ever message creates pending
+    if (activeConv.status === "active") return true;
+    if (activeConv.status === "pending") return myMsgCount === 0;
+    return false; // stopped / ended
+  })();
+
   async function send() {
-    if (!user || !active || text.trim().length === 0) return;
+    if (!user || !active || text.trim().length === 0 || !canSend) return;
     const body = text.trim();
     setText("");
     const { error } = await supabase.from("messages").insert({
@@ -166,6 +179,7 @@ function MessagesPage() {
     });
     if (error) { alert(error.message); setText(body); return; }
     qc.invalidateQueries({ queryKey: ["messages", user.id] });
+    qc.invalidateQueries({ queryKey: ["conversations", user.id] });
   }
 
   if (!user) {
