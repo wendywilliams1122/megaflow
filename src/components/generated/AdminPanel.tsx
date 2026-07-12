@@ -926,17 +926,19 @@ export const AdminPanel = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
-      <div className="flex w-full pt-4">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#f6f7f8] font-sans text-[#111827]">
+      <div className="grid w-full grid-cols-1 pt-4 lg:grid-cols-[248px_minmax(0,1fr)]">
         <AdminSideNav tab={tab} setTab={setTab} isAdmin={isAdmin} pendingReports={stats?.pending_reports ?? 0} />
-        <main className="min-w-0 flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        <main className="min-w-0 w-full max-w-none space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           {msg && <div className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-700">{msg}</div>}
 
-          <header className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0ea5e9] text-white"><Shield size={20} /></div>
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight">{isAdmin ? "Admin Panel" : "Staff Panel"}</h1>
-              <p className="text-sm text-[#6b7280]">Manage members, threads, marketplace, reports and site config.</p>
+          <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0ea5e9] text-white"><Shield size={20} /></div>
+              <div className="min-w-0">
+                <h1 className="truncate text-2xl font-extrabold tracking-tight">{isAdmin ? "Admin Panel" : "Staff Panel"}</h1>
+                <p className="truncate text-sm text-[#6b7280]">Manage members, threads, marketplace, reports and site config.</p>
+              </div>
             </div>
           </header>
 
@@ -944,7 +946,7 @@ export const AdminPanel = () => {
           {/* ---------- OVERVIEW ---------- */}
           {tab === "overview" && (
             <>
-              <section className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">
+              <section className="grid w-full min-w-0 grid-cols-2 gap-4 md:grid-cols-4 2xl:grid-cols-7">
                 {[
                   { icon: <Users size={20} />, label: "Members", value: stats?.members ?? 0, bg: "bg-sky-500" },
                   { icon: <MessageSquare size={20} />, label: "Threads", value: stats?.threads ?? 0, bg: "bg-emerald-500" },
@@ -972,8 +974,10 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </section>
-              <BlockedDomainsCard flash={flash} />
-              <MultiAccountIPCard />
+              <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
+                <BlockedDomainsCard flash={flash} />
+                <MultiAccountIPCard />
+              </section>
               <AdminAnalytics />
 
             </>
@@ -1464,7 +1468,7 @@ export const AdminPanel = () => {
 
           {/* ---------- SETTINGS ---------- */}
           {tab === "settings" && isAdmin && (
-            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <section className="w-full min-w-0 space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
               <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800 text-white"><SettingsIcon size={18} /></div><div><h2 className="text-lg font-extrabold">Site settings</h2><p className="text-xs text-[#6b7280]">Brand, contact, points economy, limits and site announcement.</p></div></div>
 
               <div className="rounded-lg border-2 border-amber-200 bg-amber-50 p-4">
@@ -1670,7 +1674,7 @@ export const AdminPanel = () => {
 
           {/* ---------- BROADCAST ---------- */}
           {tab === "broadcast" && isAdmin && (
-            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <section className="w-full min-w-0 space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
               <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-600 text-white"><Megaphone size={18} /></div><div><h2 className="text-lg font-extrabold">Broadcast notification</h2><p className="text-xs text-[#6b7280]">Sends a bell notification to every active member.</p></div></div>
               <label className="block text-xs font-bold text-[#6b7280]">Title *<input value={broadcast.title} onChange={(e) => setBroadcast({ ...broadcast, title: e.target.value })} placeholder="New downloads pack available" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
               <label className="block text-xs font-bold text-[#6b7280]">Body<textarea rows={3} value={broadcast.body} onChange={(e) => setBroadcast({ ...broadcast, body: e.target.value })} placeholder="Short message shown under the title…" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
@@ -1715,7 +1719,7 @@ export const AdminPanel = () => {
 
           {/* ---------- SECURITY (2FA) ---------- */}
           {tab === "security" && isAdmin && (
-            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+            <section className="w-full min-w-0 space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white"><KeyRound size={18} /></div>
                 <div><h2 className="text-lg font-extrabold">Two-factor authentication</h2><p className="text-xs text-[#6b7280]">Protect your admin account with a TOTP app (Google Authenticator, 1Password, Authy).</p></div>
