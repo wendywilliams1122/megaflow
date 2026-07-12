@@ -17,14 +17,14 @@ export function LevelBadge({ points, className = "" }: { points: number | null |
   const pct = Math.min(100, Math.round(((cur - prev) / Math.max(1, next - prev)) * 100));
   return (
     <div className={`inline-flex items-center gap-2 ${className}`}>
-      <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#0ea5e9] to-[#6366f1] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">
-        <Zap size={10} /> Lv {lvl}
+      <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#0ea5e9] to-[#6366f1] px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-sm">
+        <Zap size={12} /> Lv {lvl}
       </span>
       <div className="hidden sm:block">
-        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-[#e5e7eb]">
+        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-current/20">
           <div className="h-full bg-gradient-to-r from-[#0ea5e9] to-[#6366f1]" style={{ width: `${pct}%` }} />
         </div>
-        <div className="mt-0.5 text-[10px] text-[#6b7280]">{cur} / {next} pts</div>
+        <div className="mt-0.5 text-[10px] font-semibold opacity-80">{cur} / {next} pts</div>
       </div>
     </div>
   );
