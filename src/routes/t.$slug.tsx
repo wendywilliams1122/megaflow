@@ -275,6 +275,9 @@ function ThreadPage() {
                               </button>
                             )}
                           </div>
+                          <div className="mt-4 border-t border-[#e5e7eb] pt-3">
+                            <ReactionBar targetType="post" targetId={p.id} initialCounts={p.reaction_counts ?? {}} />
+                          </div>
                         </div>
                       </div>
                     </div>
