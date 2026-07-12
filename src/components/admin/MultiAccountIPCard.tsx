@@ -42,7 +42,7 @@ export function MultiAccountIPCard() {
   }, []);
 
   return (
-    <section className="mt-4 max-w-2xl space-y-3 rounded-xl border border-amber-200 bg-white p-6 shadow-sm">
+    <section className="w-full min-w-0 space-y-3 rounded-xl border border-amber-200 bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500 text-white">
           <AlertTriangle size={18} />

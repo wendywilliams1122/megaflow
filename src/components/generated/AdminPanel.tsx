@@ -926,10 +926,10 @@ export const AdminPanel = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f6f7f8] font-sans text-[#111827]">
-      <div className="flex w-full pt-4">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#f6f7f8] font-sans text-[#111827]">
+      <div className="grid w-full grid-cols-1 pt-4 lg:grid-cols-[248px_minmax(0,1fr)]">
         <AdminSideNav tab={tab} setTab={setTab} isAdmin={isAdmin} pendingReports={stats?.pending_reports ?? 0} />
-        <main className="min-w-0 flex-1 space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        <main className="min-w-0 w-full max-w-none space-y-6 px-4 py-6 sm:px-6 lg:px-8">
           {msg && <div className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-700">{msg}</div>}
 
           <header className="flex items-center gap-3">
@@ -972,8 +972,10 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </section>
-              <BlockedDomainsCard flash={flash} />
-              <MultiAccountIPCard />
+              <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
+                <BlockedDomainsCard flash={flash} />
+                <MultiAccountIPCard />
+              </section>
               <AdminAnalytics />
 
             </>

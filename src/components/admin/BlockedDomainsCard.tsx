@@ -32,7 +32,7 @@ export function BlockedDomainsCard({ flash }: { flash: (m: string) => void }) {
   };
 
   return (
-    <section className="mt-4 max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+    <section className="w-full min-w-0 space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-600 text-white">
           <Ban size={18} />
@@ -43,12 +43,12 @@ export function BlockedDomainsCard({ flash }: { flash: (m: string) => void }) {
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="mailinator.com"
-          className="flex-1 rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm"
+          className="min-w-0 rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm"
         />
         <button onClick={add} className="inline-flex items-center gap-1.5 rounded-lg bg-[#0ea5e9] px-3 py-2 text-sm font-bold text-white hover:bg-sky-600">
           <Plus size={14} /> Add
