@@ -13,7 +13,7 @@ import { UserBadge } from "@/components/UserBadge";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
 import { toast } from "sonner";
-import { Lock, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine, EyeOff } from "lucide-react";
+import { Lock, LockOpen, Pin, Trash2, ChevronRight, MessageSquare, Clock, PenLine, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/t/$slug")({
   component: ThreadPage,
