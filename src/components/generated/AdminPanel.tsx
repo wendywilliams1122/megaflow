@@ -16,7 +16,13 @@ import {
   ClipboardList, Bell,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "products" | "orders" | "reports" | "categories" | "ads" | "settings" | "audit";
+type Tab = "overview" | "users" | "threads" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit";
+type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any };
+type TagRow = { id: string; slug: string; name: string; thread_count: number };
+type UserDetail = {
+  profile: any; roles: string[]; ips: any[]; badges: any[];
+  threads: any[]; posts: any[]; orders: any[]; warnings: number; ban_reason: string | null;
+};
 
 type UserRow = {
   id: string; username: string; display_name: string | null;
@@ -43,6 +49,7 @@ type SettingsRow = {
   points_thread: number; points_comment: number; points_upvote: number; points_referral: number;
   max_threads_per_day: number; max_comments_per_day: number; warnings_before_ban: number;
   downloads_min_points: number; announcement: string | null; announcement_active: boolean;
+  maintenance_mode: boolean; maintenance_message: string | null;
 };
 type ProductRow = {
   id: string; title: string; slug: string; description: string | null;
@@ -145,7 +152,19 @@ export const AdminPanel = () => {
     points_thread: 10, points_comment: 2, points_upvote: 1, points_referral: 25,
     max_threads_per_day: 5, max_comments_per_day: 30, warnings_before_ban: 3,
     downloads_min_points: 0, announcement: "", announcement_active: false,
+    maintenance_mode: false, maintenance_message: "",
   });
+
+  // Badges / Tags / Broadcast / User detail
+  const [badgesList, setBadgesList] = useState<BadgeRow[]>([]);
+  const [editingBadge, setEditingBadge] = useState<Partial<BadgeRow> | null>(null);
+  const [tagsList, setTagsList] = useState<TagRow[]>([]);
+  const [editingTag, setEditingTag] = useState<Partial<TagRow> | null>(null);
+  const [mergeSel, setMergeSel] = useState<{ from: string; to: string }>({ from: "", to: "" });
+  const [broadcast, setBroadcast] = useState({ title: "", body: "", link: "/" });
+  const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
+  const [userDetailBusy, setUserDetailBusy] = useState(false);
+  const [awardBadgeId, setAwardBadgeId] = useState("");
 
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -285,6 +304,8 @@ export const AdminPanel = () => {
       downloads_min_points: data.downloads_min_points ?? 0,
       announcement: data.announcement ?? "",
       announcement_active: !!data.announcement_active,
+      maintenance_mode: !!data.maintenance_mode,
+      maintenance_message: data.maintenance_message ?? "",
     });
   };
 
@@ -302,6 +323,8 @@ export const AdminPanel = () => {
       downloads_min_points: settings.downloads_min_points,
       announcement: settings.announcement?.trim() || null,
       announcement_active: settings.announcement_active,
+      maintenance_mode: settings.maintenance_mode,
+      maintenance_message: settings.maintenance_message?.trim() || null,
     }).eq("id", true);
     setBusy(null);
     if (error) return flash("Failed: " + error.message);
@@ -585,6 +608,127 @@ export const AdminPanel = () => {
     downloadCSV("orders", (data as any[]) ?? []);
   };
 
+  // ---------- Badges ----------
+  const loadBadges = async () => {
+    const { data } = await supabase.from("badges").select("id, name, description, icon, tier, criteria").order("tier");
+    setBadgesList((data as BadgeRow[]) ?? []);
+  };
+  const saveBadge = async () => {
+    if (!editingBadge) return;
+    const payload = {
+      id: (editingBadge.id ?? "").trim(),
+      name: (editingBadge.name ?? "").trim(),
+      description: (editingBadge.description ?? "").trim(),
+      icon: (editingBadge.icon ?? "🏅").trim(),
+      tier: (editingBadge.tier ?? "bronze").trim(),
+      criteria: editingBadge.criteria ?? {},
+    };
+    if (!payload.id || !payload.name) return flash("id and name required");
+    const { error } = await supabase.from("badges").upsert(payload as any);
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge saved"); setEditingBadge(null); await loadBadges();
+    logAction("badge.upsert", "badge", payload.id, { name: payload.name });
+  };
+  const deleteBadge = async (id: string) => {
+    if (!confirm(`Delete badge "${id}"?`)) return;
+    const { error } = await supabase.from("badges").delete().eq("id", id);
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge deleted"); await loadBadges();
+    logAction("badge.delete", "badge", id);
+  };
+
+  // ---------- Tags ----------
+  const loadTags = async () => {
+    const { data: tags } = await supabase.from("tags").select("id, slug, name").order("name");
+    const { data: joins } = await (supabase as any).from("thread_tags").select("tag_id");
+    const counts = new Map<string, number>();
+    ((joins as any[]) ?? []).forEach((j) => counts.set(j.tag_id, (counts.get(j.tag_id) ?? 0) + 1));
+    setTagsList(((tags as any[]) ?? []).map((t) => ({ ...t, thread_count: counts.get(t.id) ?? 0 })));
+  };
+  const saveTag = async () => {
+    if (!editingTag) return;
+    const name = (editingTag.name ?? "").trim();
+    const slug = (editingTag.slug ?? "").trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (!name || !slug) return flash("Name required");
+    const payload = { name, slug };
+    const q = editingTag.id
+      ? supabase.from("tags").update(payload).eq("id", editingTag.id)
+      : supabase.from("tags").insert(payload);
+    const { error } = await q;
+    if (error) return flash("Failed: " + error.message);
+    flash("Tag saved"); setEditingTag(null); await loadTags();
+    logAction("tag.upsert", "tag", editingTag.id, { name });
+  };
+  const deleteTag = async (id: string, name: string) => {
+    if (!confirm(`Delete tag "${name}"? Threads keep other tags.`)) return;
+    await (supabase as any).from("thread_tags").delete().eq("tag_id", id);
+    const { error } = await supabase.from("tags").delete().eq("id", id);
+    if (error) return flash("Failed: " + error.message);
+    flash("Tag deleted"); await loadTags();
+    logAction("tag.delete", "tag", id, { name });
+  };
+  const mergeTags = async () => {
+    if (!mergeSel.from || !mergeSel.to || mergeSel.from === mergeSel.to) return flash("Pick two different tags");
+    const { error } = await (supabase as any).rpc("admin_merge_tags", { _from: mergeSel.from, _to: mergeSel.to });
+    if (error) return flash("Failed: " + error.message);
+    flash("Tags merged"); setMergeSel({ from: "", to: "" }); await loadTags();
+  };
+
+  // ---------- Broadcast ----------
+  const sendBroadcast = async () => {
+    if (!broadcast.title.trim()) return flash("Title required");
+    if (!confirm("Send this notification to EVERY active member?")) return;
+    setBusy("broadcast");
+    const { data, error } = await (supabase as any).rpc("admin_broadcast", {
+      _title: broadcast.title.trim(),
+      _body: broadcast.body.trim() || null,
+      _link: broadcast.link.trim() || "/",
+    });
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash(`Sent to ${data} members`);
+    setBroadcast({ title: "", body: "", link: "/" });
+  };
+
+  // ---------- User 360° detail ----------
+  const openUserDetail = async (uid: string) => {
+    setUserDetailBusy(true); setUserDetail({ profile: null, roles: [], ips: [], badges: [], threads: [], posts: [], orders: [], warnings: 0, ban_reason: null });
+    const [prof, roles, ips, badges, threads, posts, orders, mod] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+      (supabase as any).from("profile_ips").select("*").eq("user_id", uid),
+      (supabase as any).from("user_badges").select("badge_id, awarded_at, badges(name, icon, tier)").eq("user_id", uid),
+      supabase.from("threads").select("id, slug, title, created_at, vote_score, reply_count").eq("author_id", uid).order("created_at", { ascending: false }).limit(20),
+      supabase.from("posts").select("id, thread_id, body, created_at").eq("author_id", uid).order("created_at", { ascending: false }).limit(20),
+      (supabase as any).from("orders").select("id, product_title, unit_price_cents, currency, status, created_at").eq("buyer_id", uid).order("created_at", { ascending: false }).limit(20),
+      (supabase as any).from("profile_moderation").select("warnings, ban_reason").eq("user_id", uid).maybeSingle(),
+    ]);
+    setUserDetail({
+      profile: (prof as any).data,
+      roles: ((roles as any).data ?? []).map((r: any) => r.role),
+      ips: ((ips as any).data ?? []),
+      badges: ((badges as any).data ?? []),
+      threads: ((threads as any).data ?? []),
+      posts: ((posts as any).data ?? []),
+      orders: ((orders as any).data ?? []),
+      warnings: (mod as any).data?.warnings ?? 0,
+      ban_reason: (mod as any).data?.ban_reason ?? null,
+    });
+    setUserDetailBusy(false);
+  };
+  const awardBadgeToUser = async () => {
+    if (!userDetail?.profile?.id || !awardBadgeId) return;
+    const { error } = await (supabase as any).rpc("admin_award_badge", { _user_id: userDetail.profile.id, _badge_id: awardBadgeId });
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge awarded"); setAwardBadgeId(""); openUserDetail(userDetail.profile.id);
+  };
+  const revokeBadgeFromUser = async (badge_id: string) => {
+    if (!userDetail?.profile?.id) return;
+    const { error } = await (supabase as any).rpc("admin_revoke_badge", { _user_id: userDetail.profile.id, _badge_id: badge_id });
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge revoked"); openUserDetail(userDetail.profile.id);
+  };
+
   useEffect(() => {
     if (!isStaff) return;
     loadStats();
@@ -596,8 +740,10 @@ export const AdminPanel = () => {
   useEffect(() => { if (isStaff && tab === "orders") loadOrders(); /* eslint-disable-next-line */ }, [isStaff, tab, ordersPage, ordersQ, ordersStatus]);
   useEffect(() => { if (isStaff && tab === "reports") loadReports(); /* eslint-disable-next-line */ }, [isStaff, tab, reportsStatus]);
   useEffect(() => { if (isStaff && tab === "categories") loadCategories(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "badges") { loadBadges(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "tags") { loadTags(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "ads") loadAds(); /* eslint-disable-next-line */ }, [isStaff, tab]);
-  useEffect(() => { if (isStaff && tab === "settings") loadSettings(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && (tab === "settings" || tab === "broadcast")) loadSettings(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "audit") loadAudit(); /* eslint-disable-next-line */ }, [isStaff, tab]);
 
   const tabs: { id: Tab; label: string; adminOnly?: boolean; badge?: number }[] = useMemo(() => [
@@ -606,8 +752,11 @@ export const AdminPanel = () => {
     { id: "threads", label: "Threads" },
     { id: "reports", label: "Reports", badge: stats?.pending_reports ?? 0 },
     { id: "categories", label: "Categories", adminOnly: true },
+    { id: "tags", label: "Tags", adminOnly: true },
+    { id: "badges", label: "Badges", adminOnly: true },
     { id: "products", label: "Products" },
     { id: "orders", label: "Orders" },
+    { id: "broadcast", label: "Broadcast", adminOnly: true },
     { id: "ads", label: "Ads", adminOnly: true },
     { id: "settings", label: "Settings", adminOnly: true },
     { id: "audit", label: "Audit log", adminOnly: true },
@@ -789,6 +938,7 @@ export const AdminPanel = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap justify-end gap-1">
+                            <button onClick={() => openUserDetail(u.id)} className="rounded-md border border-[#e5e7eb] px-2 py-1 text-xs font-bold hover:border-sky-300 hover:text-sky-600" title="View 360°">View</button>
                             <button onClick={() => toggleRole(u, "admin")} className="rounded-md border border-[#e5e7eb] px-2 py-1 text-xs font-bold hover:border-red-300 hover:text-red-600" title="Toggle admin">
                               {u.roles.includes("admin") ? <ShieldOff size={13} /> : <ShieldCheck size={13} />}
                             </button>
@@ -1119,6 +1269,13 @@ export const AdminPanel = () => {
                 <label className="mt-2 flex items-center gap-2 text-xs font-bold text-amber-900"><input type="checkbox" checked={settings.announcement_active} onChange={(e) => setSettings({ ...settings, announcement_active: e.target.checked })} />Show banner to all visitors</label>
               </div>
 
+              <div className={`rounded-lg border-2 p-4 ${settings.maintenance_mode ? "border-red-300 bg-red-50" : "border-slate-200 bg-slate-50"}`}>
+                <div className="mb-2 flex items-center gap-2"><AlertTriangle size={16} className={settings.maintenance_mode ? "text-red-600" : "text-slate-600"} /><span className="text-sm font-extrabold">Maintenance mode</span></div>
+                <textarea rows={2} value={settings.maintenance_message ?? ""} onChange={(e) => setSettings({ ...settings, maintenance_message: e.target.value })} placeholder="We'll be right back — upgrading downloads…" className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" />
+                <label className="mt-2 flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={settings.maintenance_mode} onChange={(e) => setSettings({ ...settings, maintenance_mode: e.target.checked })} />Enable maintenance mode (public site read-only for non-staff)</label>
+              </div>
+
+
               <label className="block text-xs font-bold text-[#6b7280]">Brand name<input value={settings.brand_name} onChange={(e) => setSettings({ ...settings, brand_name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
               <label className="block text-xs font-bold text-[#6b7280]">WhatsApp<input value={settings.whatsapp_number ?? ""} onChange={(e) => setSettings({ ...settings, whatsapp_number: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
               <label className="block text-xs font-bold text-[#6b7280]">Contact email<input value={settings.contact_email ?? ""} onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
@@ -1158,6 +1315,187 @@ export const AdminPanel = () => {
                 </table>
               </div>
             </section>
+          )}
+
+          {/* ---------- BADGES ---------- */}
+          {tab === "badges" && isAdmin && (
+            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
+                <div><h2 className="text-sm font-extrabold">Badges</h2><p className="text-xs text-[#6b7280]">Create/edit badges. Award manually from a user's 360° view.</p></div>
+                <button onClick={() => setEditingBadge({ id: "", name: "", description: "", icon: "🏅", tier: "bronze", criteria: {} })} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600"><Plus size={12} className="mr-1 inline" /> New badge</button>
+              </div>
+              <div className="grid gap-3 p-4 md:grid-cols-2 lg:grid-cols-3">
+                {badgesList.map((b) => (
+                  <div key={b.id} className="rounded-lg border border-[#e5e7eb] p-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2"><span className="text-2xl">{b.icon}</span><div><p className="text-sm font-extrabold">{b.name}</p><p className="text-[10px] uppercase tracking-wider text-[#6b7280]">{b.tier} · {b.id}</p></div></div>
+                      <div className="flex gap-1"><button onClick={() => setEditingBadge(b)} className="rounded border border-[#e5e7eb] p-1 hover:border-sky-300"><Pencil size={12} /></button><button onClick={() => deleteBadge(b.id)} className="rounded border border-red-200 p-1 text-red-600 hover:bg-red-50"><Trash2 size={12} /></button></div>
+                    </div>
+                    <p className="mt-2 text-xs text-[#6b7280]">{b.description}</p>
+                  </div>
+                ))}
+                {badgesList.length === 0 && <p className="col-span-full py-6 text-center text-sm text-[#6b7280]">No badges yet.</p>}
+              </div>
+              {editingBadge && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setEditingBadge(null)}>
+                  <div className="w-full max-w-md space-y-3 rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between"><h3 className="text-base font-extrabold">{editingBadge.id ? "Edit" : "New"} badge</h3><button onClick={() => setEditingBadge(null)}><X size={16} /></button></div>
+                    <label className="block text-xs font-bold text-[#6b7280]">ID (slug)<input disabled={!!badgesList.find((b) => b.id === editingBadge.id)} value={editingBadge.id ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm disabled:bg-slate-50" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Name<input value={editingBadge.name ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Icon (emoji)<input value={editingBadge.icon ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, icon: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Tier
+                      <select value={editingBadge.tier ?? "bronze"} onChange={(e) => setEditingBadge({ ...editingBadge, tier: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm">
+                        {["bronze","silver","gold","platinum","special"].map((t) => <option key={t}>{t}</option>)}
+                      </select>
+                    </label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Description<textarea rows={2} value={editingBadge.description ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, description: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <button onClick={saveBadge} className="w-full rounded-lg bg-[#0ea5e9] px-3 py-2 text-sm font-bold text-white hover:bg-sky-600">Save</button>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ---------- TAGS ---------- */}
+          {tab === "tags" && isAdmin && (
+            <section className="space-y-4">
+              <div className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
+                  <div><h2 className="text-sm font-extrabold">Tags ({tagsList.length})</h2><p className="text-xs text-[#6b7280]">Rename, delete, or merge tags.</p></div>
+                  <button onClick={() => setEditingTag({ name: "", slug: "" })} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600"><Plus size={12} className="mr-1 inline" /> New tag</button>
+                </div>
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase text-[#6b7280]"><tr><th className="px-4 py-2">Name</th><th className="px-4 py-2">Slug</th><th className="px-4 py-2 text-right">Threads</th><th className="px-4 py-2 text-right">Actions</th></tr></thead>
+                  <tbody className="divide-y divide-[#e5e7eb]">
+                    {tagsList.map((t) => (
+                      <tr key={t.id}>
+                        <td className="px-4 py-2 font-semibold">{t.name}</td>
+                        <td className="px-4 py-2 font-mono text-xs text-[#6b7280]">{t.slug}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{t.thread_count}</td>
+                        <td className="px-4 py-2 text-right"><button onClick={() => setEditingTag(t)} className="mr-1 rounded border border-[#e5e7eb] p-1 hover:border-sky-300"><Pencil size={12} /></button><button onClick={() => deleteTag(t.id, t.name)} className="rounded border border-red-200 p-1 text-red-600 hover:bg-red-50"><Trash2 size={12} /></button></td>
+                      </tr>
+                    ))}
+                    {tagsList.length === 0 && <tr><td colSpan={4} className="px-4 py-6 text-center text-sm text-[#6b7280]">No tags yet.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm">
+                <h3 className="mb-2 text-sm font-extrabold">Merge tags</h3>
+                <p className="mb-3 text-xs text-[#6b7280]">Moves all threads from source tag to target tag, then deletes the source.</p>
+                <div className="flex flex-wrap items-end gap-2">
+                  <label className="text-xs font-bold text-[#6b7280]">From
+                    <select value={mergeSel.from} onChange={(e) => setMergeSel({ ...mergeSel, from: e.target.value })} className="mt-1 block w-48 rounded-lg border border-[#e5e7eb] px-2 py-1.5 text-sm"><option value="">Select…</option>{tagsList.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.thread_count})</option>)}</select>
+                  </label>
+                  <label className="text-xs font-bold text-[#6b7280]">Into
+                    <select value={mergeSel.to} onChange={(e) => setMergeSel({ ...mergeSel, to: e.target.value })} className="mt-1 block w-48 rounded-lg border border-[#e5e7eb] px-2 py-1.5 text-sm"><option value="">Select…</option>{tagsList.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.thread_count})</option>)}</select>
+                  </label>
+                  <button onClick={mergeTags} className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600">Merge</button>
+                </div>
+              </div>
+              {editingTag && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setEditingTag(null)}>
+                  <div className="w-full max-w-md space-y-3 rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between"><h3 className="text-base font-extrabold">{editingTag.id ? "Edit" : "New"} tag</h3><button onClick={() => setEditingTag(null)}><X size={16} /></button></div>
+                    <label className="block text-xs font-bold text-[#6b7280]">Name<input value={editingTag.name ?? ""} onChange={(e) => setEditingTag({ ...editingTag, name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Slug (auto if empty)<input value={editingTag.slug ?? ""} onChange={(e) => setEditingTag({ ...editingTag, slug: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <button onClick={saveTag} className="w-full rounded-lg bg-[#0ea5e9] px-3 py-2 text-sm font-bold text-white hover:bg-sky-600">Save</button>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ---------- BROADCAST ---------- */}
+          {tab === "broadcast" && isAdmin && (
+            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-600 text-white"><Megaphone size={18} /></div><div><h2 className="text-lg font-extrabold">Broadcast notification</h2><p className="text-xs text-[#6b7280]">Sends a bell notification to every active member.</p></div></div>
+              <label className="block text-xs font-bold text-[#6b7280]">Title *<input value={broadcast.title} onChange={(e) => setBroadcast({ ...broadcast, title: e.target.value })} placeholder="New downloads pack available" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+              <label className="block text-xs font-bold text-[#6b7280]">Body<textarea rows={3} value={broadcast.body} onChange={(e) => setBroadcast({ ...broadcast, body: e.target.value })} placeholder="Short message shown under the title…" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+              <label className="block text-xs font-bold text-[#6b7280]">Link<input value={broadcast.link} onChange={(e) => setBroadcast({ ...broadcast, link: e.target.value })} placeholder="/marketplace" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+              <div className="flex justify-end"><button disabled={busy === "broadcast"} onClick={sendBroadcast} className="flex items-center gap-1.5 rounded-lg bg-fuchsia-600 px-4 py-2 text-sm font-bold text-white hover:bg-fuchsia-700 disabled:opacity-50"><Megaphone size={14} />{busy === "broadcast" ? "Sending…" : "Send to all members"}</button></div>
+            </section>
+          )}
+
+          {/* ---------- USER 360° DRAWER ---------- */}
+          {userDetail && (
+            <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={() => setUserDetail(null)}>
+              <div className="h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-xl font-extrabold">User 360°</h2>
+                  <button onClick={() => setUserDetail(null)}><X size={20} /></button>
+                </div>
+                {userDetailBusy && !userDetail.profile ? (
+                  <div className="py-10 text-center"><Loader2 className="mx-auto animate-spin text-[#6b7280]" /></div>
+                ) : userDetail.profile ? (
+                  <div className="space-y-4">
+                    <div className="rounded-lg border border-[#e5e7eb] p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0ea5e9] font-extrabold text-white">{(userDetail.profile.username ?? "U").slice(0, 2).toUpperCase()}</div>
+                        <div>
+                          <p className="text-lg font-extrabold">@{userDetail.profile.username}</p>
+                          <p className="text-xs text-[#6b7280]">Joined {new Date(userDetail.profile.created_at).toLocaleDateString()} · {userDetail.profile.points ?? 0} pts · rep {userDetail.profile.reputation ?? 0}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                        {userDetail.roles.map((r) => <span key={r} className="rounded-full bg-slate-100 px-2 py-0.5 font-extrabold uppercase">{r}</span>)}
+                        {userDetail.profile.is_banned && <span className="rounded-full bg-red-100 px-2 py-0.5 font-extrabold uppercase text-red-700">Banned</span>}
+                        {userDetail.warnings > 0 && <span className="rounded-full bg-amber-100 px-2 py-0.5 font-extrabold uppercase text-amber-700">{userDetail.warnings} warnings</span>}
+                      </div>
+                      {userDetail.ban_reason && <p className="mt-2 rounded bg-red-50 p-2 text-xs text-red-700"><b>Ban reason:</b> {userDetail.ban_reason}</p>}
+                    </div>
+
+                    <div className="rounded-lg border border-[#e5e7eb] p-4">
+                      <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Badges ({userDetail.badges.length})</p>
+                      <div className="flex flex-wrap gap-2">
+                        {userDetail.badges.map((b: any) => (
+                          <span key={b.badge_id} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">
+                            <span>{b.badges?.icon ?? "🏅"}</span>{b.badges?.name ?? b.badge_id}
+                            <button onClick={() => revokeBadgeFromUser(b.badge_id)} className="ml-1 text-red-500 hover:text-red-700"><X size={10} /></button>
+                          </span>
+                        ))}
+                        {userDetail.badges.length === 0 && <span className="text-xs text-[#6b7280]">No badges</span>}
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <select value={awardBadgeId} onChange={(e) => setAwardBadgeId(e.target.value)} className="flex-1 rounded-lg border border-[#e5e7eb] px-2 py-1.5 text-sm"><option value="">Award badge…</option>{badgesList.map((b) => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}</select>
+                        <button onClick={awardBadgeToUser} disabled={!awardBadgeId} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600 disabled:opacity-40">Award</button>
+                      </div>
+                      {badgesList.length === 0 && <p className="mt-2 text-[10px] text-[#6b7280]">Tip: create badges in the Badges tab first.</p>}
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Threads ({userDetail.threads.length})</p>
+                        <ul className="space-y-1 text-xs">
+                          {userDetail.threads.map((t: any) => <li key={t.id}><Link to="/t/$slug" params={{ slug: t.slug }} className="font-semibold hover:text-[#0ea5e9]">{t.title}</Link> <span className="text-[#6b7280]">({t.vote_score}▲ · {t.reply_count}💬)</span></li>)}
+                          {userDetail.threads.length === 0 && <li className="text-[#6b7280]">No threads</li>}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Recent replies ({userDetail.posts.length})</p>
+                        <ul className="space-y-1 text-xs">
+                          {userDetail.posts.map((p: any) => <li key={p.id} className="line-clamp-2 text-[#374151]">{p.body?.slice(0, 100)}</li>)}
+                          {userDetail.posts.length === 0 && <li className="text-[#6b7280]">No replies</li>}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Orders ({userDetail.orders.length})</p>
+                        <ul className="space-y-1 text-xs">
+                          {userDetail.orders.map((o: any) => <li key={o.id}><span className="font-semibold">{o.product_title}</span> · {(o.unit_price_cents / 100).toFixed(2)} {o.currency} · <span className="text-[#6b7280]">{o.status}</span></li>)}
+                          {userDetail.orders.length === 0 && <li className="text-[#6b7280]">No orders</li>}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">IPs ({userDetail.ips.length})</p>
+                        <ul className="space-y-1 font-mono text-xs">
+                          {userDetail.ips.map((ip: any, i: number) => <li key={i}>{ip.last_ip ?? ip.signup_ip}</li>)}
+                          {userDetail.ips.length === 0 && <li className="text-[#6b7280] font-sans">No IPs recorded</li>}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
           )}
         </main>
       </div>
