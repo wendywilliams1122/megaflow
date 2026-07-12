@@ -1112,11 +1112,19 @@ export const AdminPanel = () => {
 
           {/* ---------- THREADS ---------- */}
           {tab === "threads" && (
+            <div className="space-y-6">
+            <DuplicateThreadsCard flash={flash} />
             <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] px-4 py-3">
                 <SearchInput value={threadsQ} onChange={(v) => { setThreadsPage(0); setThreadsQ(v); }} placeholder="Search thread title…" />
                 {threadsSel.size > 0 && (
-                  <button onClick={bulkDeleteThreads} className="rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100"><Trash2 size={12} className="mr-1 inline" /> Delete {threadsSel.size}</button>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => bulkThreadFlag("is_pinned", true)} className="rounded-md border border-sky-200 bg-sky-50 px-2.5 py-1.5 text-xs font-bold text-sky-700 hover:bg-sky-100"><Pin size={12} className="mr-1 inline" /> Pin {threadsSel.size}</button>
+                    <button onClick={() => bulkThreadFlag("is_pinned", false)} className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100">Unpin</button>
+                    <button onClick={() => bulkThreadFlag("is_locked", true)} className="rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-bold text-amber-700 hover:bg-amber-100"><Lock size={12} className="mr-1 inline" /> Lock</button>
+                    <button onClick={() => bulkThreadFlag("is_locked", false)} className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100"><Unlock size={12} className="mr-1 inline" /> Unlock</button>
+                    <button onClick={bulkDeleteThreads} className="rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100"><Trash2 size={12} className="mr-1 inline" /> Delete {threadsSel.size}</button>
+                  </div>
                 )}
               </div>
               <div className="overflow-x-auto">
