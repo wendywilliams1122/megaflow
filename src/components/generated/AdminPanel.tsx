@@ -13,6 +13,9 @@ import { TopContentCard } from "@/components/admin/TopContentCard";
 import { SuspiciousActivityCard } from "@/components/admin/SuspiciousActivityCard";
 import { AdvancedUserSearch } from "@/components/admin/AdvancedUserSearch";
 import { LoginAttemptsCard } from "@/components/admin/LoginAttemptsCard";
+import { CouponsPanel } from "@/components/admin/CouponsPanel";
+import { ScheduledBroadcastsPanel } from "@/components/admin/ScheduledBroadcastsPanel";
+import { SalesAnalyticsCard } from "@/components/admin/SalesAnalyticsCard";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -26,7 +29,7 @@ import {
   ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "coupons" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "scheduled" | "ads" | "settings" | "audit" | "security" | "modactions" | "automod";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any; awarded_count?: number };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
@@ -51,7 +54,7 @@ type Stats = {
 type OrderRow = {
   id: string; product_title: string; product_slug: string | null; unit_price_cents: number;
   currency: string; quantity: number; buyer_name: string; buyer_contact: string;
-  method: "buy" | "cart" | "whatsapp" | "email"; status: "new" | "contacted" | "completed" | "cancelled";
+  method: "buy" | "cart" | "whatsapp" | "email"; status: "new" | "contacted" | "completed" | "cancelled" | "refunded";
   note: string | null; created_at: string;
 };
 type SettingsRow = {
@@ -994,8 +997,9 @@ export const AdminPanel = () => {
               </section>
               <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
                 <TopContentCard />
-                <AdminAnalytics />
+                <SalesAnalyticsCard />
               </section>
+              <AdminAnalytics />
 
             </>
           )}
@@ -1430,7 +1434,7 @@ export const AdminPanel = () => {
                         <td className="px-4 py-3 text-right font-extrabold tabular-nums">{new Intl.NumberFormat("en-US", { style: "currency", currency: o.currency }).format((o.unit_price_cents * o.quantity) / 100)}</td>
                         <td className="px-4 py-3">
                           <select disabled={busy === o.id} value={o.status} onChange={(e) => updateOrderStatus(o, e.target.value as OrderRow["status"])} className={`rounded-md border px-2 py-1 text-xs font-bold ${o.status === "new" ? "border-amber-300 bg-amber-50 text-amber-700" : o.status === "contacted" ? "border-sky-300 bg-sky-50 text-sky-700" : o.status === "completed" ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-red-300 bg-red-50 text-red-700"}`}>
-                            <option value="new">New</option><option value="contacted">Contacted</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+                            <option value="new">New</option><option value="contacted">Contacted</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option><option value="refunded">Refunded</option>
                           </select>
                         </td>
                         <td className="px-4 py-3 text-xs text-[#6b7280]">{new Date(o.created_at).toLocaleString()}</td>
@@ -1702,6 +1706,11 @@ export const AdminPanel = () => {
               <div className="flex justify-end"><button disabled={busy === "broadcast"} onClick={sendBroadcast} className="flex items-center gap-1.5 rounded-lg bg-fuchsia-600 px-4 py-2 text-sm font-bold text-white hover:bg-fuchsia-700 disabled:opacity-50"><Megaphone size={14} />{busy === "broadcast" ? "Sending…" : "Send to all members"}</button></div>
             </section>
           )}
+
+          {tab === "coupons" && isAdmin && <CouponsPanel />}
+          {tab === "scheduled" && isAdmin && <ScheduledBroadcastsPanel />}
+
+
 
           {/* ---------- TRASH ---------- */}
           {tab === "trash" && (
