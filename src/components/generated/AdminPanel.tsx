@@ -10,6 +10,9 @@ import { UserNotesCard } from "@/components/admin/UserNotesCard";
 import { GrowthChartsCard } from "@/components/admin/GrowthChartsCard";
 import { LiveActivityFeed } from "@/components/admin/LiveActivityFeed";
 import { TopContentCard } from "@/components/admin/TopContentCard";
+import { SuspiciousActivityCard } from "@/components/admin/SuspiciousActivityCard";
+import { AdvancedUserSearch } from "@/components/admin/AdvancedUserSearch";
+import { LoginAttemptsCard } from "@/components/admin/LoginAttemptsCard";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
