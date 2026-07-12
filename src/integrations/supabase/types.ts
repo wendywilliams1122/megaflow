@@ -53,6 +53,39 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           created_at: string
@@ -666,6 +699,8 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          announcement: string | null
+          announcement_active: boolean
           brand_name: string
           contact_email: string | null
           downloads_min_points: number
@@ -681,6 +716,8 @@ export type Database = {
           whatsapp_number: string | null
         }
         Insert: {
+          announcement?: string | null
+          announcement_active?: boolean
           brand_name?: string
           contact_email?: string | null
           downloads_min_points?: number
@@ -696,6 +733,8 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Update: {
+          announcement?: string | null
+          announcement_active?: boolean
           brand_name?: string
           contact_email?: string | null
           downloads_min_points?: number
