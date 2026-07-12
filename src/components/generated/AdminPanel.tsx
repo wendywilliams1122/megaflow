@@ -1316,6 +1316,187 @@ export const AdminPanel = () => {
               </div>
             </section>
           )}
+
+          {/* ---------- BADGES ---------- */}
+          {tab === "badges" && isAdmin && (
+            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
+                <div><h2 className="text-sm font-extrabold">Badges</h2><p className="text-xs text-[#6b7280]">Create/edit badges. Award manually from a user's 360° view.</p></div>
+                <button onClick={() => setEditingBadge({ id: "", name: "", description: "", icon: "🏅", tier: "bronze", criteria: {} })} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600"><Plus size={12} className="mr-1 inline" /> New badge</button>
+              </div>
+              <div className="grid gap-3 p-4 md:grid-cols-2 lg:grid-cols-3">
+                {badgesList.map((b) => (
+                  <div key={b.id} className="rounded-lg border border-[#e5e7eb] p-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2"><span className="text-2xl">{b.icon}</span><div><p className="text-sm font-extrabold">{b.name}</p><p className="text-[10px] uppercase tracking-wider text-[#6b7280]">{b.tier} · {b.id}</p></div></div>
+                      <div className="flex gap-1"><button onClick={() => setEditingBadge(b)} className="rounded border border-[#e5e7eb] p-1 hover:border-sky-300"><Pencil size={12} /></button><button onClick={() => deleteBadge(b.id)} className="rounded border border-red-200 p-1 text-red-600 hover:bg-red-50"><Trash2 size={12} /></button></div>
+                    </div>
+                    <p className="mt-2 text-xs text-[#6b7280]">{b.description}</p>
+                  </div>
+                ))}
+                {badgesList.length === 0 && <p className="col-span-full py-6 text-center text-sm text-[#6b7280]">No badges yet.</p>}
+              </div>
+              {editingBadge && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setEditingBadge(null)}>
+                  <div className="w-full max-w-md space-y-3 rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between"><h3 className="text-base font-extrabold">{editingBadge.id ? "Edit" : "New"} badge</h3><button onClick={() => setEditingBadge(null)}><X size={16} /></button></div>
+                    <label className="block text-xs font-bold text-[#6b7280]">ID (slug)<input disabled={!!badgesList.find((b) => b.id === editingBadge.id)} value={editingBadge.id ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm disabled:bg-slate-50" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Name<input value={editingBadge.name ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Icon (emoji)<input value={editingBadge.icon ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, icon: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Tier
+                      <select value={editingBadge.tier ?? "bronze"} onChange={(e) => setEditingBadge({ ...editingBadge, tier: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm">
+                        {["bronze","silver","gold","platinum","special"].map((t) => <option key={t}>{t}</option>)}
+                      </select>
+                    </label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Description<textarea rows={2} value={editingBadge.description ?? ""} onChange={(e) => setEditingBadge({ ...editingBadge, description: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <button onClick={saveBadge} className="w-full rounded-lg bg-[#0ea5e9] px-3 py-2 text-sm font-bold text-white hover:bg-sky-600">Save</button>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ---------- TAGS ---------- */}
+          {tab === "tags" && isAdmin && (
+            <section className="space-y-4">
+              <div className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+                <div className="flex items-center justify-between border-b border-[#e5e7eb] px-4 py-3">
+                  <div><h2 className="text-sm font-extrabold">Tags ({tagsList.length})</h2><p className="text-xs text-[#6b7280]">Rename, delete, or merge tags.</p></div>
+                  <button onClick={() => setEditingTag({ name: "", slug: "" })} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600"><Plus size={12} className="mr-1 inline" /> New tag</button>
+                </div>
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase text-[#6b7280]"><tr><th className="px-4 py-2">Name</th><th className="px-4 py-2">Slug</th><th className="px-4 py-2 text-right">Threads</th><th className="px-4 py-2 text-right">Actions</th></tr></thead>
+                  <tbody className="divide-y divide-[#e5e7eb]">
+                    {tagsList.map((t) => (
+                      <tr key={t.id}>
+                        <td className="px-4 py-2 font-semibold">{t.name}</td>
+                        <td className="px-4 py-2 font-mono text-xs text-[#6b7280]">{t.slug}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{t.thread_count}</td>
+                        <td className="px-4 py-2 text-right"><button onClick={() => setEditingTag(t)} className="mr-1 rounded border border-[#e5e7eb] p-1 hover:border-sky-300"><Pencil size={12} /></button><button onClick={() => deleteTag(t.id, t.name)} className="rounded border border-red-200 p-1 text-red-600 hover:bg-red-50"><Trash2 size={12} /></button></td>
+                      </tr>
+                    ))}
+                    {tagsList.length === 0 && <tr><td colSpan={4} className="px-4 py-6 text-center text-sm text-[#6b7280]">No tags yet.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm">
+                <h3 className="mb-2 text-sm font-extrabold">Merge tags</h3>
+                <p className="mb-3 text-xs text-[#6b7280]">Moves all threads from source tag to target tag, then deletes the source.</p>
+                <div className="flex flex-wrap items-end gap-2">
+                  <label className="text-xs font-bold text-[#6b7280]">From
+                    <select value={mergeSel.from} onChange={(e) => setMergeSel({ ...mergeSel, from: e.target.value })} className="mt-1 block w-48 rounded-lg border border-[#e5e7eb] px-2 py-1.5 text-sm"><option value="">Select…</option>{tagsList.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.thread_count})</option>)}</select>
+                  </label>
+                  <label className="text-xs font-bold text-[#6b7280]">Into
+                    <select value={mergeSel.to} onChange={(e) => setMergeSel({ ...mergeSel, to: e.target.value })} className="mt-1 block w-48 rounded-lg border border-[#e5e7eb] px-2 py-1.5 text-sm"><option value="">Select…</option>{tagsList.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.thread_count})</option>)}</select>
+                  </label>
+                  <button onClick={mergeTags} className="rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600">Merge</button>
+                </div>
+              </div>
+              {editingTag && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => setEditingTag(null)}>
+                  <div className="w-full max-w-md space-y-3 rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between"><h3 className="text-base font-extrabold">{editingTag.id ? "Edit" : "New"} tag</h3><button onClick={() => setEditingTag(null)}><X size={16} /></button></div>
+                    <label className="block text-xs font-bold text-[#6b7280]">Name<input value={editingTag.name ?? ""} onChange={(e) => setEditingTag({ ...editingTag, name: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <label className="block text-xs font-bold text-[#6b7280]">Slug (auto if empty)<input value={editingTag.slug ?? ""} onChange={(e) => setEditingTag({ ...editingTag, slug: e.target.value })} className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+                    <button onClick={saveTag} className="w-full rounded-lg bg-[#0ea5e9] px-3 py-2 text-sm font-bold text-white hover:bg-sky-600">Save</button>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ---------- BROADCAST ---------- */}
+          {tab === "broadcast" && isAdmin && (
+            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-lg bg-fuchsia-600 text-white"><Megaphone size={18} /></div><div><h2 className="text-lg font-extrabold">Broadcast notification</h2><p className="text-xs text-[#6b7280]">Sends a bell notification to every active member.</p></div></div>
+              <label className="block text-xs font-bold text-[#6b7280]">Title *<input value={broadcast.title} onChange={(e) => setBroadcast({ ...broadcast, title: e.target.value })} placeholder="New downloads pack available" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+              <label className="block text-xs font-bold text-[#6b7280]">Body<textarea rows={3} value={broadcast.body} onChange={(e) => setBroadcast({ ...broadcast, body: e.target.value })} placeholder="Short message shown under the title…" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+              <label className="block text-xs font-bold text-[#6b7280]">Link<input value={broadcast.link} onChange={(e) => setBroadcast({ ...broadcast, link: e.target.value })} placeholder="/marketplace" className="mt-1 w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm" /></label>
+              <div className="flex justify-end"><button disabled={busy === "broadcast"} onClick={sendBroadcast} className="flex items-center gap-1.5 rounded-lg bg-fuchsia-600 px-4 py-2 text-sm font-bold text-white hover:bg-fuchsia-700 disabled:opacity-50"><Megaphone size={14} />{busy === "broadcast" ? "Sending…" : "Send to all members"}</button></div>
+            </section>
+          )}
+
+          {/* ---------- USER 360° DRAWER ---------- */}
+          {userDetail && (
+            <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={() => setUserDetail(null)}>
+              <div className="h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-xl font-extrabold">User 360°</h2>
+                  <button onClick={() => setUserDetail(null)}><X size={20} /></button>
+                </div>
+                {userDetailBusy && !userDetail.profile ? (
+                  <div className="py-10 text-center"><Loader2 className="mx-auto animate-spin text-[#6b7280]" /></div>
+                ) : userDetail.profile ? (
+                  <div className="space-y-4">
+                    <div className="rounded-lg border border-[#e5e7eb] p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0ea5e9] font-extrabold text-white">{(userDetail.profile.username ?? "U").slice(0, 2).toUpperCase()}</div>
+                        <div>
+                          <p className="text-lg font-extrabold">@{userDetail.profile.username}</p>
+                          <p className="text-xs text-[#6b7280]">Joined {new Date(userDetail.profile.created_at).toLocaleDateString()} · {userDetail.profile.points ?? 0} pts · rep {userDetail.profile.reputation ?? 0}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                        {userDetail.roles.map((r) => <span key={r} className="rounded-full bg-slate-100 px-2 py-0.5 font-extrabold uppercase">{r}</span>)}
+                        {userDetail.profile.is_banned && <span className="rounded-full bg-red-100 px-2 py-0.5 font-extrabold uppercase text-red-700">Banned</span>}
+                        {userDetail.warnings > 0 && <span className="rounded-full bg-amber-100 px-2 py-0.5 font-extrabold uppercase text-amber-700">{userDetail.warnings} warnings</span>}
+                      </div>
+                      {userDetail.ban_reason && <p className="mt-2 rounded bg-red-50 p-2 text-xs text-red-700"><b>Ban reason:</b> {userDetail.ban_reason}</p>}
+                    </div>
+
+                    <div className="rounded-lg border border-[#e5e7eb] p-4">
+                      <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Badges ({userDetail.badges.length})</p>
+                      <div className="flex flex-wrap gap-2">
+                        {userDetail.badges.map((b: any) => (
+                          <span key={b.badge_id} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">
+                            <span>{b.badges?.icon ?? "🏅"}</span>{b.badges?.name ?? b.badge_id}
+                            <button onClick={() => revokeBadgeFromUser(b.badge_id)} className="ml-1 text-red-500 hover:text-red-700"><X size={10} /></button>
+                          </span>
+                        ))}
+                        {userDetail.badges.length === 0 && <span className="text-xs text-[#6b7280]">No badges</span>}
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <select value={awardBadgeId} onChange={(e) => setAwardBadgeId(e.target.value)} className="flex-1 rounded-lg border border-[#e5e7eb] px-2 py-1.5 text-sm"><option value="">Award badge…</option>{badgesList.map((b) => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}</select>
+                        <button onClick={awardBadgeToUser} disabled={!awardBadgeId} className="rounded-lg bg-[#0ea5e9] px-3 py-1.5 text-xs font-bold text-white hover:bg-sky-600 disabled:opacity-40">Award</button>
+                      </div>
+                      {badgesList.length === 0 && <p className="mt-2 text-[10px] text-[#6b7280]">Tip: create badges in the Badges tab first.</p>}
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Threads ({userDetail.threads.length})</p>
+                        <ul className="space-y-1 text-xs">
+                          {userDetail.threads.map((t: any) => <li key={t.id}><Link to="/t/$slug" params={{ slug: t.slug }} className="font-semibold hover:text-[#0ea5e9]">{t.title}</Link> <span className="text-[#6b7280]">({t.vote_score}▲ · {t.reply_count}💬)</span></li>)}
+                          {userDetail.threads.length === 0 && <li className="text-[#6b7280]">No threads</li>}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Recent replies ({userDetail.posts.length})</p>
+                        <ul className="space-y-1 text-xs">
+                          {userDetail.posts.map((p: any) => <li key={p.id} className="line-clamp-2 text-[#374151]">{p.body?.slice(0, 100)}</li>)}
+                          {userDetail.posts.length === 0 && <li className="text-[#6b7280]">No replies</li>}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Orders ({userDetail.orders.length})</p>
+                        <ul className="space-y-1 text-xs">
+                          {userDetail.orders.map((o: any) => <li key={o.id}><span className="font-semibold">{o.product_title}</span> · {(o.unit_price_cents / 100).toFixed(2)} {o.currency} · <span className="text-[#6b7280]">{o.status}</span></li>)}
+                          {userDetail.orders.length === 0 && <li className="text-[#6b7280]">No orders</li>}
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">IPs ({userDetail.ips.length})</p>
+                        <ul className="space-y-1 font-mono text-xs">
+                          {userDetail.ips.map((ip: any, i: number) => <li key={i}>{ip.last_ip ?? ip.signup_ip}</li>)}
+                          {userDetail.ips.length === 0 && <li className="text-[#6b7280] font-sans">No IPs recorded</li>}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>
