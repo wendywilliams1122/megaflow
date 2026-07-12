@@ -23,7 +23,7 @@ export function RealDashboard() {
     enabled: !!user?.id,
     queryFn: async () => {
       const uid = user!.id;
-      const [threadsCount, postsCount, bookmarksCount, unreadNotif, unreadMsgs, myThreads, notifs, msgs] = await Promise.all([
+      const [threadsCount, postsCount, bookmarksCount, unreadNotif, unreadMsgs, myThreads, notifs, sentMsgs, recvMsgs] = await Promise.all([
         supabase.from("threads").select("id", { count: "exact", head: true }).eq("author_id", uid),
         supabase.from("posts").select("id", { count: "exact", head: true }).eq("author_id", uid),
         supabase.from("bookmarks").select("id", { count: "exact", head: true }).eq("user_id", uid),
@@ -31,16 +31,29 @@ export function RealDashboard() {
         supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_id", uid).is("read_at", null),
         supabase.from("threads").select("id, title, slug, reply_count, view_count, last_activity_at, category:categories!threads_category_id_fkey(name)").eq("author_id", uid).order("last_activity_at", { ascending: false }).limit(6),
         supabase.from("notifications").select("id, title, body, link, created_at, is_read").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
-        supabase.from("messages").select("id, body, created_at, read_at, sender_id, recipient_id").or(`sender_id.eq.${uid},recipient_id.eq.${uid}`).order("created_at", { ascending: false }).limit(5),
+        supabase.from("messages").select("id, body, created_at, read_at, sender_id, recipient_id").eq("sender_id", uid).order("created_at", { ascending: false }).limit(10),
+        supabase.from("messages").select("id, body, created_at, read_at, sender_id, recipient_id").eq("recipient_id", uid).order("created_at", { ascending: false }).limit(10),
       ]);
-      const msgList = (msgs.data ?? []) as any[];
-      const otherIds = Array.from(new Set(msgList.map((m) => (m.sender_id === uid ? m.recipient_id : m.sender_id))));
+      // Merge sent + received, dedupe by conversation partner (latest per partner), keep top 5
+      const combined = [...(sentMsgs.data ?? []), ...(recvMsgs.data ?? [])] as any[];
+      combined.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+      const seen = new Set<string>();
+      const msgList: any[] = [];
+      for (const m of combined) {
+        const other = m.sender_id === uid ? m.recipient_id : m.sender_id;
+        if (seen.has(other)) continue;
+        seen.add(other);
+        msgList.push(m);
+        if (msgList.length >= 5) break;
+      }
+      const otherIds = Array.from(seen);
       let profMap: Record<string, any> = {};
       if (otherIds.length > 0) {
         const { data: profs } = await supabase.from("profiles").select("id, username, display_name, avatar_url").in("id", otherIds);
         (profs ?? []).forEach((p: any) => { profMap[p.id] = p; });
       }
       const msgsWithProfile = msgList.map((m) => ({ ...m, other: profMap[m.sender_id === uid ? m.recipient_id : m.sender_id], outgoing: m.sender_id === uid }));
+
       return {
         threads: threadsCount.count ?? 0,
         posts: postsCount.count ?? 0,
