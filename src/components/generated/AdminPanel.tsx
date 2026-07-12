@@ -507,6 +507,18 @@ export const AdminPanel = () => {
     loadThreads(); loadStats();
   };
 
+  const bulkThreadFlag = async (field: "is_pinned" | "is_locked", value: boolean) => {
+    if (threadsSel.size === 0) return;
+    setBusy("bulk-thread");
+    const ids = [...threadsSel];
+    await (supabase as any).from("threads").update({ [field]: value }).in("id", ids);
+    setBusy(null);
+    flash(`Updated ${ids.length} threads`);
+    logAction(`thread.bulk_${field}_${value}`, "thread", null as any, { ids });
+    setThreadsSel(new Set());
+    loadThreads();
+  };
+
   // ---------- Product ----------
   const slugify = (s: string) => s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   const saveProduct = async () => {
