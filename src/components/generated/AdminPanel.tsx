@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit" | "security";
-type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any };
+type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any; awarded_count?: number };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
   profile: any; roles: string[]; ips: any[]; badges: any[];
@@ -620,7 +620,11 @@ export const AdminPanel = () => {
   // ---------- Badges ----------
   const loadBadges = async () => {
     const { data } = await supabase.from("badges").select("id, name, description, icon, tier, criteria").order("tier");
-    setBadgesList((data as BadgeRow[]) ?? []);
+    const list = (data as BadgeRow[]) ?? [];
+    const counts = await Promise.all(
+      list.map((b) => (supabase as any).from("user_badges").select("user_id", { count: "exact", head: true }).eq("badge_id", b.id)),
+    );
+    setBadgesList(list.map((b, i) => ({ ...b, awarded_count: counts[i].count ?? 0 })));
   };
   const saveBadge = async () => {
     if (!editingBadge) return;
