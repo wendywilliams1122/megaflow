@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { timeAgo } from "@/lib/forum";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, ShieldAlert, Clock, Ban, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/messages")({
   head: () => ({
