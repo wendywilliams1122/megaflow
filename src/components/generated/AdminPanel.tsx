@@ -1813,10 +1813,34 @@ export const AdminPanel = () => {
                           <button onClick={() => viewAsUser(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-xs font-bold hover:border-sky-300 hover:text-sky-600"><UserCog size={12} /> View as user</button>
                           <button onClick={() => gdprExport(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-xs font-bold hover:border-emerald-300 hover:text-emerald-600"><FileJson size={12} /> GDPR export</button>
                           <button onClick={() => forceSignOut(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50"><LogOut size={12} /> Force sign-out</button>
+                          <button onClick={async () => {
+                            const hours = parseInt(prompt("Ban for how many hours?", "24") ?? "0", 10);
+                            if (!hours) return;
+                            const reason = prompt("Reason (optional)") ?? null;
+                            const until = new Date(Date.now() + hours * 3600_000).toISOString();
+                            const { error } = await (supabase as any).rpc("admin_temp_ban", { _user_id: userDetail.profile.id, _until: until, _reason: reason });
+                            if (error) return flash(error.message);
+                            flash(`Temp-banned for ${hours}h`); openUserDetail(userDetail.profile.id);
+                          }} className="inline-flex items-center gap-1 rounded-lg border border-orange-200 px-3 py-1.5 text-xs font-bold text-orange-600 hover:bg-orange-50"><Ban size={12} /> Temp ban</button>
+                          <button onClick={async () => {
+                            const { error } = await (supabase as any).rpc("admin_unban", { _user_id: userDetail.profile.id, _reason: null });
+                            if (error) return flash(error.message);
+                            flash("Unbanned"); openUserDetail(userDetail.profile.id);
+                          }} className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 px-3 py-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-50"><CheckCircle2 size={12} /> Unban</button>
+                          <button onClick={async () => {
+                            const enable = !userDetail.profile.is_shadow_banned;
+                            const { error } = await (supabase as any).rpc("admin_shadow_ban", { _user_id: userDetail.profile.id, _enabled: enable, _reason: null });
+                            if (error) return flash(error.message);
+                            flash(enable ? "Shadow-banned" : "Shadow ban removed"); openUserDetail(userDetail.profile.id);
+                          }} className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-xs font-bold ${userDetail.profile.is_shadow_banned ? "border-purple-300 bg-purple-50 text-purple-700" : "border-[#e5e7eb] text-[#374151] hover:border-purple-300 hover:text-purple-600"}`}><EyeOff size={12} /> {userDetail.profile.is_shadow_banned ? "Un-shadow" : "Shadow ban"}</button>
                         </div>
+                        {userDetail.profile.banned_until && <p className="mt-2 text-[10px] font-bold text-orange-600">Temp ban expires: {new Date(userDetail.profile.banned_until).toLocaleString()}</p>}
                         {userDetail.profile.force_reauth_at && <p className="mt-2 text-[10px] text-[#6b7280]">Last forced sign-out: {new Date(userDetail.profile.force_reauth_at).toLocaleString()}</p>}
                       </div>
                     )}
+
+                    <UserNotesCard userId={userDetail.profile.id} />
+
 
 
                     <div className="rounded-lg border border-[#e5e7eb] p-4">
