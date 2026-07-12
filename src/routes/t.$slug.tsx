@@ -24,6 +24,7 @@ type Thread = {
   vote_score: number; reply_count: number;
   reaction_counts: Record<string, number> | null;
   is_pinned: boolean; is_locked: boolean;
+  original_category_id: string | null;
   created_at: string; author_id: string;
   category: { slug: string; name: string; color: string | null } | null;
   author: { username: string; display_name: string | null; avatar_url: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
