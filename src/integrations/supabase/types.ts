@@ -1666,6 +1666,17 @@ export type Database = {
           vote_score: number
         }[]
       }
+      validate_coupon: {
+        Args: { _code: string }
+        Returns: {
+          code: string
+          discount_type: string
+          discount_value: number
+          min_purchase_cents: number
+          reason: string
+          valid: boolean
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
