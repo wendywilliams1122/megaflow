@@ -947,9 +947,11 @@ export const AdminPanel = () => {
               </section>
               <BlockedDomainsCard flash={flash} />
               <MultiAccountIPCard />
+              <AdminAnalytics />
 
             </>
           )}
+
 
           {/* ---------- USERS ---------- */}
           {tab === "users" && isAdmin && (
