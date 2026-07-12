@@ -49,6 +49,7 @@ type SettingsRow = {
   points_thread: number; points_comment: number; points_upvote: number; points_referral: number;
   max_threads_per_day: number; max_comments_per_day: number; warnings_before_ban: number;
   downloads_min_points: number; announcement: string | null; announcement_active: boolean;
+  maintenance_mode: boolean; maintenance_message: string | null;
 };
 type ProductRow = {
   id: string; title: string; slug: string; description: string | null;
