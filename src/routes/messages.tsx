@@ -18,7 +18,8 @@ export const Route = createFileRoute("/messages")({
   component: MessagesPage,
 });
 
-type Msg = { id: string; sender_id: string; recipient_id: string; body: string; read_at: string | null; created_at: string };
+type Msg = { id: string; sender_id: string; recipient_id: string; body: string; read_at: string | null; created_at: string; is_staff_intervention?: boolean };
+type Conversation = { id: string; user_min: string; user_max: string; status: "pending" | "active" | "stopped" | "ended"; status_note: string | null };
 type Profile = { id: string; username: string; display_name: string | null; avatar_url: string | null };
 
 function MessagesPage() {
