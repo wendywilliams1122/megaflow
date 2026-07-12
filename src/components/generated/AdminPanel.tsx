@@ -870,7 +870,7 @@ export const AdminPanel = () => {
   useEffect(() => { if (isStaff && tab === "threads") loadThreads(); /* eslint-disable-next-line */ }, [isStaff, tab, threadsPage, threadsQ]);
   useEffect(() => { if (isStaff && tab === "products") loadProducts(); /* eslint-disable-next-line */ }, [isStaff, tab, productsPage, productsQ]);
   useEffect(() => { if (isStaff && tab === "orders") loadOrders(); /* eslint-disable-next-line */ }, [isStaff, tab, ordersPage, ordersQ, ordersStatus]);
-  useEffect(() => { if (isStaff && tab === "reports") loadReports(); /* eslint-disable-next-line */ }, [isStaff, tab, reportsStatus]);
+  useEffect(() => { if (isStaff && tab === "reports") loadReports(); /* eslint-disable-next-line */ }, [isStaff, tab, reportsStatus, reportsCategory]);
   useEffect(() => { if (isStaff && tab === "categories") loadCategories(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "badges") { loadBadges(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "tags") { loadTags(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
