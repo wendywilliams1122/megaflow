@@ -4,6 +4,8 @@ import { AdminSideNav } from "@/components/admin/AdminSideNav";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { BlockedDomainsCard } from "@/components/admin/BlockedDomainsCard";
 import { MultiAccountIPCard } from "@/components/admin/MultiAccountIPCard";
+import { ModActionsPanel } from "@/components/admin/ModActionsPanel";
+import { AutomodPanel } from "@/components/admin/AutomodPanel";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
