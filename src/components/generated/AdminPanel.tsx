@@ -608,6 +608,127 @@ export const AdminPanel = () => {
     downloadCSV("orders", (data as any[]) ?? []);
   };
 
+  // ---------- Badges ----------
+  const loadBadges = async () => {
+    const { data } = await supabase.from("badges").select("id, name, description, icon, tier, criteria").order("tier");
+    setBadgesList((data as BadgeRow[]) ?? []);
+  };
+  const saveBadge = async () => {
+    if (!editingBadge) return;
+    const payload = {
+      id: (editingBadge.id ?? "").trim(),
+      name: (editingBadge.name ?? "").trim(),
+      description: (editingBadge.description ?? "").trim(),
+      icon: (editingBadge.icon ?? "🏅").trim(),
+      tier: (editingBadge.tier ?? "bronze").trim(),
+      criteria: editingBadge.criteria ?? {},
+    };
+    if (!payload.id || !payload.name) return flash("id and name required");
+    const { error } = await supabase.from("badges").upsert(payload as any);
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge saved"); setEditingBadge(null); await loadBadges();
+    logAction("badge.upsert", "badge", payload.id, { name: payload.name });
+  };
+  const deleteBadge = async (id: string) => {
+    if (!confirm(`Delete badge "${id}"?`)) return;
+    const { error } = await supabase.from("badges").delete().eq("id", id);
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge deleted"); await loadBadges();
+    logAction("badge.delete", "badge", id);
+  };
+
+  // ---------- Tags ----------
+  const loadTags = async () => {
+    const { data: tags } = await supabase.from("tags").select("id, slug, name").order("name");
+    const { data: joins } = await (supabase as any).from("thread_tags").select("tag_id");
+    const counts = new Map<string, number>();
+    ((joins as any[]) ?? []).forEach((j) => counts.set(j.tag_id, (counts.get(j.tag_id) ?? 0) + 1));
+    setTagsList(((tags as any[]) ?? []).map((t) => ({ ...t, thread_count: counts.get(t.id) ?? 0 })));
+  };
+  const saveTag = async () => {
+    if (!editingTag) return;
+    const name = (editingTag.name ?? "").trim();
+    const slug = (editingTag.slug ?? "").trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (!name || !slug) return flash("Name required");
+    const payload = { name, slug };
+    const q = editingTag.id
+      ? supabase.from("tags").update(payload).eq("id", editingTag.id)
+      : supabase.from("tags").insert(payload);
+    const { error } = await q;
+    if (error) return flash("Failed: " + error.message);
+    flash("Tag saved"); setEditingTag(null); await loadTags();
+    logAction("tag.upsert", "tag", editingTag.id, { name });
+  };
+  const deleteTag = async (id: string, name: string) => {
+    if (!confirm(`Delete tag "${name}"? Threads keep other tags.`)) return;
+    await (supabase as any).from("thread_tags").delete().eq("tag_id", id);
+    const { error } = await supabase.from("tags").delete().eq("id", id);
+    if (error) return flash("Failed: " + error.message);
+    flash("Tag deleted"); await loadTags();
+    logAction("tag.delete", "tag", id, { name });
+  };
+  const mergeTags = async () => {
+    if (!mergeSel.from || !mergeSel.to || mergeSel.from === mergeSel.to) return flash("Pick two different tags");
+    const { error } = await (supabase as any).rpc("admin_merge_tags", { _from: mergeSel.from, _to: mergeSel.to });
+    if (error) return flash("Failed: " + error.message);
+    flash("Tags merged"); setMergeSel({ from: "", to: "" }); await loadTags();
+  };
+
+  // ---------- Broadcast ----------
+  const sendBroadcast = async () => {
+    if (!broadcast.title.trim()) return flash("Title required");
+    if (!confirm("Send this notification to EVERY active member?")) return;
+    setBusy("broadcast");
+    const { data, error } = await (supabase as any).rpc("admin_broadcast", {
+      _title: broadcast.title.trim(),
+      _body: broadcast.body.trim() || null,
+      _link: broadcast.link.trim() || "/",
+    });
+    setBusy(null);
+    if (error) return flash("Failed: " + error.message);
+    flash(`Sent to ${data} members`);
+    setBroadcast({ title: "", body: "", link: "/" });
+  };
+
+  // ---------- User 360° detail ----------
+  const openUserDetail = async (uid: string) => {
+    setUserDetailBusy(true); setUserDetail({ profile: null, roles: [], ips: [], badges: [], threads: [], posts: [], orders: [], warnings: 0, ban_reason: null });
+    const [prof, roles, ips, badges, threads, posts, orders, mod] = await Promise.all([
+      supabase.from("profiles").select("*").eq("id", uid).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+      (supabase as any).from("profile_ips").select("*").eq("user_id", uid),
+      (supabase as any).from("user_badges").select("badge_id, awarded_at, badges(name, icon, tier)").eq("user_id", uid),
+      supabase.from("threads").select("id, slug, title, created_at, vote_score, reply_count").eq("author_id", uid).order("created_at", { ascending: false }).limit(20),
+      supabase.from("posts").select("id, thread_id, body, created_at").eq("author_id", uid).order("created_at", { ascending: false }).limit(20),
+      (supabase as any).from("orders").select("id, product_title, unit_price_cents, currency, status, created_at").eq("buyer_id", uid).order("created_at", { ascending: false }).limit(20),
+      (supabase as any).from("profile_moderation").select("warnings, ban_reason").eq("user_id", uid).maybeSingle(),
+    ]);
+    setUserDetail({
+      profile: (prof as any).data,
+      roles: ((roles as any).data ?? []).map((r: any) => r.role),
+      ips: ((ips as any).data ?? []),
+      badges: ((badges as any).data ?? []),
+      threads: ((threads as any).data ?? []),
+      posts: ((posts as any).data ?? []),
+      orders: ((orders as any).data ?? []),
+      warnings: (mod as any).data?.warnings ?? 0,
+      ban_reason: (mod as any).data?.ban_reason ?? null,
+    });
+    setUserDetailBusy(false);
+  };
+  const awardBadgeToUser = async () => {
+    if (!userDetail?.profile?.id || !awardBadgeId) return;
+    const { error } = await (supabase as any).rpc("admin_award_badge", { _user_id: userDetail.profile.id, _badge_id: awardBadgeId });
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge awarded"); setAwardBadgeId(""); openUserDetail(userDetail.profile.id);
+  };
+  const revokeBadgeFromUser = async (badge_id: string) => {
+    if (!userDetail?.profile?.id) return;
+    const { error } = await (supabase as any).rpc("admin_revoke_badge", { _user_id: userDetail.profile.id, _badge_id: badge_id });
+    if (error) return flash("Failed: " + error.message);
+    flash("Badge revoked"); openUserDetail(userDetail.profile.id);
+  };
+
   useEffect(() => {
     if (!isStaff) return;
     loadStats();
@@ -619,8 +740,10 @@ export const AdminPanel = () => {
   useEffect(() => { if (isStaff && tab === "orders") loadOrders(); /* eslint-disable-next-line */ }, [isStaff, tab, ordersPage, ordersQ, ordersStatus]);
   useEffect(() => { if (isStaff && tab === "reports") loadReports(); /* eslint-disable-next-line */ }, [isStaff, tab, reportsStatus]);
   useEffect(() => { if (isStaff && tab === "categories") loadCategories(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "badges") { loadBadges(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "tags") { loadTags(); } /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "ads") loadAds(); /* eslint-disable-next-line */ }, [isStaff, tab]);
-  useEffect(() => { if (isStaff && tab === "settings") loadSettings(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && (tab === "settings" || tab === "broadcast")) loadSettings(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "audit") loadAudit(); /* eslint-disable-next-line */ }, [isStaff, tab]);
 
   const tabs: { id: Tab; label: string; adminOnly?: boolean; badge?: number }[] = useMemo(() => [
@@ -629,8 +752,11 @@ export const AdminPanel = () => {
     { id: "threads", label: "Threads" },
     { id: "reports", label: "Reports", badge: stats?.pending_reports ?? 0 },
     { id: "categories", label: "Categories", adminOnly: true },
+    { id: "tags", label: "Tags", adminOnly: true },
+    { id: "badges", label: "Badges", adminOnly: true },
     { id: "products", label: "Products" },
     { id: "orders", label: "Orders" },
+    { id: "broadcast", label: "Broadcast", adminOnly: true },
     { id: "ads", label: "Ads", adminOnly: true },
     { id: "settings", label: "Settings", adminOnly: true },
     { id: "audit", label: "Audit log", adminOnly: true },
