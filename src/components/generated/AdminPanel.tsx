@@ -737,7 +737,87 @@ export const AdminPanel = () => {
     flash("Badge revoked"); openUserDetail(userDetail.profile.id);
   };
 
-  useEffect(() => {
+  // ---------- Trash ----------
+  const loadTrash = async () => {
+    const { data } = await supabase.from("threads")
+      .select("id, slug, title, created_at, deleted_at, deleted_reason, author:profiles(username)")
+      .eq("is_deleted", true).order("deleted_at", { ascending: false }).limit(200);
+    setTrashThreads((data as any[]) ?? []);
+  };
+  const restoreThread = async (id: string, title: string) => {
+    const { error } = await (supabase as any).rpc("admin_restore_thread", { _thread_id: id });
+    if (error) return flash("Failed: " + error.message);
+    flash("Thread restored");
+    logAction("thread.restore", "thread", id, { title });
+    loadTrash(); loadStats();
+  };
+  const purgeThread = async (id: string, title: string) => {
+    if (!confirm(`Permanently delete "${title}"? Cannot be undone.`)) return;
+    const { error } = await (supabase as any).rpc("admin_purge_thread", { _thread_id: id });
+    if (error) return flash("Failed: " + error.message);
+    flash("Purged");
+    logAction("thread.purge", "thread", id, { title });
+    loadTrash(); loadStats();
+  };
+
+  // ---------- Security / User account actions ----------
+  const forceSignOut = async (uid: string, username: string) => {
+    if (!confirm(`Force sign-out @${username} from all devices?`)) return;
+    const { error } = await (supabase as any).rpc("admin_force_signout", { _user_id: uid });
+    if (error) return flash("Failed: " + error.message);
+    flash("User will be signed out on next request");
+  };
+  const gdprExport = async (uid: string, username: string) => {
+    const { data, error } = await (supabase as any).rpc("admin_export_user_data", { _user_id: uid });
+    if (error) return flash("Failed: " + error.message);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `gdpr-${username}-${new Date().toISOString().slice(0,10)}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+    flash("GDPR export downloaded");
+  };
+  const viewAsUser = async (uid: string, username: string) => {
+    const reason = prompt(`Log "View as @${username}". Reason:`, "support request");
+    if (reason === null) return;
+    await (supabase as any).rpc("admin_log_impersonate", { _user_id: uid, _reason: reason });
+    localStorage.setItem("viewAsUser", JSON.stringify({ id: uid, username, at: Date.now() }));
+    flash(`Viewing as @${username} (logged). Opening profile…`);
+    window.open(`/u/${username}`, "_blank");
+  };
+
+  // ---------- 2FA (self-enroll for staff) ----------
+  const loadMfaFactors = async () => {
+    const { data } = await supabase.auth.mfa.listFactors();
+    setMfaFactors(data?.all ?? []);
+  };
+  const startMfaEnroll = async () => {
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: `Admin-${Date.now()}` });
+    if (error) return flash("Failed: " + error.message);
+    setMfaEnroll({ id: data.id, qr: (data as any).totp?.qr_code ?? "", secret: (data as any).totp?.secret ?? "" });
+  };
+  const verifyMfaEnroll = async () => {
+    if (!mfaEnroll || !mfaCode.trim()) return;
+    const ch = await supabase.auth.mfa.challenge({ factorId: mfaEnroll.id });
+    if (ch.error) return flash("Failed: " + ch.error.message);
+    const v = await supabase.auth.mfa.verify({ factorId: mfaEnroll.id, challengeId: ch.data.id, code: mfaCode.trim() });
+    if (v.error) return flash("Failed: " + v.error.message);
+    flash("2FA enabled");
+    setMfaEnroll(null); setMfaCode("");
+    if (user?.id) await supabase.from("profiles").update({ totp_enabled: true }).eq("id", user.id);
+    logAction("security.2fa_enable");
+    loadMfaFactors();
+  };
+  const unenrollMfa = async (factorId: string) => {
+    if (!confirm("Disable this 2FA factor?")) return;
+    const { error } = await supabase.auth.mfa.unenroll({ factorId });
+    if (error) return flash("Failed: " + error.message);
+    flash("2FA disabled");
+    if (user?.id) await supabase.from("profiles").update({ totp_enabled: false }).eq("id", user.id);
+    logAction("security.2fa_disable");
+    loadMfaFactors();
+  };
+
     if (!isStaff) return;
     loadStats();
   }, [isStaff]);
