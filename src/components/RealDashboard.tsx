@@ -132,7 +132,7 @@ export function RealDashboard() {
               <div className="p-6 text-center text-sm text-slate-500">No notifications yet.</div>
             )}
             {data?.notifs.map((n: any) => (
-              <Link key={n.id} to="/notifications" className={`flex gap-3 p-4 hover:bg-slate-50 ${!n.read ? "bg-sky-50/30" : ""}`}>
+              <Link key={n.id} to="/notifications" className={`flex gap-3 p-4 hover:bg-slate-50 ${!n.is_read ? "bg-sky-50/30" : ""}`}>
                 <div className="mt-0.5 text-sky-500"><Bell size={16} /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-slate-900">{n.title}</p>
@@ -160,7 +160,7 @@ export function RealDashboard() {
               <div className="p-6 text-center text-sm text-slate-500">No messages yet.</div>
             )}
             {data?.msgs.map((m: any) => (
-              <Link key={m.id} to="/messages" className={`flex gap-3 p-4 hover:bg-slate-50 ${!m.read ? "bg-sky-50/20" : ""}`}>
+              <Link key={m.id} to="/messages" className={`flex gap-3 p-4 hover:bg-slate-50 ${!m.read_at ? "bg-sky-50/20" : ""}`}>
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-100 font-bold text-sky-700">
                   {(m.profiles?.username ?? "?").slice(0, 2).toUpperCase()}
                 </div>
