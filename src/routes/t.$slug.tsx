@@ -133,6 +133,32 @@ function ThreadPage() {
     toast.success("Deleted");
     window.location.href = "/";
   };
+
+  const toggleClose = async () => {
+    if (!thread) return;
+    const isClosed = thread.category?.slug === "closed-threads";
+    if (isClosed) {
+      if (!thread.original_category_id) return toast.error("No original category recorded");
+      const { error } = await supabase
+        .from("threads")
+        .update({ is_locked: false, category_id: thread.original_category_id, original_category_id: null })
+        .eq("id", thread.id);
+      if (error) return toast.error(error.message);
+      toast.success("Thread reopened");
+    } else {
+      if (!confirm("Close this thread? It will move to Closed Threads and no more replies are allowed.")) return;
+      const { data: cat, error: catErr } = await supabase
+        .from("categories").select("id").eq("slug", "closed-threads").maybeSingle();
+      if (catErr || !cat) return toast.error("Closed Threads category missing");
+      const { error } = await supabase
+        .from("threads")
+        .update({ is_locked: true, original_category_id: thread.category_id ?? null, category_id: cat.id })
+        .eq("id", thread.id);
+      if (error) return toast.error(error.message);
+      toast.success("Thread closed");
+    }
+    qc.invalidateQueries({ queryKey: ["thread", slug] });
+  };
   const deletePost = async (id: string) => {
     if (!confirm("Delete this reply?")) return;
     const { error } = await supabase.from("posts").delete().eq("id", id);
