@@ -56,7 +56,7 @@ function stripLeadingTitle(body: string | null | undefined, title: string): stri
 
 function ThreadPage() {
   const { slug } = Route.useParams();
-  const { user } = useAuth();
+  const { user, isModerator } = useAuth();
   const qc = useQueryClient();
   const [reply, setReply] = useState("");
   const [replying, setReplying] = useState(false);
