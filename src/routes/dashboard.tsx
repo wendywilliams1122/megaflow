@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { UserDashboard } from "@/components/generated/UserDashboard";
+import { RealDashboard } from "@/components/RealDashboard";
 import { ReferralPointsCard } from "@/components/ReferralPointsCard";
 
 export const Route = createFileRoute("/dashboard")({
@@ -13,7 +13,8 @@ export const Route = createFileRoute("/dashboard")({
   component: () => (
     <>
       <ReferralPointsCard />
-      <UserDashboard />
+      <RealDashboard />
     </>
   ),
 });
+
