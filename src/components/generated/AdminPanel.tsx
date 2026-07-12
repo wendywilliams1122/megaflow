@@ -983,6 +983,7 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </section>
+              <SuspiciousActivityCard />
               <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
                 <BlockedDomainsCard flash={flash} />
                 <MultiAccountIPCard />
