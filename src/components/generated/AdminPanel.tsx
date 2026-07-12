@@ -1618,8 +1618,8 @@ export const AdminPanel = () => {
                           <button onClick={() => deleteBadge(b.id)} className="rounded-md border border-white/70 bg-white/90 p-1 text-red-600 shadow-sm hover:bg-red-50" title="Delete"><Trash2 size={12} /></button>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-3xl shadow-sm ring-2 ${s.ring}`}>
-                            {b.icon}
+                          <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-[#111827] shadow-sm ring-2 ${s.ring}`}>
+                            <BadgeIcon icon={b.icon} size={26} />
                           </div>
                           <div className="min-w-0">
                             <p className="truncate text-sm font-extrabold text-[#111827]">{b.name}</p>
