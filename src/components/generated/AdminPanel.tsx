@@ -13,10 +13,10 @@ import {
   Plus, Pencil, X, ShoppingCart, Settings as SettingsIcon, Save,
   Megaphone, Eye, EyeOff, Search, ChevronLeft, ChevronRight, Download,
   Flag, FolderTree, DollarSign, Plus as PlusIcon, Minus, AlertTriangle,
-  ClipboardList, Bell,
+  ClipboardList, Bell, Trash, RotateCcw, LogOut, FileJson, KeyRound, UserCog,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit" | "security";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
@@ -165,6 +165,12 @@ export const AdminPanel = () => {
   const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
   const [userDetailBusy, setUserDetailBusy] = useState(false);
   const [awardBadgeId, setAwardBadgeId] = useState("");
+
+  // Trash + Security
+  const [trashThreads, setTrashThreads] = useState<any[]>([]);
+  const [mfaEnroll, setMfaEnroll] = useState<{ id: string; qr: string; secret: string } | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaFactors, setMfaFactors] = useState<any[]>([]);
 
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -425,25 +431,27 @@ export const AdminPanel = () => {
     loadThreads();
   };
   const deleteThread = async (t: ThreadRow) => {
-    if (!confirm(`Delete thread "${t.title}"?`)) return;
+    const reason = prompt(`Move thread "${t.title}" to Trash. Optional reason:`, "");
+    if (reason === null) return;
     setBusy(t.id);
-    const { error } = await supabase.from("threads").delete().eq("id", t.id);
+    const { error } = await (supabase as any).rpc("admin_soft_delete_thread", { _thread_id: t.id, _reason: reason || null });
     setBusy(null);
     if (error) return flash("Failed: " + error.message);
-    flash("Thread deleted");
-    logAction("thread.delete", "thread", t.id, { title: t.title });
+    flash("Moved to trash");
+    logAction("thread.soft_delete", "thread", t.id, { title: t.title, reason });
     loadThreads(); loadStats();
   };
   const bulkDeleteThreads = async () => {
     if (threadsSel.size === 0) return;
-    if (!confirm(`Delete ${threadsSel.size} threads? This cannot be undone.`)) return;
+    if (!confirm(`Move ${threadsSel.size} threads to Trash?`)) return;
     setBusy("bulk-thread");
     const ids = [...threadsSel];
-    const { error } = await supabase.from("threads").delete().in("id", ids);
+    for (const id of ids) {
+      await (supabase as any).rpc("admin_soft_delete_thread", { _thread_id: id, _reason: "bulk" });
+    }
     setBusy(null);
-    if (error) return flash("Failed: " + error.message);
-    flash(`Deleted ${ids.length} threads`);
-    logAction("thread.bulk_delete", "thread", null as any, { ids });
+    flash(`Moved ${ids.length} threads to Trash`);
+    logAction("thread.bulk_soft_delete", "thread", null as any, { ids });
     loadThreads(); loadStats();
   };
 
@@ -729,6 +737,87 @@ export const AdminPanel = () => {
     flash("Badge revoked"); openUserDetail(userDetail.profile.id);
   };
 
+  // ---------- Trash ----------
+  const loadTrash = async () => {
+    const { data } = await supabase.from("threads")
+      .select("id, slug, title, created_at, deleted_at, deleted_reason, author:profiles(username)")
+      .eq("is_deleted", true).order("deleted_at", { ascending: false }).limit(200);
+    setTrashThreads((data as any[]) ?? []);
+  };
+  const restoreThread = async (id: string, title: string) => {
+    const { error } = await (supabase as any).rpc("admin_restore_thread", { _thread_id: id });
+    if (error) return flash("Failed: " + error.message);
+    flash("Thread restored");
+    logAction("thread.restore", "thread", id, { title });
+    loadTrash(); loadStats();
+  };
+  const purgeThread = async (id: string, title: string) => {
+    if (!confirm(`Permanently delete "${title}"? Cannot be undone.`)) return;
+    const { error } = await (supabase as any).rpc("admin_purge_thread", { _thread_id: id });
+    if (error) return flash("Failed: " + error.message);
+    flash("Purged");
+    logAction("thread.purge", "thread", id, { title });
+    loadTrash(); loadStats();
+  };
+
+  // ---------- Security / User account actions ----------
+  const forceSignOut = async (uid: string, username: string) => {
+    if (!confirm(`Force sign-out @${username} from all devices?`)) return;
+    const { error } = await (supabase as any).rpc("admin_force_signout", { _user_id: uid });
+    if (error) return flash("Failed: " + error.message);
+    flash("User will be signed out on next request");
+  };
+  const gdprExport = async (uid: string, username: string) => {
+    const { data, error } = await (supabase as any).rpc("admin_export_user_data", { _user_id: uid });
+    if (error) return flash("Failed: " + error.message);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `gdpr-${username}-${new Date().toISOString().slice(0,10)}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+    flash("GDPR export downloaded");
+  };
+  const viewAsUser = async (uid: string, username: string) => {
+    const reason = prompt(`Log "View as @${username}". Reason:`, "support request");
+    if (reason === null) return;
+    await (supabase as any).rpc("admin_log_impersonate", { _user_id: uid, _reason: reason });
+    localStorage.setItem("viewAsUser", JSON.stringify({ id: uid, username, at: Date.now() }));
+    flash(`Viewing as @${username} (logged). Opening profile…`);
+    window.open(`/u/${username}`, "_blank");
+  };
+
+  // ---------- 2FA (self-enroll for staff) ----------
+  const loadMfaFactors = async () => {
+    const { data } = await supabase.auth.mfa.listFactors();
+    setMfaFactors(data?.all ?? []);
+  };
+  const startMfaEnroll = async () => {
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: `Admin-${Date.now()}` });
+    if (error) return flash("Failed: " + error.message);
+    setMfaEnroll({ id: data.id, qr: (data as any).totp?.qr_code ?? "", secret: (data as any).totp?.secret ?? "" });
+  };
+  const verifyMfaEnroll = async () => {
+    if (!mfaEnroll || !mfaCode.trim()) return;
+    const ch = await supabase.auth.mfa.challenge({ factorId: mfaEnroll.id });
+    if (ch.error) return flash("Failed: " + ch.error.message);
+    const v = await supabase.auth.mfa.verify({ factorId: mfaEnroll.id, challengeId: ch.data.id, code: mfaCode.trim() });
+    if (v.error) return flash("Failed: " + v.error.message);
+    flash("2FA enabled");
+    setMfaEnroll(null); setMfaCode("");
+    if (user?.id) await supabase.from("profiles").update({ totp_enabled: true }).eq("id", user.id);
+    logAction("security.2fa_enable");
+    loadMfaFactors();
+  };
+  const unenrollMfa = async (factorId: string) => {
+    if (!confirm("Disable this 2FA factor?")) return;
+    const { error } = await supabase.auth.mfa.unenroll({ factorId });
+    if (error) return flash("Failed: " + error.message);
+    flash("2FA disabled");
+    if (user?.id) await supabase.from("profiles").update({ totp_enabled: false }).eq("id", user.id);
+    logAction("security.2fa_disable");
+    loadMfaFactors();
+  };
+
   useEffect(() => {
     if (!isStaff) return;
     loadStats();
@@ -745,11 +834,14 @@ export const AdminPanel = () => {
   useEffect(() => { if (isStaff && tab === "ads") loadAds(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && (tab === "settings" || tab === "broadcast")) loadSettings(); /* eslint-disable-next-line */ }, [isStaff, tab]);
   useEffect(() => { if (isStaff && tab === "audit") loadAudit(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "trash") loadTrash(); /* eslint-disable-next-line */ }, [isStaff, tab]);
+  useEffect(() => { if (isStaff && tab === "security") loadMfaFactors(); /* eslint-disable-next-line */ }, [isStaff, tab]);
 
   const tabs: { id: Tab; label: string; adminOnly?: boolean; badge?: number }[] = useMemo(() => [
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users", adminOnly: true },
     { id: "threads", label: "Threads" },
+    { id: "trash", label: "Trash", adminOnly: false },
     { id: "reports", label: "Reports", badge: stats?.pending_reports ?? 0 },
     { id: "categories", label: "Categories", adminOnly: true },
     { id: "tags", label: "Tags", adminOnly: true },
@@ -759,6 +851,7 @@ export const AdminPanel = () => {
     { id: "broadcast", label: "Broadcast", adminOnly: true },
     { id: "ads", label: "Ads", adminOnly: true },
     { id: "settings", label: "Settings", adminOnly: true },
+    { id: "security", label: "Security", adminOnly: true },
     { id: "audit", label: "Audit log", adminOnly: true },
   ], [stats?.pending_reports]);
 
@@ -1416,7 +1509,89 @@ export const AdminPanel = () => {
             </section>
           )}
 
-          {/* ---------- USER 360° DRAWER ---------- */}
+          {/* ---------- TRASH ---------- */}
+          {tab === "trash" && (
+            <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
+              <div className="flex items-center gap-3 border-b border-[#e5e7eb] px-4 py-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-700 text-white"><Trash size={16} /></div>
+                <div><h2 className="text-sm font-extrabold">Trash</h2><p className="text-xs text-[#6b7280]">Soft-deleted threads — restore or permanently delete.</p></div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-[#6b7280]">
+                    <tr><th className="px-4 py-3">Thread</th><th className="px-4 py-3">Author</th><th className="px-4 py-3">Deleted</th><th className="px-4 py-3">Reason</th><th className="px-4 py-3 text-right">Actions</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e5e7eb]">
+                    {trashThreads.map((t) => (
+                      <tr key={t.id} className="hover:bg-slate-50/70">
+                        <td className="px-4 py-3 font-semibold">{t.title}</td>
+                        <td className="px-4 py-3 text-[#6b7280]">{t.author?.username ?? "—"}</td>
+                        <td className="px-4 py-3 text-xs text-[#6b7280]">{t.deleted_at ? new Date(t.deleted_at).toLocaleString() : "—"}</td>
+                        <td className="max-w-xs px-4 py-3 text-xs text-[#6b7280]">{t.deleted_reason ?? "—"}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-1">
+                            <button onClick={() => restoreThread(t.id, t.title)} className="inline-flex items-center gap-1 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700 hover:bg-emerald-100"><RotateCcw size={12} /> Restore</button>
+                            {isAdmin && <button onClick={() => purgeThread(t.id, t.title)} className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50"><Trash2 size={12} /> Purge</button>}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {trashThreads.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-sm text-[#6b7280]">Trash is empty.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {/* ---------- SECURITY (2FA) ---------- */}
+          {tab === "security" && isAdmin && (
+            <section className="max-w-2xl space-y-4 rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white"><KeyRound size={18} /></div>
+                <div><h2 className="text-lg font-extrabold">Two-factor authentication</h2><p className="text-xs text-[#6b7280]">Protect your admin account with a TOTP app (Google Authenticator, 1Password, Authy).</p></div>
+              </div>
+
+              <div className="rounded-lg border border-[#e5e7eb] p-4">
+                <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Active factors</p>
+                {mfaFactors.length === 0 && <p className="text-xs text-[#6b7280]">No 2FA factors enrolled.</p>}
+                <ul className="space-y-2">
+                  {mfaFactors.map((f: any) => (
+                    <li key={f.id} className="flex items-center justify-between rounded border border-[#e5e7eb] px-3 py-2 text-sm">
+                      <div><span className="font-bold">{f.friendly_name || f.factor_type}</span> <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-extrabold uppercase">{f.status}</span></div>
+                      <button onClick={() => unenrollMfa(f.id)} className="rounded border border-red-200 px-2 py-1 text-xs font-bold text-red-600 hover:bg-red-50">Remove</button>
+                    </li>
+                  ))}
+                </ul>
+                {!mfaEnroll && (
+                  <button onClick={startMfaEnroll} className="mt-3 rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-700">Enroll new authenticator</button>
+                )}
+              </div>
+
+              {mfaEnroll && (
+                <div className="rounded-lg border-2 border-indigo-200 bg-indigo-50 p-4">
+                  <p className="mb-2 text-sm font-extrabold text-indigo-900">Scan the QR in your authenticator app</p>
+                  {mfaEnroll.qr && <img src={mfaEnroll.qr} alt="TOTP QR code" className="mx-auto my-3 h-48 w-48 rounded bg-white p-2" />}
+                  <p className="text-center text-xs text-indigo-800">Or enter secret manually: <code className="rounded bg-white px-2 py-0.5 font-mono">{mfaEnroll.secret}</code></p>
+                  <div className="mt-3 flex gap-2">
+                    <input value={mfaCode} onChange={(e) => setMfaCode(e.target.value)} placeholder="6-digit code" className="flex-1 rounded-lg border border-indigo-300 bg-white px-3 py-2 text-sm" />
+                    <button onClick={verifyMfaEnroll} className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-bold text-white hover:bg-indigo-700">Verify & activate</button>
+                    <button onClick={() => { setMfaEnroll(null); setMfaCode(""); }} className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-xs font-bold">Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              <div className="rounded-lg border border-[#e5e7eb] p-4 text-xs text-[#6b7280]">
+                <p className="font-bold text-[#111827]">About "Force sign-out" &amp; "View as user"</p>
+                <ul className="mt-2 list-disc space-y-1 pl-4">
+                  <li>Force sign-out flags the account; the app signs the user out on their next request.</li>
+                  <li>"View as user" opens the target's public profile in a new tab and logs the action to the Audit log — it does not grant access to their private data.</li>
+                  <li>GDPR export bundles profile, roles, threads, replies, orders and badges into a downloadable JSON.</li>
+                </ul>
+              </div>
+            </section>
+          )}
+
+
           {userDetail && (
             <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={() => setUserDetail(null)}>
               <div className="h-full w-full max-w-2xl overflow-y-auto bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
@@ -1443,6 +1618,19 @@ export const AdminPanel = () => {
                       </div>
                       {userDetail.ban_reason && <p className="mt-2 rounded bg-red-50 p-2 text-xs text-red-700"><b>Ban reason:</b> {userDetail.ban_reason}</p>}
                     </div>
+
+                    {isAdmin && (
+                      <div className="rounded-lg border border-[#e5e7eb] p-4">
+                        <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Account actions</p>
+                        <div className="flex flex-wrap gap-2">
+                          <button onClick={() => viewAsUser(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-xs font-bold hover:border-sky-300 hover:text-sky-600"><UserCog size={12} /> View as user</button>
+                          <button onClick={() => gdprExport(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-xs font-bold hover:border-emerald-300 hover:text-emerald-600"><FileJson size={12} /> GDPR export</button>
+                          <button onClick={() => forceSignOut(userDetail.profile.id, userDetail.profile.username)} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50"><LogOut size={12} /> Force sign-out</button>
+                        </div>
+                        {userDetail.profile.force_reauth_at && <p className="mt-2 text-[10px] text-[#6b7280]">Last forced sign-out: {new Date(userDetail.profile.force_reauth_at).toLocaleString()}</p>}
+                      </div>
+                    )}
+
 
                     <div className="rounded-lg border border-[#e5e7eb] p-4">
                       <p className="mb-2 text-xs font-extrabold uppercase text-[#6b7280]">Badges ({userDetail.badges.length})</p>
