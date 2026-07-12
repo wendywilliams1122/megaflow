@@ -7,7 +7,7 @@ import {
   Gift, BookOpen, GraduationCap, Package, Gem, Wrench, Monitor, Unlock,
   Ticket, Library, Newspaper, MessageCircle, ClipboardList, ScrollText,
   ShoppingCart, XCircle, ShoppingBag, ShieldCheck, LifeBuoy, LayoutDashboard, Settings as SettingsIcon,
-  Bookmark, Bell,
+  Bookmark, Bell, Mail, ShieldAlert,
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { LevelBadge } from "@/components/LevelBadge";
@@ -23,7 +23,7 @@ type NavItem = {
   id: string;
   label: string;
   icon: ComponentType<{ size?: number }>;
-  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/leaderboard" | "/categories" | "/dashboard" | "/settings" | "/bookmarks" | "/notifications";
+  to: "/" | "/marketplace" | "/rules" | "/support" | "/contact" | "/advertisement" | "/about" | "/best-members" | "/leaderboard" | "/categories" | "/dashboard" | "/settings" | "/bookmarks" | "/notifications" | "/messages" | "/mod";
   authOnly?: boolean;
 };
 
@@ -33,6 +33,8 @@ const sidebarNavItems: NavItem[] = [
   { id: "dashboard", label: "My Dashboard", icon: LayoutDashboard, to: "/dashboard", authOnly: true },
   { id: "bookmarks", label: "My Bookmarks", icon: Bookmark, to: "/bookmarks", authOnly: true },
   { id: "notifications", label: "Notifications", icon: Bell, to: "/notifications", authOnly: true },
+  { id: "messages", label: "Messages", icon: Mail, to: "/messages", authOnly: true },
+  { id: "mod", label: "Mod Queue", icon: ShieldAlert, to: "/mod", authOnly: true },
   { id: "settings", label: "Account Settings", icon: SettingsIcon, to: "/settings", authOnly: true },
   { id: "marketplace", label: "Marketplace", icon: ShoppingBag, to: "/marketplace" },
   { id: "categories", label: "Categories", icon: Package, to: "/categories" },
