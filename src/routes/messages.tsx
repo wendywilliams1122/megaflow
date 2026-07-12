@@ -148,6 +148,10 @@ function MessagesPage() {
       .channel("dm-" + user.id)
       .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () => {
         qc.invalidateQueries({ queryKey: ["messages", user.id] });
+        qc.invalidateQueries({ queryKey: ["conversations", user.id] });
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () => {
+        qc.invalidateQueries({ queryKey: ["conversations", user.id] });
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
