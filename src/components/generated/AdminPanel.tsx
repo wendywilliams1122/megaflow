@@ -54,7 +54,7 @@ type Stats = {
 type OrderRow = {
   id: string; product_title: string; product_slug: string | null; unit_price_cents: number;
   currency: string; quantity: number; buyer_name: string; buyer_contact: string;
-  method: "buy" | "cart" | "whatsapp" | "email"; status: "new" | "contacted" | "completed" | "cancelled";
+  method: "buy" | "cart" | "whatsapp" | "email"; status: "new" | "contacted" | "completed" | "cancelled" | "refunded";
   note: string | null; created_at: string;
 };
 type SettingsRow = {
