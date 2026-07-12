@@ -152,7 +152,19 @@ export const AdminPanel = () => {
     points_thread: 10, points_comment: 2, points_upvote: 1, points_referral: 25,
     max_threads_per_day: 5, max_comments_per_day: 30, warnings_before_ban: 3,
     downloads_min_points: 0, announcement: "", announcement_active: false,
+    maintenance_mode: false, maintenance_message: "",
   });
+
+  // Badges / Tags / Broadcast / User detail
+  const [badgesList, setBadgesList] = useState<BadgeRow[]>([]);
+  const [editingBadge, setEditingBadge] = useState<Partial<BadgeRow> | null>(null);
+  const [tagsList, setTagsList] = useState<TagRow[]>([]);
+  const [editingTag, setEditingTag] = useState<Partial<TagRow> | null>(null);
+  const [mergeSel, setMergeSel] = useState<{ from: string; to: string }>({ from: "", to: "" });
+  const [broadcast, setBroadcast] = useState({ title: "", body: "", link: "/" });
+  const [userDetail, setUserDetail] = useState<UserDetail | null>(null);
+  const [userDetailBusy, setUserDetailBusy] = useState(false);
+  const [awardBadgeId, setAwardBadgeId] = useState("");
 
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
