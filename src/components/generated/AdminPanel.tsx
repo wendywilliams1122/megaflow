@@ -10,6 +10,9 @@ import { UserNotesCard } from "@/components/admin/UserNotesCard";
 import { GrowthChartsCard } from "@/components/admin/GrowthChartsCard";
 import { LiveActivityFeed } from "@/components/admin/LiveActivityFeed";
 import { TopContentCard } from "@/components/admin/TopContentCard";
+import { SuspiciousActivityCard } from "@/components/admin/SuspiciousActivityCard";
+import { AdvancedUserSearch } from "@/components/admin/AdvancedUserSearch";
+import { LoginAttemptsCard } from "@/components/admin/LoginAttemptsCard";
 import { RichEditor } from "@/components/RichEditor";
 
 import { useAuth } from "@/hooks/use-auth";
@@ -980,6 +983,7 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </section>
+              <SuspiciousActivityCard />
               <section className="grid w-full min-w-0 gap-6 xl:grid-cols-2">
                 <BlockedDomainsCard flash={flash} />
                 <MultiAccountIPCard />
@@ -999,6 +1003,8 @@ export const AdminPanel = () => {
 
           {/* ---------- USERS ---------- */}
           {tab === "users" && isAdmin && (
+            <>
+            <AdvancedUserSearch onOpen={openUserDetail} />
             <section className="overflow-hidden rounded-xl border border-[#e5e7eb] bg-white shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e5e7eb] px-4 py-3">
                 <SearchInput value={usersQ} onChange={(v) => { setUsersPage(0); setUsersQ(v); }} placeholder="Search username / name…" />
@@ -1084,6 +1090,7 @@ export const AdminPanel = () => {
               </div>
               <Pager page={usersPage} total={usersTotal} onPage={setUsersPage} />
             </section>
+            </>
           )}
 
           {/* ---------- THREADS ---------- */}
@@ -1775,8 +1782,11 @@ export const AdminPanel = () => {
                   <li>GDPR export bundles profile, roles, threads, replies, orders and badges into a downloadable JSON.</li>
                 </ul>
               </div>
+
+              <LoginAttemptsCard />
             </section>
           )}
+
 
 
           {userDetail && (
