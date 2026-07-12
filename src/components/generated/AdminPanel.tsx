@@ -16,7 +16,7 @@ import {
   ClipboardList, Bell,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "threads" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit";
+type Tab = "overview" | "users" | "threads" | "trash" | "products" | "orders" | "reports" | "categories" | "badges" | "tags" | "broadcast" | "ads" | "settings" | "audit" | "security";
 type BadgeRow = { id: string; name: string; description: string; icon: string; tier: string; criteria: any };
 type TagRow = { id: string; slug: string; name: string; thread_count: number };
 type UserDetail = {
