@@ -32,28 +32,32 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
       </div>
 
       {!loading && !hasAccess && lockMsg && (
-        <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2">
-          <div className="flex items-center justify-between gap-2 text-xs font-bold text-amber-800">
-            <span className="inline-flex items-center gap-1.5">
-              <Lock size={11} /> {lockMsg}
-            </span>
+        <div className="space-y-2">
+          <p className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+            <Lock size={11} className="mr-1 inline" />
+            Downloads unlock after 10 days of membership and at least one thread you created.
+          </p>
+          <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2">
+            <div className="flex items-center justify-between gap-2 text-xs font-bold text-amber-800">
+              <span className="inline-flex items-center gap-1.5">
+                <Lock size={11} /> {lockMsg}
+              </span>
+              {reason === "too-new" && !hasThread && (
+                <span className="text-[10px] font-semibold text-amber-700">+ 1 thread</span>
+              )}
+            </div>
             {reason === "too-new" && (
-              <span className="text-[10px] font-semibold text-amber-700">+ 1 thread</span>
+              <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-amber-100">
+                <div
+                  className="h-full rounded-full bg-amber-500 transition-all"
+                  style={{ width: `${Math.min(100, (daysOld / 10) * 100)}%` }}
+                />
+              </div>
             )}
           </div>
-          {reason === "too-new" && (
-            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-amber-100">
-              <div
-                className="h-full rounded-full bg-amber-500 transition-all"
-                style={{ width: `${Math.min(100, (daysOld / 10) * 100)}%` }}
-              />
-            </div>
-          )}
-          {reason === "too-new" && !hasThread && (
-            <p className="mt-1 text-[10px] font-semibold text-amber-700">Also post 1 thread</p>
-          )}
         </div>
       )}
+
 
 
       <ul className="space-y-2">
