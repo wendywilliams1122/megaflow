@@ -369,16 +369,14 @@ function ThreadPage() {
                   {thread.is_locked ? (
                     <p className="p-8 text-center text-sm text-[#6b7280]">This thread is locked.</p>
                   ) : user ? (
-                    <form onSubmit={submitReply}>
-                      <textarea
+                    <form onSubmit={submitReply} className="p-3 sm:p-4">
+                      <RichEditor
                         value={reply}
-                        onChange={(e) => setReply(e.target.value)}
-                        rows={5}
+                        onChange={setReply}
                         placeholder="Write a thoughtful reply…"
-                        className="block w-full resize-y bg-white p-4 text-sm leading-7 text-[#111827] placeholder:text-[#6b7280] focus:outline-none"
-                        maxLength={5000}
+                        minHeight={200}
                       />
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#e5e7eb] bg-[#f6f7f8] px-4 py-3">
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
@@ -388,11 +386,11 @@ function ThreadPage() {
                           >
                             <EyeOff size={12} /> Spoiler
                           </button>
-                          <span className="text-xs text-[#6b7280]">{reply.length} / 5,000</span>
+                          <span className="text-xs text-[#6b7280]">{reply.length} / 20,000</span>
                         </div>
                         <button
                           type="submit"
-                          disabled={replying || !reply.trim()}
+                          disabled={replying || !reply.replace(/<[^>]+>/g, "").trim()}
                           className="inline-flex items-center gap-2 rounded-lg bg-[#0ea5e9] px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-sky-100 hover:bg-sky-600 disabled:opacity-50"
                         >
                           <PenLine size={16} />
@@ -400,6 +398,7 @@ function ThreadPage() {
                         </button>
                       </div>
                     </form>
+
                   ) : (
                     <div className="p-8 text-center">
                       <h3 className="text-base font-extrabold text-[#111827]">Sign in to participate</h3>
