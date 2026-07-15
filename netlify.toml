@@ -1,0 +1,12 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+# Nitro's `netlify` preset produces a ready-to-deploy site:
+#   - static assets in `dist/`
+#   - SSR + server functions bundled as a Netlify Function
+# The preset writes its own function config, so no `[functions]` block or
+# `[[redirects]]` rules are needed here.
+
+[build.environment]
+  NODE_VERSION = "20"
