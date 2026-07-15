@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Pencil, Save, X } from "lucide-react";
 import { RichBody } from "./RichBody";
+import { RichEditor } from "./RichEditor";
+
 
 type Props = {
   table: "threads" | "posts";
@@ -63,13 +65,13 @@ export function InlineEdit({ table, id, initialBody, initialTitle, canEdit, onSa
           maxLength={200}
         />
       )}
-      <textarea
+      <RichEditor
         value={body}
-        onChange={(e) => setBody(e.target.value)}
-        rows={table === "threads" ? 10 : 6}
-        className="w-full resize-y rounded-lg border border-[#e5e7eb] bg-white p-3 text-sm leading-7 text-[#111827] focus:border-[#0ea5e9] focus:outline-none"
-        maxLength={20000}
+        onChange={setBody}
+        placeholder={table === "threads" ? "Write your post…" : "Write your reply…"}
+        minHeight={table === "threads" ? 260 : 180}
       />
+
       <div className="flex items-center gap-2">
         <button
           onClick={save}
