@@ -12,4 +12,12 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // When building outside Lovable (e.g. on Netlify CI), pin the Nitro preset
+  // to `netlify` so the output is a ready-to-deploy Netlify site with
+  // functions. Inside Lovable's own build, this override is ignored and the
+  // Cloudflare preset is used — so the live preview and lovable.app deploy
+  // are unaffected.
+  nitro: {
+    preset: process.env.NETLIFY ? "netlify" : "cloudflare-module",
+  },
 });
