@@ -4,8 +4,21 @@ import { useSpoilerAccess } from "@/hooks/use-forum-access";
 export type DownloadItem = { url: string; label: string };
 
 export function DownloadList({ items }: { items: DownloadItem[] }) {
-  const { canView: hasAccess, loading } = useSpoilerAccess();
+  const access = useSpoilerAccess();
+  const { canView: hasAccess, loading, reason, daysOld, hasThread, points, minPoints } = access;
   if (!items?.length) return null;
+
+  const daysLeft = Math.max(0, 10 - daysOld);
+  const lockMsg =
+    reason === "signed-out"
+      ? "Sign in to unlock downloads."
+      : reason === "too-new"
+      ? `${daysLeft}d left · Day ${daysOld}/10`
+      : reason === "no-thread"
+      ? "Create 1 thread to unlock"
+      : reason === "low-points"
+      ? `${points}/${minPoints} pts to unlock`
+      : null;
 
   return (
     <div className="mt-6 space-y-3 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-4 sm:p-5">
@@ -18,12 +31,30 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
         </h3>
       </div>
 
-      {!loading && !hasAccess && (
-        <p className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
-          <Lock size={11} className="mr-1 inline" />
-          Downloads unlock after 10 days of membership and at least one thread you created.
-        </p>
+      {!loading && !hasAccess && lockMsg && (
+        <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-2">
+          <div className="flex items-center justify-between gap-2 text-xs font-bold text-amber-800">
+            <span className="inline-flex items-center gap-1.5">
+              <Lock size={11} /> {lockMsg}
+            </span>
+            {reason === "too-new" && (
+              <span className="text-[10px] font-semibold text-amber-700">+ 1 thread</span>
+            )}
+          </div>
+          {reason === "too-new" && (
+            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-amber-100">
+              <div
+                className="h-full rounded-full bg-amber-500 transition-all"
+                style={{ width: `${Math.min(100, (daysOld / 10) * 100)}%` }}
+              />
+            </div>
+          )}
+          {reason === "too-new" && !hasThread && (
+            <p className="mt-1 text-[10px] font-semibold text-amber-700">Also post 1 thread</p>
+          )}
+        </div>
       )}
+
 
       <ul className="space-y-2">
         {items.map((d, i) =>
