@@ -10,6 +10,7 @@ import { ReportButton } from "@/components/ReportButton";
 import { SideRail } from "@/components/SideRail";
 import { RichBody } from "@/components/RichBody";
 import { InlineEdit } from "@/components/InlineEdit";
+import { RichEditor } from "@/components/RichEditor";
 import { UserBadge } from "@/components/UserBadge";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
