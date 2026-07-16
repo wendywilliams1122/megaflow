@@ -2,6 +2,17 @@
   command = "bun run build"
   publish = "dist"
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    Content-Security-Policy = "frame-ancestors 'self'"
+
+
 # Nitro's `netlify` preset produces a ready-to-deploy site:
 #   - static assets in `dist/`
 #   - SSR + server functions bundled as a Netlify Function

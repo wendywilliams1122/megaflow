@@ -53,7 +53,18 @@ function AdminGate() {
       </div>
     );
   }
-  if (!isAdmin) return <AdminOtpLogin />;
+  if (!isAdmin) {
+    const showLogin = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("login") === "1";
+    if (!showLogin) {
+      return (
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 text-center">
+          <h1 className="text-4xl font-bold">404</h1>
+          <p className="text-muted-foreground">The page you requested could not be found.</p>
+        </div>
+      );
+    }
+    return <AdminOtpLogin />;
+  }
   return <AdminPanel />;
 }
 
