@@ -10,8 +10,7 @@ const ADMIN_EMAIL = "minusflowofficial@gmail.com";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Panel - MegaFlow" },
-      { name: "description", content: "Administration dashboard for MegaFlow." },
+      { title: "Not Found - MegaFlow" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),

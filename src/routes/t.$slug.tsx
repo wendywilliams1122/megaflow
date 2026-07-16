@@ -31,7 +31,7 @@ export const Route = createFileRoute("/t/$slug")({
           "@context": "https://schema.org",
           "@type": "DiscussionForumPosting",
           headline: params.slug.replace(/-/g, " "),
-          url: `https://megaflow.lovable.app/t/${params.slug}`,
+          url: `/t/${params.slug}`,
         }),
       },
     ],
