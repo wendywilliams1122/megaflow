@@ -52,7 +52,7 @@ function HomePage() {
       let qb = supabase
         .from("threads")
         .select(
-          "id, slug, title, vote_score, reply_count, created_at, last_activity_at, is_pinned, category:categories!threads_category_id_fkey(slug, name, color), author:profiles(username)",
+          "id, slug, title, vote_score, reply_count, view_count, created_at, last_activity_at, is_pinned, category:categories!threads_category_id_fkey(slug, name, color), author:profiles(username)",
         )
         .order("is_pinned", { ascending: false });
 
