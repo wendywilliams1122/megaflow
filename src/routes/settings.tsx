@@ -102,6 +102,7 @@ function SettingsPage() {
       .from("profiles")
       .update({
         username: uname,
+        username_customized: true,
         display_name: form.display_name.trim() || null,
         avatar_url: form.avatar_url.trim() || null,
         cover_url: form.cover_url.trim() || null,
