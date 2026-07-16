@@ -13,7 +13,6 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
   const [remaining, setRemaining] = useState(WAIT_SECONDS);
   const [paused, setPaused] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const openedRef = useRef(false);
 
   useEffect(() => {
     if (!pending) return;
@@ -35,18 +34,14 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
     intervalRef.current = setInterval(() => {
       setRemaining((r) => {
         if (r <= 1) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          intervalRef.current = null;
-          if (!openedRef.current && pending) {
-            openedRef.current = true;
-            window.open(pending.url, "_blank", "noopener,noreferrer");
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
           }
-          setTimeout(() => {
-            setPending(null);
-            setRemaining(WAIT_SECONDS);
-            openedRef.current = false;
-          }, 400);
-          return 0;
+          window.open(pending.url, "_blank", "noopener,noreferrer");
+          setPending(null);
+          setRemaining(WAIT_SECONDS);
+          return WAIT_SECONDS;
         }
         return r - 1;
       });
@@ -64,16 +59,16 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
     if (pending) return;
     setRemaining(WAIT_SECONDS);
     setPaused(document.hidden);
-    openedRef.current = false;
     setPending(d);
   };
 
   const cancel = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = null;
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
     setPending(null);
     setRemaining(WAIT_SECONDS);
-    openedRef.current = false;
   };
 
   if (!items?.length) return null;
