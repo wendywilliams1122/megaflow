@@ -14,6 +14,7 @@ export type Profile = {
   referral_code?: string | null;
   ban_reason?: string | null;
   is_banned?: boolean;
+  username_customized?: boolean;
 };
 
 
