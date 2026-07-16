@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
-import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight } from "lucide-react";
+import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight, Eye } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : undefined }),
