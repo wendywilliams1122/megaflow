@@ -6,7 +6,13 @@
 #   - static assets in `dist/`
 #   - SSR + server functions bundled as a Netlify Function
 # The preset writes its own function config, so no `[functions]` block or
-# `[[redirects]]` rules are needed here.
+# normal app route redirects are needed here.
+
+[[redirects]]
+  from = "/~oauth/*"
+  to = "https://megaflow.lovable.app/~oauth/:splat"
+  status = 302
+  force = true
 
 [build.environment]
   NODE_VERSION = "20"
