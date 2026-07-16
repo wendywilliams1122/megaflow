@@ -11,17 +11,18 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
   const access = useSpoilerAccess();
   const { canView: hasAccess, loading, reason, daysOld, hasThread, points, minPoints } = access;
   const [pending, setPending] = useState<DownloadItem | null>(null);
-  const [unlockedUrls, setUnlockedUrls] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set();
-    try {
-      return new Set(JSON.parse(window.sessionStorage.getItem("megaflow-unlocked-downloads") || "[]"));
-    } catch {
-      return new Set();
-    }
-  });
+  const [unlockedUrls, setUnlockedUrls] = useState<Set<string>>(() => new Set());
   const [remaining, setRemaining] = useState(WAIT_SECONDS);
   const [paused, setPaused] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    try {
+      setUnlockedUrls(new Set(JSON.parse(window.localStorage.getItem("megaflow-unlocked-downloads") || "[]")));
+    } catch {
+      setUnlockedUrls(new Set());
+    }
+  }, []);
 
   const markUnlocked = (url: string) => {
     if (!isValidDownloadUrl(url)) return;
@@ -29,7 +30,7 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
       const next = new Set(current);
       next.add(url);
       if (typeof window !== "undefined") {
-        window.sessionStorage.setItem("megaflow-unlocked-downloads", JSON.stringify([...next]));
+        window.localStorage.setItem("megaflow-unlocked-downloads", JSON.stringify([...next]));
       }
       return next;
     });
