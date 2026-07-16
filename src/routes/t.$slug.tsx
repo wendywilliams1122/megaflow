@@ -100,8 +100,17 @@ function ThreadPage() {
     const key = `viewed:${thread.id}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
-    supabase.rpc("increment_thread_view", { _thread_id: thread.id });
-  }, [thread?.id]);
+    (async () => {
+      const { error } = await supabase.rpc("increment_thread_view", { _thread_id: thread.id });
+      if (error) {
+        sessionStorage.removeItem(key);
+        return;
+      }
+      qc.invalidateQueries({ queryKey: ["thread", slug] });
+      qc.invalidateQueries({ queryKey: ["threads"] });
+      qc.invalidateQueries({ queryKey: ["home-threads"] });
+    })();
+  }, [thread?.id, slug, qc]);
 
   const { data: threadFullBody } = useQuery({
     queryKey: ["thread-body", thread?.id, user?.id],
