@@ -947,13 +947,6 @@ export const AdminPanel = () => {
       </div>
     </div>
   );
-  const SearchInput = ({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) => (
-    <div className="relative">
-      <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#6b7280]" />
-      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-        className="w-64 rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 pl-8 text-sm focus:border-[#0ea5e9] focus:outline-none" />
-    </div>
-  );
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#f6f7f8] font-sans text-[#111827]">
