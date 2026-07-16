@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag, ShoppingCart } from "lucide-react";
+import { Search, Shield, FileText, LogIn, LogOut, Menu, Plus, ShoppingBag, ShoppingCart, AlertCircle } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { SideNav } from "@/components/SideNav";
 import { NotificationBell } from "@/components/NotificationBell";
@@ -148,6 +148,24 @@ export function Header() {
           )}
         </div>
       </div>
+      {user && profile && profile.username_customized === false && (
+        <div className="border-t border-amber-200 bg-amber-50">
+          <div className="mx-auto flex max-w-[1440px] flex-col items-start gap-2 px-4 py-2 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+            <div className="flex items-start gap-2">
+              <AlertCircle size={16} className="mt-0.5 flex-shrink-0 text-amber-700" />
+              <span className="font-semibold">
+                Bhai pehlay apna username fix karro — abhi <span className="font-extrabold">@{profile.username}</span> auto-generated hai.
+              </span>
+            </div>
+            <Link
+              to="/settings"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-extrabold text-white hover:bg-amber-700"
+            >
+              Set username
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
