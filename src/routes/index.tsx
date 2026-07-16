@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SideRail } from "@/components/SideRail";
 import { AdCard, useAds } from "@/components/AdSlot";
 import { timeAgo } from "@/lib/forum";
-import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight } from "lucide-react";
+import { Megaphone, PenSquare, Pin, MessageSquare, Clock, ChevronRight, Eye } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : undefined }),
@@ -27,6 +27,7 @@ type ThreadRow = {
   title: string;
   vote_score: number;
   reply_count: number;
+  view_count: number;
   created_at: string;
   last_activity_at: string;
   is_pinned: boolean;
@@ -51,7 +52,7 @@ function HomePage() {
       let qb = supabase
         .from("threads")
         .select(
-          "id, slug, title, vote_score, reply_count, created_at, last_activity_at, is_pinned, category:categories!threads_category_id_fkey(slug, name, color), author:profiles(username)",
+          "id, slug, title, vote_score, reply_count, view_count, created_at, last_activity_at, is_pinned, category:categories!threads_category_id_fkey(slug, name, color), author:profiles(username)",
         )
         .order("is_pinned", { ascending: false });
 
@@ -210,6 +211,10 @@ function HomePage() {
                           <span className="inline-flex items-center gap-1.5">
                             <MessageSquare size={14} className="text-[#9ca3af]" /> {t.reply_count}
                             <span className="text-[#9ca3af]">replies</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
+                            <Eye size={14} className="text-[#9ca3af]" /> {t.view_count}
+                            <span className="text-[#9ca3af]">views</span>
                           </span>
                           <span className="inline-flex items-center gap-1.5">
                             <Clock size={14} className="text-[#9ca3af]" /> {timeAgo(t.last_activity_at)}

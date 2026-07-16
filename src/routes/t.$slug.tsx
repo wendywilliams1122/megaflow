@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { VoteButtons } from "@/components/VoteButtons";
@@ -94,6 +94,14 @@ function ThreadPage() {
       return data as unknown as Thread | null;
     },
   });
+
+  useEffect(() => {
+    if (!thread?.id) return;
+    const key = `viewed:${thread.id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    supabase.rpc("increment_thread_view", { _thread_id: thread.id });
+  }, [thread?.id]);
 
   const { data: threadFullBody } = useQuery({
     queryKey: ["thread-body", thread?.id, user?.id],

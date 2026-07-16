@@ -1627,6 +1627,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_thread_view: {
+        Args: { _thread_id: string }
+        Returns: undefined
+      }
       is_email_domain_blocked: { Args: { _email: string }; Returns: boolean }
       level_for_points: { Args: { _pts: number }; Returns: number }
       log_session_device: {
