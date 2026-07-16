@@ -1,11 +1,81 @@
 import { Download, Lock } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useSpoilerAccess } from "@/hooks/use-forum-access";
 
 export type DownloadItem = { url: string; label: string };
 
+const WAIT_SECONDS = 10;
+
 export function DownloadList({ items }: { items: DownloadItem[] }) {
   const access = useSpoilerAccess();
   const { canView: hasAccess, loading, reason, daysOld, hasThread, points, minPoints } = access;
+  const [pending, setPending] = useState<DownloadItem | null>(null);
+  const [remaining, setRemaining] = useState(WAIT_SECONDS);
+  const [paused, setPaused] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const openedRef = useRef(false);
+
+  useEffect(() => {
+    if (!pending) return;
+    const onVis = () => setPaused(document.hidden);
+    setPaused(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, [pending]);
+
+  useEffect(() => {
+    if (!pending) return;
+    if (paused) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setRemaining((r) => {
+        if (r <= 1) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          if (!openedRef.current && pending) {
+            openedRef.current = true;
+            window.open(pending.url, "_blank", "noopener,noreferrer");
+          }
+          setTimeout(() => {
+            setPending(null);
+            setRemaining(WAIT_SECONDS);
+            openedRef.current = false;
+          }, 400);
+          return 0;
+        }
+        return r - 1;
+      });
+    }, 1000);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [pending, paused]);
+
+  const startWait = (e: React.MouseEvent, d: DownloadItem) => {
+    e.preventDefault();
+    if (pending) return;
+    setRemaining(WAIT_SECONDS);
+    setPaused(document.hidden);
+    openedRef.current = false;
+    setPending(d);
+  };
+
+  const cancel = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = null;
+    setPending(null);
+    setRemaining(WAIT_SECONDS);
+    openedRef.current = false;
+  };
+
   if (!items?.length) return null;
 
   const daysLeft = Math.max(0, 10 - daysOld);
@@ -19,6 +89,8 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
       : reason === "low-points"
       ? `${points}/${minPoints} pts to unlock`
       : null;
+
+  const pct = ((WAIT_SECONDS - remaining) / WAIT_SECONDS) * 100;
 
   return (
     <div className="mt-6 space-y-3 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50 to-white p-4 sm:p-5">
@@ -58,8 +130,6 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
         </div>
       )}
 
-
-
       <ul className="space-y-2">
         {items.map((d, i) =>
           hasAccess ? (
@@ -68,6 +138,7 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
                 href={d.url}
                 target="_blank"
                 rel="noreferrer noopener"
+                onClick={(e) => startWait(e, d)}
                 className="dl-btn group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl bg-[#0ea5e9] px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-sky-200 transition-all hover:-translate-y-0.5 hover:bg-sky-600 hover:shadow-md hover:shadow-sky-300"
               >
                 <span className="dl-shine pointer-events-none absolute inset-0" aria-hidden />
@@ -87,6 +158,55 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
           ),
         )}
       </ul>
+
+      {pending && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sky-100">
+              <Download className="text-[#0ea5e9]" size={28} />
+            </div>
+            <h4 className="mb-1 text-lg font-extrabold text-[#0f172a]">
+              Preparing your download
+            </h4>
+            <p className="mb-4 truncate text-xs text-[#6b7280]">{pending.label}</p>
+
+            <div className="relative mx-auto mb-3 h-24 w-24">
+              <svg className="h-24 w-24 -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" stroke="#e0f2fe" strokeWidth="8" fill="none" />
+                <circle
+                  cx="50" cy="50" r="45"
+                  stroke="#0ea5e9" strokeWidth="8" fill="none"
+                  strokeLinecap="round"
+                  strokeDasharray={2 * Math.PI * 45}
+                  strokeDashoffset={(2 * Math.PI * 45) * (1 - pct / 100)}
+                  style={{ transition: "stroke-dashoffset 1s linear" }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center text-2xl font-extrabold text-[#0f172a]">
+                {remaining}
+              </div>
+            </div>
+
+            {paused ? (
+              <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800">
+                ⏸ Paused — return to this tab to continue
+              </p>
+            ) : (
+              <p className="mb-3 text-xs font-semibold text-[#6b7280]">
+                Please wait {remaining} second{remaining === 1 ? "" : "s"}… Stay on this tab.
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={cancel}
+              className="text-xs font-bold text-[#6b7280] underline hover:text-[#0f172a]"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
