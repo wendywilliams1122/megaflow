@@ -6,13 +6,12 @@ import { SideRail } from "@/components/SideRail";
 import { RichEditor } from "@/components/RichEditor";
 import { toast } from "sonner";
 import { makeThreadSlug } from "@/lib/forum";
+import { serializeDownloadLinks, splitDownloadUrlInput, validateDownloadUrl, type DownloadLink } from "@/lib/download-links";
 import { PenLine, Download, Plus, X } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
   component: NewThreadPage,
 });
-
-type Download = { label: string; url: string };
 
 function NewThreadPage() {
   const navigate = useNavigate();
@@ -20,7 +19,7 @@ function NewThreadPage() {
   const [body, setBody] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [tagsInput, setTagsInput] = useState("");
-  const [downloads, setDownloads] = useState<Download[]>([]);
+  const [downloads, setDownloads] = useState<DownloadLink[]>([]);
   const [dlLabel, setDlLabel] = useState("");
   const [dlUrl, setDlUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -40,10 +39,17 @@ function NewThreadPage() {
   });
 
   const addDownload = () => {
-    const url = dlUrl.trim();
-    if (!url) return toast.error("Enter a download URL");
-    try { new URL(url); } catch { return toast.error("Enter a valid URL (https://…)"); }
-    setDownloads((d) => [...d, { label: dlLabel.trim() || "Download", url }]);
+    const urls = splitDownloadUrlInput(dlUrl);
+    if (!urls.length) return toast.error("Download link enter karo");
+    const invalid = urls.find((url) => !validateDownloadUrl(url).success);
+    if (invalid) return toast.error(validateDownloadUrl(invalid).error?.issues[0]?.message ?? "Yahan sirf valid link enter karo");
+    setDownloads((d) => [
+      ...d,
+      ...urls.map((url, index) => ({
+        label: dlLabel.trim() || (urls.length > 1 ? `Download ${d.length + index + 1}` : "Download"),
+        url,
+      })),
+    ]);
     setDlLabel("");
     setDlUrl("");
   };
@@ -59,9 +65,7 @@ function NewThreadPage() {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) throw new Error("Not signed in");
       const slug = makeThreadSlug(title);
-      const dlBlock = downloads
-        .map((d) => `[download url="${d.url.replace(/"/g, "&quot;")}" label="${d.label.replace(/"/g, "&quot;")}"]`)
-        .join("\n");
+      const dlBlock = serializeDownloadLinks(downloads);
       const finalBody = dlBlock ? `${body}\n${dlBlock}` : body;
 
       const { data: thread, error } = await supabase
@@ -187,7 +191,7 @@ function NewThreadPage() {
                 <input
                   value={dlUrl}
                   onChange={(e) => setDlUrl(e.target.value)}
-                  placeholder="https://…"
+                  placeholder="https://… (multiple links ko comma ya new line se add karo)"
                   className="flex-1 rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm"
                 />
                 <button

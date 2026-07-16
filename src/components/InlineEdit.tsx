@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Pencil, Save, X, Download as DownloadIcon, Plus } from "lucide-react";
 import { RichBody } from "./RichBody";
 import { RichEditor } from "./RichEditor";
+import { serializeDownloadLinks, splitDownloadUrlInput, validateDownloadUrl, type DownloadLink } from "@/lib/download-links";
 
 
 type Props = {
@@ -17,11 +18,9 @@ type Props = {
   children?: React.ReactNode;
 };
 
-type DL = { label: string; url: string };
-
 // Extract [download url="..." label="..."] shortcodes from body → (cleanBody, downloads[])
-function splitDownloads(input: string): { body: string; downloads: DL[] } {
-  const downloads: DL[] = [];
+function splitDownloads(input: string): { body: string; downloads: DownloadLink[] } {
+  const downloads: DownloadLink[] = [];
   const re = /\[download\s+url=["']([^"']+)["'](?:\s+label=["']([^"']*)["'])?\s*\]/gi;
   const body = (input ?? "").replace(re, (_m, url, label) => {
     downloads.push({ url: String(url), label: (String(label ?? "").trim()) || "Download" });
@@ -30,30 +29,28 @@ function splitDownloads(input: string): { body: string; downloads: DL[] } {
   return { body: body.replace(/\n{3,}/g, "\n\n").trim(), downloads };
 }
 
-function serializeDownloads(dls: DL[]): string {
-  return dls
-    .map(
-      (d) =>
-        `[download url="${d.url.replace(/"/g, "&quot;")}" label="${d.label.replace(/"/g, "&quot;")}"]`,
-    )
-    .join("\n");
-}
-
 export function InlineEdit({ table, id, initialBody, initialTitle, canEdit, onSaved, bodyClassName }: Props) {
   const [editing, setEditing] = useState(false);
   const initial = splitDownloads(initialBody ?? "");
   const [body, setBody] = useState(initial.body);
   const [title, setTitle] = useState(initialTitle ?? "");
-  const [downloads, setDownloads] = useState<DL[]>(initial.downloads);
+  const [downloads, setDownloads] = useState<DownloadLink[]>(initial.downloads);
   const [dlLabel, setDlLabel] = useState("");
   const [dlUrl, setDlUrl] = useState("");
   const [saving, setSaving] = useState(false);
 
   const addDownload = () => {
-    const url = dlUrl.trim();
-    if (!url) return toast.error("Enter a download URL");
-    try { new URL(url); } catch { return toast.error("Enter a valid URL (https://…)"); }
-    setDownloads((d) => [...d, { label: dlLabel.trim() || "Download", url }]);
+    const urls = splitDownloadUrlInput(dlUrl);
+    if (!urls.length) return toast.error("Download link enter karo");
+    const invalid = urls.find((url) => !validateDownloadUrl(url).success);
+    if (invalid) return toast.error(validateDownloadUrl(invalid).error?.issues[0]?.message ?? "Yahan sirf valid link enter karo");
+    setDownloads((d) => [
+      ...d,
+      ...urls.map((url, index) => ({
+        label: dlLabel.trim() || (urls.length > 1 ? `Download ${d.length + index + 1}` : "Download"),
+        url,
+      })),
+    ]);
     setDlLabel("");
     setDlUrl("");
   };
@@ -62,7 +59,7 @@ export function InlineEdit({ table, id, initialBody, initialTitle, canEdit, onSa
     if (!body.trim()) return toast.error("Body can't be empty");
     if (table === "threads" && !title.trim()) return toast.error("Title can't be empty");
     setSaving(true);
-    const dlBlock = serializeDownloads(downloads);
+    const dlBlock = serializeDownloadLinks(downloads);
     const finalBody = dlBlock ? `${body}\n${dlBlock}` : body;
     const query = table === "threads"
       ? supabase.from("threads").update({ body: finalBody, title })
@@ -156,7 +153,7 @@ export function InlineEdit({ table, id, initialBody, initialTitle, canEdit, onSa
           <input
             value={dlUrl}
             onChange={(e) => setDlUrl(e.target.value)}
-            placeholder="https://…"
+              placeholder="https://… (multiple links ko comma ya new line se add karo)"
             className="flex-1 rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-sm"
           />
           <button
