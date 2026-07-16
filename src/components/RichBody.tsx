@@ -1,6 +1,7 @@
 import DOMPurify from "dompurify";
 import { DownloadList, type DownloadItem } from "@/components/DownloadButton";
 import { Spoiler } from "@/components/Spoiler";
+import { isValidDownloadUrl } from "@/lib/download-links";
 
 // Extracts [download url="..." label="..."] shortcodes from the text/HTML and
 // returns the cleaned body plus a list of downloads. Also supports legacy
@@ -9,7 +10,10 @@ function extractDownloads(input: string): { body: string; downloads: DownloadIte
   const downloads: DownloadItem[] = [];
   const re = /\[download\s+url=["']([^"']+)["'](?:\s+label=["']([^"']*)["'])?\s*\]/gi;
   let body = input.replace(re, (_m, url, label) => {
-    downloads.push({ url: String(url), label: String(label ?? "").trim() || "Download" });
+    const cleanUrl = String(url).trim();
+    if (isValidDownloadUrl(cleanUrl)) {
+      downloads.push({ url: cleanUrl, label: String(label ?? "").trim() || "Download" });
+    }
     return "";
   });
   // Public-body placeholder markers (for signed-out / ineligible viewers)

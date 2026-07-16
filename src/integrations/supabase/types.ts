@@ -1684,6 +1684,10 @@ export type Database = {
           valid: boolean
         }[]
       }
+      validate_download_shortcodes: {
+        Args: { _body: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

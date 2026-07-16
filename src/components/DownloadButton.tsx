@@ -1,6 +1,7 @@
-import { Download, Lock } from "lucide-react";
+import { CheckCircle2, Download, Lock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSpoilerAccess } from "@/hooks/use-forum-access";
+import { isValidDownloadUrl } from "@/lib/download-links";
 
 export type DownloadItem = { url: string; label: string };
 
@@ -10,9 +11,30 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
   const access = useSpoilerAccess();
   const { canView: hasAccess, loading, reason, daysOld, hasThread, points, minPoints } = access;
   const [pending, setPending] = useState<DownloadItem | null>(null);
+  const [unlockedUrls, setUnlockedUrls] = useState<Set<string>>(() => new Set());
   const [remaining, setRemaining] = useState(WAIT_SECONDS);
   const [paused, setPaused] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    try {
+      setUnlockedUrls(new Set(JSON.parse(window.localStorage.getItem("megaflow-unlocked-downloads") || "[]")));
+    } catch {
+      setUnlockedUrls(new Set());
+    }
+  }, []);
+
+  const markUnlocked = (url: string) => {
+    if (!isValidDownloadUrl(url)) return;
+    setUnlockedUrls((current) => {
+      const next = new Set(current);
+      next.add(url);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("megaflow-unlocked-downloads", JSON.stringify([...next]));
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!pending) return;
@@ -38,6 +60,7 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
           }
+          markUnlocked(pending.url);
           window.open(pending.url, "_blank", "noopener,noreferrer");
           setPending(null);
           setRemaining(WAIT_SECONDS);
@@ -56,7 +79,11 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
 
   const startWait = (e: React.MouseEvent, d: DownloadItem) => {
     e.preventDefault();
-    if (pending) return;
+    if (pending || !isValidDownloadUrl(d.url)) return;
+    if (unlockedUrls.has(d.url)) {
+      window.open(d.url, "_blank", "noopener,noreferrer");
+      return;
+    }
     setRemaining(WAIT_SECONDS);
     setPaused(document.hidden);
     setPending(d);
@@ -127,8 +154,21 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
 
       <ul className="space-y-2">
         {items.map((d, i) =>
-          hasAccess ? (
+          hasAccess && isValidDownloadUrl(d.url) ? (
             <li key={i}>
+              {unlockedUrls.has(d.url) ? (
+                <a
+                  href={d.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl bg-emerald-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm shadow-emerald-200 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-md hover:shadow-emerald-300"
+                >
+                  <span className="truncate">{d.label || "Download"}</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs">
+                    Unlocked <CheckCircle2 size={15} />
+                  </span>
+                </a>
+              ) : (
               <a
                 href={d.url}
                 target="_blank"
@@ -142,6 +182,7 @@ export function DownloadList({ items }: { items: DownloadItem[] }) {
                   <Download size={15} />
                 </span>
               </a>
+              )}
             </li>
           ) : (
             <li key={i}>
