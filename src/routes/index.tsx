@@ -213,6 +213,10 @@ function HomePage() {
                             <span className="text-[#9ca3af]">replies</span>
                           </span>
                           <span className="inline-flex items-center gap-1.5">
+                            <Eye size={14} className="text-[#9ca3af]" /> {t.view_count}
+                            <span className="text-[#9ca3af]">views</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1.5">
                             <Clock size={14} className="text-[#9ca3af]" /> {timeAgo(t.last_activity_at)}
                           </span>
                         </div>
