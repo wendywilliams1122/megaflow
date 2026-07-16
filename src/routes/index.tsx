@@ -27,6 +27,7 @@ type ThreadRow = {
   title: string;
   vote_score: number;
   reply_count: number;
+  view_count: number;
   created_at: string;
   last_activity_at: string;
   is_pinned: boolean;
