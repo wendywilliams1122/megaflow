@@ -32,7 +32,7 @@ export function useAuth() {
       const [{ data: p }, { data: mod }] = await Promise.all([
         supabase
           .from("profiles")
-          .select("id, username, display_name, avatar_url, reputation, points, trust_score, referral_code, is_banned, force_reauth_at")
+          .select("id, username, display_name, avatar_url, reputation, points, trust_score, referral_code, is_banned, force_reauth_at, username_customized")
           .eq("id", userId)
           .maybeSingle(),
         supabase
