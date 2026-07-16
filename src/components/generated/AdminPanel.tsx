@@ -23,6 +23,17 @@ import { SearchAnalyticsPanel } from "@/components/admin/SearchAnalyticsPanel";
 import { BadgeIcon } from "@/components/admin/BadgeIcon";
 import { QuestsPanel, WeeklyLeaderboardCard } from "@/components/admin/QuestsPanel";
 import { RichEditor } from "@/components/RichEditor";
+import { Search as SearchIcon } from "lucide-react";
+
+function SearchInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
+  return (
+    <div className="relative">
+      <SearchIcon size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#6b7280]" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+        className="w-64 rounded-lg border border-[#e5e7eb] bg-white px-3 py-1.5 pl-8 text-sm focus:border-[#0ea5e9] focus:outline-none" />
+    </div>
+  );
+}
 
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
