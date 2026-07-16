@@ -10,3 +10,6 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  VITE_SUPABASE_URL = "https://dhtkzrxgozhyrpflfyrw.supabase.co"
+  VITE_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_6u9RHthJHiVbIQMQJ3oqnA_aY0gOtAx"
+  VITE_SUPABASE_PROJECT_ID = "dhtkzrxgozhyrpflfyrw"
