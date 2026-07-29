@@ -609,6 +609,7 @@ export type Database = {
           deleted_reason: string | null
           id: string
           is_deleted: boolean
+          parent_post_id: string | null
           reaction_counts: Json
           thread_id: string
           updated_at: string
@@ -624,6 +625,7 @@ export type Database = {
           deleted_reason?: string | null
           id?: string
           is_deleted?: boolean
+          parent_post_id?: string | null
           reaction_counts?: Json
           thread_id: string
           updated_at?: string
@@ -639,6 +641,7 @@ export type Database = {
           deleted_reason?: string | null
           id?: string
           is_deleted?: boolean
+          parent_post_id?: string | null
           reaction_counts?: Json
           thread_id?: string
           updated_at?: string
@@ -650,6 +653,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_parent_post_id_fkey"
+            columns: ["parent_post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
             referencedColumns: ["id"]
           },
           {
