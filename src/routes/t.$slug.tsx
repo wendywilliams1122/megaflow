@@ -219,6 +219,97 @@ function ThreadPage() {
 
   const color = thread?.category?.color ?? "#0ea5e9";
 
+  const allPosts = posts ?? [];
+  const childMap: Record<string, Post[]> = {};
+  for (const p of allPosts) {
+    if (p.parent_post_id) (childMap[p.parent_post_id] ||= []).push(p);
+  }
+  const topLevelPosts = allPosts.filter(
+    (p) => !p.parent_post_id || !allPosts.some((x) => x.id === p.parent_post_id),
+  );
+
+  const renderPost = (p: Post, depth: number): React.ReactNode => (
+    <div key={p.id} className={depth > 0 ? "mt-3 border-l-2 border-[#e5e7eb] pl-3 sm:pl-5" : ""}>
+      <div className="overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-sm">
+        <div className="md:flex">
+          <aside className="border-b border-[#e5e7eb] p-4 md:w-56 md:border-b-0 md:border-r">
+            <div className="flex items-center gap-3 md:block">
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white ${toneFor(p.author?.username ?? "u")}`}>
+                {(p.author?.username ?? "?").slice(0, 2).toUpperCase()}
+              </div>
+              <div className="min-w-0 md:mt-2">
+                {p.author && (
+                  <Link to="/u/$username" params={{ username: p.author.username }} className="block text-sm font-extrabold text-[#111827] hover:text-[#0ea5e9]">
+                    @{p.author.username}
+                  </Link>
+                )}
+                <UserBadge className="mt-0.5" points={p.author?.points} staffBadge={p.author?.staff_badge} isBanned={p.author?.is_banned} />
+                <p className="text-xs text-[#6b7280]">{p.author?.points ?? p.author?.reputation ?? 0} pts · {timeAgo(p.created_at)}</p>
+              </div>
+            </div>
+          </aside>
+          <div className="min-w-0 flex-1 p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex min-w-0 flex-1 gap-4">
+                <VoteButtons targetType="post" targetId={p.id} initialScore={p.vote_score} />
+                <InlineEdit
+                  table="posts"
+                  id={p.id}
+                  initialBody={postFullBodies?.[p.id] ?? p.body}
+                  canEdit={user?.id === p.author_id || isModerator}
+                  onSaved={() => qc.invalidateQueries({ queryKey: ["posts", thread?.id] })}
+                  bodyClassName="min-w-0 flex-1 text-sm leading-7 text-[#374151]"
+                />
+              </div>
+              {user?.id === p.author_id && (
+                <button onClick={() => deletePost(p.id)} className="rounded-lg p-2 text-[#6b7280] hover:bg-red-50 hover:text-red-600">
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-[#e5e7eb] pt-3">
+              <ReactionBar targetType="post" targetId={p.id} initialCounts={p.reaction_counts ?? {}} />
+              {user && !thread?.is_locked && (
+                <button
+                  onClick={() => { setReplyToId(replyToId === p.id ? null : p.id); setCommentReply(""); }}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-[#e5e7eb] bg-white px-2.5 py-1.5 text-xs font-bold text-[#374151] hover:border-[#0ea5e9] hover:text-[#0ea5e9]"
+                >
+                  <Reply size={12} /> Reply
+                </button>
+              )}
+              <div className="ml-auto"><ReportButton targetType="post" targetId={p.id} /></div>
+            </div>
+            {replyToId === p.id && user && (
+              <div className="mt-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                <p className="mb-2 text-xs font-bold text-[#6b7280]">Replying to @{p.author?.username}</p>
+                <RichEditor value={commentReply} onChange={setCommentReply} placeholder="Write your reply…" minHeight={140} />
+                <div className="mt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setReplyToId(null); setCommentReply(""); }}
+                    className="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2 text-xs font-bold text-[#374151]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={sendingCommentReply || !commentReply.replace(/<[^>]+>/g, "").trim()}
+                    onClick={() => submitCommentReply(p.id)}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#0ea5e9] px-3.5 py-2 text-xs font-bold text-white hover:bg-sky-600 disabled:opacity-50"
+                  >
+                    <PenLine size={12} /> {sendingCommentReply ? "Posting…" : "Post Reply"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {(childMap[p.id] ?? []).map((c) => renderPost(c, depth + 1))}
+    </div>
+  );
+
+
   return (
     <div className="mx-auto flex max-w-[1440px]">
       <SideRail />
