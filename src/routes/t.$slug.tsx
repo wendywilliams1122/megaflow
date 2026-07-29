@@ -53,6 +53,7 @@ type Thread = {
 
 type Post = {
   id: string; body: string; vote_score: number; created_at: string; author_id: string;
+  parent_post_id: string | null;
   reaction_counts: Record<string, number> | null;
   author: { username: string; display_name: string | null; reputation: number; is_banned?: boolean; points?: number; staff_badge?: string | null } | null;
 };
