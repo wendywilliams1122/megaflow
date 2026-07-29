@@ -160,6 +160,20 @@ function ThreadPage() {
     qc.invalidateQueries({ queryKey: ["thread", slug] });
   };
 
+  const submitCommentReply = async (parentId: string) => {
+    if (!user || !thread || !commentReply.replace(/<[^>]+>/g, "").trim()) return;
+    setSendingCommentReply(true);
+    const { error } = await supabase.from("posts").insert({
+      thread_id: thread.id, author_id: user.id, body: commentReply.trim(), parent_post_id: parentId,
+    });
+    setSendingCommentReply(false);
+    if (error) return toast.error(error.message);
+    setCommentReply("");
+    setReplyToId(null);
+    qc.invalidateQueries({ queryKey: ["posts", thread.id] });
+    qc.invalidateQueries({ queryKey: ["thread", slug] });
+  };
+
   const deleteThread = async () => {
     if (!thread || !confirm("Delete this thread?")) return;
     const { error } = await supabase.from("threads").delete().eq("id", thread.id);
