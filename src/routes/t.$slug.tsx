@@ -77,6 +77,9 @@ function ThreadPage() {
   const qc = useQueryClient();
   const [reply, setReply] = useState("");
   const [replying, setReplying] = useState(false);
+  const [replyToId, setReplyToId] = useState<string | null>(null);
+  const [commentReply, setCommentReply] = useState("");
+  const [sendingCommentReply, setSendingCommentReply] = useState(false);
   const { data: ads } = useAds("thread");
 
   const { data: thread, isLoading } = useQuery({
