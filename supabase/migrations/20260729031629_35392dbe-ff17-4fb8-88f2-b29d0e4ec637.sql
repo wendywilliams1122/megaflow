@@ -1,0 +1,2 @@
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS parent_post_id uuid REFERENCES public.posts(id) ON DELETE CASCADE;
+CREATE INDEX IF NOT EXISTS posts_parent_post_id_idx ON public.posts(parent_post_id);
