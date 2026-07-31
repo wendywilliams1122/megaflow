@@ -53,12 +53,14 @@ export const CategoriesExplorer = () => {
     queryKey: ['categories-explorer-stats'],
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
+      const c = (q: any) => q.limit(1);
       const [users, threads, posts, active] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('threads').select('id', { count: 'exact', head: true }).eq('is_deleted', false),
-        supabase.from('posts').select('id', { count: 'exact', head: true }).eq('is_deleted', false),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('last_active_on', today),
+        c(supabase.from('profiles').select('id', { count: 'exact' })),
+        c(supabase.from('threads').select('id', { count: 'exact' }).eq('is_deleted', false)),
+        c(supabase.from('posts').select('id', { count: 'exact' }).eq('is_deleted', false)),
+        c(supabase.from('profiles').select('id', { count: 'exact' }).eq('last_active_on', today)),
       ]);
+
       return {
         users: users.count ?? 0,
         threads: threads.count ?? 0,
