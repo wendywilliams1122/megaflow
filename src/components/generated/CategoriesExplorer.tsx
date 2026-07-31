@@ -34,35 +34,33 @@ export const CategoriesExplorer = () => {
   const { data: categories } = useQuery({
     queryKey: ['categories-explorer'],
     queryFn: async () => {
-      const { data: cats } = await supabase
-        .from('categories')
-        .select('id, slug, name, description, icon')
-        .order('sort_order');
-      const list = cats ?? [];
-      const counts = await Promise.all(
-        list.map((c) =>
-          supabase
-            .from('threads')
-            .select('id', { count: 'exact', head: true })
-            .eq('category_id', c.id)
-            .eq('is_deleted', false),
-        ),
-      );
-      return list.map((c, i) => ({ ...c, count: counts[i].count ?? 0 }));
+      const [{ data: cats }, { data: rows }] = await Promise.all([
+        supabase.from('categories').select('id, slug, name, description, icon').order('sort_order'),
+        supabase.from('threads').select('category_id').eq('is_deleted', false).limit(10000),
+      ]);
+      const tally = new Map<string, number>();
+      for (const r of rows ?? []) {
+        if (!r.category_id) continue;
+        tally.set(r.category_id, (tally.get(r.category_id) ?? 0) + 1);
+      }
+      return (cats ?? []).map((c) => ({ ...c, count: tally.get(c.id) ?? 0 }));
     },
     staleTime: 60_000,
   });
+
 
   const { data: stats } = useQuery({
     queryKey: ['categories-explorer-stats'],
     queryFn: async () => {
       const today = new Date().toISOString().slice(0, 10);
+      const c = (q: any) => q.limit(1);
       const [users, threads, posts, active] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('threads').select('id', { count: 'exact', head: true }).eq('is_deleted', false),
-        supabase.from('posts').select('id', { count: 'exact', head: true }).eq('is_deleted', false),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('last_active_on', today),
+        c(supabase.from('profiles').select('id', { count: 'exact' })),
+        c(supabase.from('threads').select('id', { count: 'exact' }).eq('is_deleted', false)),
+        c(supabase.from('posts').select('id', { count: 'exact' }).eq('is_deleted', false)),
+        c(supabase.from('profiles').select('id', { count: 'exact' }).eq('last_active_on', today)),
       ]);
+
       return {
         users: users.count ?? 0,
         threads: threads.count ?? 0,
